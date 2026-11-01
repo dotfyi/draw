@@ -65,11 +65,11 @@
   .sep { width: 1px; height: 24px; background: var(--line); margin: 0 4px; }
 
   /* очікування */
-  #wait { justify-content: center; gap: 14px; text-align: center; }
+  #wait { justify-content: center; gap: 14px; text-align: center; position: relative; }
+  #wait .eyes { font-size: 40px; line-height: 1; }
+  #wait .ghost-btn { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); white-space: nowrap; }
   #wait .big { animation: float 2.4s ease-in-out infinite; }
   @keyframes float { 50% { transform: translateY(-10px); } }
-  .dots::after { content: ""; animation: dots 1.4s steps(4) infinite; }
-  @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
 
   /* результат */
   #reveal { overflow-y: auto; gap: 16px; padding-bottom: 8px; justify-content: flex-start; touch-action: pan-y; }
@@ -139,8 +139,9 @@
 <section class="screen" id="wait">
   <div class="big">✉️</div>
   <h1>надіслано</h1>
-  <p class="muted">чекаю малюнок другої половинки<span class="dots"></span></p>
-  <button class="ghost-btn" id="again1">нова гра</button>
+  <p class="muted">чекаю малюнок другої половинки</p>
+  <div class="eyes">👀</div>
+  <button class="ghost-btn" id="menu">головне меню</button>
 </section>
 
 <section class="screen" id="reveal">
@@ -311,6 +312,8 @@
   /* екран завжди виводиться з даних і серверного часу */
   function update() {
     if (!me) return;
+    const m0 = db.match;
+    if (m0 && m0.over) { if (phase !== "lobby") { show("lobby"); paintWho(); } return; }   // гру завершили
     const c = curRound(); if (!c) return;
     const m = c.m, t = nowS();
 
@@ -470,9 +473,16 @@
     $("palette").appendChild(b);
   });
 
+  $("menu").addEventListener("click", () => {
+    const m = db.match;
+    if (!m || !m.id) { show("lobby"); return; }
+    if (!confirm("закінчити гру і вийти в меню?")) return;
+    put("match/over", true);
+    show("lobby"); paintWho();
+  });
+
   $("start").addEventListener("click", startMatch);
   $("again").addEventListener("click", startMatch);
-  $("again1").addEventListener("click", () => { if (confirm("почати нову гру спочатку?")) startMatch(); });
   setInterval(update, 200);
 
   /* ───── звʼязок із Firebase ───── */
