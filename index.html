@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbfbfa">
+<title>draw it</title>
+<style>
+  :root {
+    --bg: #fbfbfa; --fg: #37352f; --muted: #9b9a97; --line: #e4e4e1; --pill: #ffffff;
+    --inv-bg: #37352f; --inv-fg: #ffffff;
+    --serif: "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #191919; --fg: #ebebea; --muted: #7f7f7c; --line: #303030; --pill: #202020; --inv-bg: #ebebea; --inv-fg: #191919; }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    height: 100dvh; background: var(--bg); color: var(--fg);
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; align-items: center;
+    user-select: none; -webkit-user-select: none;
+    padding: calc(env(safe-area-inset-top, 0px) + 44px) 24px calc(env(safe-area-inset-bottom, 0px) + 28px);
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--muted); outline-offset: 2px; }
+  .screen { display: none; flex: 1; width: 100%; max-width: 400px; flex-direction: column; align-items: center; min-height: 0; }
+  .screen.on { display: flex; }
+  .muted { color: var(--muted); font-size: 14px; }
+
+  /* лобі */
+  #lobby { justify-content: center; gap: 16px; text-align: center; position: relative; }
+  .big { font-size: 52px; line-height: 1; }
+  h1 { font-family: var(--serif); font-size: 32px; font-weight: 600; }
+  #name {
+    width: 240px; padding: 14px 20px; font: inherit; font-size: 16px; text-align: center; color: var(--fg);
+    background: var(--pill); border: 1px solid var(--line); border-radius: 999px; outline: none;
+    user-select: text; -webkit-user-select: text; transition: border-color .2s;
+  }
+  #name::placeholder { color: var(--muted); }
+  #name:focus { border-color: var(--muted); }
+  .go { background: var(--inv-bg); color: var(--inv-fg); padding: 15px 44px; border-radius: 999px; font-size: 16px; font-weight: 500; margin-top: 6px; transition: transform .15s; }
+  .go:active { transform: scale(.96); }
+  .ghost-btn { border: 1px solid var(--line); background: var(--pill); padding: 11px 26px; border-radius: 999px; font-size: 15px; font-weight: 500; }
+
+  /* відлік */
+  #ready { justify-content: center; gap: 8px; }
+  #num { font-family: var(--serif); font-size: 150px; font-weight: 700; line-height: 1; }
+
+  /* малювання */
+  #timer { font-size: 15px; font-weight: 500; color: var(--muted); height: 20px; font-variant-numeric: tabular-nums; transition: color .3s; }
+  #timer.hot { color: var(--fg); font-weight: 700; }
+  #word { font-family: var(--serif); font-size: 30px; font-weight: 600; text-align: center; margin: 6px 0 14px; text-wrap: balance; }
+  .cwrap { flex: 1; min-height: 0; width: 100%; display: flex; align-items: center; justify-content: center; }
+  canvas { background: #fff; border: 1px solid var(--line); border-radius: 16px; touch-action: none; display: block; }
+  .tools { margin-top: 8px; display: flex; align-items: center; gap: 2px; padding: 6px; border: 1px solid var(--line); border-radius: 999px; background: var(--pill); }
+  .t { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; transition: background .2s, color .2s; }
+  .t.on { background: var(--inv-bg); color: var(--inv-fg); }
+  .t svg { width: 22px; height: 22px; }
+  .palette { margin-top: 10px; display: flex; gap: 9px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--pill); }
+  .sw { width: 22px; height: 22px; border-radius: 50%; transition: transform .15s, box-shadow .15s; }
+  .sw.on { transform: scale(1.12); box-shadow: 0 0 0 2px var(--pill), 0 0 0 3px var(--fg); }
+  .sep { width: 1px; height: 24px; background: var(--line); margin: 0 4px; }
+
+  /* очікування */
+  #wait { justify-content: center; gap: 14px; text-align: center; }
+  #wait .big { animation: float 2.4s ease-in-out infinite; }
+  @keyframes float { 50% { transform: translateY(-10px); } }
+  .dots::after { content: ""; animation: dots 1.4s steps(4) infinite; }
+  @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+
+  /* результат */
+  #reveal { overflow-y: auto; gap: 16px; padding-bottom: 8px; justify-content: flex-start; touch-action: pan-y; }
+  .rword { font-family: var(--serif); font-size: 26px; font-weight: 600; text-align: center; }
+  figure { width: min(100%, 330px); text-align: center; flex-shrink: 0; }
+  .frame { border: 1px solid var(--line); border-radius: 16px; background: #fff; overflow: hidden; }
+  figure img { width: 100%; aspect-ratio: 3 / 4; display: block; -webkit-touch-callout: default; user-select: auto; -webkit-user-select: auto; }
+  figcaption { padding: 11px 12px; border-top: 1px solid #ececea; background: #fff; font-size: 16px; font-weight: 500; color: #1f1e1b; text-align: center; }
+  .rate { margin-top: 12px; min-height: 38px; display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+  .rate button, .rate .chip { padding: 8px 16px; border-radius: 999px; font-size: 15px; font-weight: 500; }
+  .rate button { border: 1px solid var(--line); background: var(--pill); transition: background .2s, color .2s; }
+  .rate button.on, .rate .chip { background: var(--inv-bg); color: var(--inv-fg); border: 1px solid var(--inv-bg); }
+  .rv { animation: rv .9s cubic-bezier(.2,.7,.2,1) both; }
+  .rv.late { animation-delay: .8s; }
+  @keyframes rv { from { opacity: 0; filter: blur(14px); transform: scale(.96); } to { opacity: 1; filter: blur(0); transform: none; } }
+
+  @media (prefers-reduced-motion: reduce) { .rv, #wait .big { animation: none; } }
+</style>
+</head>
+<body>
+
+<section class="screen on" id="lobby">
+  <div class="big">✏️</div>
+  <h1>малюнок на двох</h1>
+  <input id="name" type="text" placeholder="імʼя" maxlength="20" autocomplete="off" autocapitalize="words" enterkeyhint="done" aria-label="імʼя">
+  <button class="go" id="start">почати</button>
+  <div class="muted" id="status"></div>
+</section>
+
+<section class="screen" id="ready">
+  <div class="muted">готові?</div>
+  <div id="num">3</div>
+</section>
+
+<section class="screen" id="draw">
+  <div id="timer">1:00</div>
+  <div id="word"></div>
+  <div class="cwrap" id="cwrap"><canvas id="cv"></canvas></div>
+  <div class="palette" id="palette"></div>
+  <div class="tools">
+    <button class="t on" data-tool="thin" aria-label="тонкий олівець"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5" fill="currentColor"/></svg></button>
+    <button class="t" data-tool="thick" aria-label="товстий олівець"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5" fill="currentColor"/></svg></button>
+    <button class="t" data-tool="erase" aria-label="гумка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="8.5" width="15" height="8" rx="2" transform="rotate(-35 12 12.5)"/><path d="M9 19.5h10"/></svg></button>
+    <div class="sep"></div>
+    <button class="t" id="undo" aria-label="скасувати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5L4 10l5 5M4 10h10a5 5 0 0 1 0 10h-3"/></svg></button>
+    <button class="t" id="done" aria-label="готово"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+  </div>
+</section>
+
+<section class="screen" id="wait">
+  <div class="big">✉️</div>
+  <h1>надіслано</h1>
+  <p class="muted">чекаю малюнок другої половинки<span class="dots"></span></p>
+  <button class="ghost-btn" id="again1">нова гра</button>
+</section>
+
+<section class="screen" id="reveal">
+  <div class="rword" id="rword"></div>
+  <figure id="figOther">
+    <div class="frame"><img id="imgOther" alt="малюнок другої половинки"><figcaption id="capOther"></figcaption></div>
+    <div class="rate" id="rateOther"><button data-v="погано">погано</button><button data-v="не дуже">не дуже</button><button data-v="чудово">чудово</button></div>
+  </figure>
+  <figure>
+    <div class="frame"><img id="imgMine" alt="твій малюнок"><figcaption id="capMine"></figcaption></div>
+    <div class="rate" id="rateMine"></div>
+  </figure>
+  <button class="go" id="again2">ще раунд</button>
+</section>
+
+<script>
+  // Ті самі значення, що й у index.html (Firebase)
+  const FIREBASE_URL = "https://draw-8cb08-default-rtdb.europe-west1.firebasedatabase.app";  // напр. "https://my-calendar-default-rtdb.europe-west1.firebasedatabase.app"
+  const ROOM = "k7Qm2xVp9Lr4Tz8n";          // той самий довгий рядок, що й у календарику
+
+  const WORDS = ["кіт у шапці","сова","равлик","пінгвін","їжак","крокодил","мавпа","жираф","восьминіг","єдиноріг","панда","корова на ковзанах","мурашник","лінивець","фламінго","морський коник","павук","качка в окулярах","хомʼяк","борсук","медуза","слон","змія","лелека","білка","жаба в короні","бегемот","дельфін","їжак на велосипеді","кенгуру","дракончик","сонний ведмідь","курка","лисиця","песик у светрі","борщ","піца","торт","кавун","морозиво","вареники","банан","гамбургер","суші","яєчня","морква","ананас","гарбуз","макарони","шоколад","попкорн","пончик","бутерброд","апельсин","печиво","сир із дірками","кукурудза","цибуля, що плаче","авокадо","шашлик","млинці","хот-дог","лимон","парасолька","пилосос","годинник","окуляри","гітара","ліжко","ключ","свічка","дзеркало","телефон","намет","зубна щітка","шкарпетка","холодильник","тостер","валіза","лампа","рюкзак","сковорідка","ножиці","капці","мʼясорубка","пральна машина","стілець","мило","рушник","підзорна труба","глобус","мікрофон","мʼяч","скейтборд","дрон","навушники","розетка","ліхтарик","компас","крісло-гойдалка","чайник","вулкан","замок","маяк","океан","хмара","місяць","райдуга","острів","водоспад","гора","пустеля","печера","ліс","болото","місто вночі","повітряна куля","сніговик","ялинка","смерч","блискавка","північне сяйво","кемпінг","пляж","ферма","космічна станція","підводний човен","літак","ракета","велосипед","потяг","трамвай","вертоліт","яхта","самокат","тролейбус","підйомний кран","човен","літаюча тарілка","екскаватор","поліцейська машина","космонавт","пірат","привид","робот","дракон","фокусник","лікар","кухар","пожежник","ніндзя","відьма","принцеса","лицар","вампір","клоун","детектив","мумія","рибалка","таксист","супергерой","інопланетянин","русалка","чарівник","водолаз","художник","діджей","садівник","пікнік","день народження","танці під дощем","кава вранці","селфі","спізнення на потяг","блекаут","довга черга","сюрприз","вечеря при свічках","мандри з наметом","прання","прибирання","феєрверк","шопінг","пробка на дорозі","спека","бульбашки","сніжки","гойдалка","дитинство","лінь","кіно вдвох","поцілунок","обійми","весільна сукня","обручка","подорож удвох","ранкова пробіжка","перша зустріч","ідея","тиша","щастя","нудьга","страх","сон","музика","вітер","секрет","монстр під ліжком","мрія","запах кави","літо","осінь","зима","весна","понеділок","відпустка","дедлайн","зарплата","інтернет","кіт, що дивиться на тебе","привид у підвалі"];
+  const DUR = 60000, READY = 3000, W = 600, H = 800;
+  const online = !!(FIREBASE_URL && ROOM && window.EventSource);
+  const base = `${FIREBASE_URL}/rooms/${ROOM}/draw`;
+  const $ = id => document.getElementById(id);
+  const vib = p => navigator.vibrate && navigator.vibrate(p);
+
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+  let me = store.get("me");
+  if (!me) { me = Math.random().toString(36).slice(2, 10); store.set("me", me); }
+
+  let db = {}, curRid = null, phase = "lobby", endAt = 0, myImg = null, readyTimer, myRate = null, hasOther = false;
+  const handled = new Set();
+
+  function show(name) {
+    phase = name;
+    document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === name));
+  }
+
+  /* ───── полотно ───── */
+  const cv = $("cv"), ctx = cv.getContext("2d");
+  cv.width = W; cv.height = H;
+  const COLORS = ["#1f1e1b", "#e03e3e", "#0b6e99", "#0f7b6c", "#d9730d"];
+  let strokes = [], cur = null, tool = "thin", lastPen = "thin", color = COLORS[0];
+  const SIZE = { thin: 4, thick: 13, erase: 30 };
+  const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+
+  function style(st) {
+    ctx.lineCap = ctx.lineJoin = "round";
+    ctx.strokeStyle = st.e ? "#fff" : st.c;
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.lineWidth = st.s;
+  }
+  function paper() { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H); }
+  function drawStroke(st) {
+    const p = st.p; style(st);
+    if (p.length === 1) { ctx.beginPath(); ctx.arc(p[0][0], p[0][1], st.s / 2, 0, 7); ctx.fill(); return; }
+    ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]);
+    for (let i = 1; i < p.length - 1; i++) { const m = mid(p[i], p[i + 1]); ctx.quadraticCurveTo(p[i][0], p[i][1], m[0], m[1]); }
+    ctx.lineTo(p[p.length - 1][0], p[p.length - 1][1]); ctx.stroke();
+  }
+  function redraw() { paper(); strokes.forEach(drawStroke); }
+  function pt(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height]; }
+
+  cv.addEventListener("pointerdown", e => {
+    cv.setPointerCapture(e.pointerId);
+    cur = { s: SIZE[tool], e: tool === "erase", c: color, p: [pt(e)] };
+    strokes.push(cur); drawStroke(cur);
+  });
+  cv.addEventListener("pointermove", e => {
+    if (!cur) return;
+    const p = cur.p; p.push(pt(e)); const n = p.length; style(cur); ctx.beginPath();
+    if (n === 2) { const m = mid(p[0], p[1]); ctx.moveTo(p[0][0], p[0][1]); ctx.lineTo(m[0], m[1]); }
+    else { const a = mid(p[n - 3], p[n - 2]), b = mid(p[n - 2], p[n - 1]); ctx.moveTo(a[0], a[1]); ctx.quadraticCurveTo(p[n - 2][0], p[n - 2][1], b[0], b[1]); }
+    ctx.stroke();
+  });
+  const up = () => {
+    if (cur && cur.p.length > 1) { const p = cur.p, n = p.length, m = mid(p[n - 2], p[n - 1]); style(cur); ctx.beginPath(); ctx.moveTo(m[0], m[1]); ctx.lineTo(p[n - 1][0], p[n - 1][1]); ctx.stroke(); }
+    cur = null;
+  };
+  cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+
+  function fit() {
+    const b = $("cwrap").getBoundingClientRect();
+    let h = b.height, w = h * 3 / 4;
+    if (w > b.width) { w = b.width; h = w * 4 / 3; }
+    cv.style.width = w + "px"; cv.style.height = h + "px";
+  }
+  addEventListener("resize", () => phase === "draw" && fit());
+
+  document.querySelectorAll("[data-tool]").forEach(b => b.addEventListener("click", () => {
+    tool = b.dataset.tool;
+    if (tool !== "erase") lastPen = tool;
+    document.querySelectorAll("[data-tool]").forEach(x => x.classList.toggle("on", x === b));
+  }));
+  $("undo").addEventListener("click", () => { strokes.pop(); redraw(); });
+  $("done").addEventListener("click", finish);
+
+  /* ───── раунди ───── */
+  function startGame() {
+    const round = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+      word: WORDS[Math.floor(Math.random() * WORDS.length)],
+      startAt: Date.now(), dur: DUR, by: me
+    };
+    db = { round };
+    if (online) fetch(base + ".json", { method: "PUT", body: JSON.stringify({ round }) }).catch(() => {});
+    sync();
+  }
+
+  function sync() {
+    const r = db.round;
+    if (r && !handled.has(r.id)) {
+      handled.add(r.id);
+      const age = Date.now() - r.startAt;
+      if (age < READY + r.dur) beginRound(r, age < 12000);
+    }
+    checkReveal();
+    renderRates();
+  }
+
+  function beginRound(r, fresh) {
+    clearTimeout(readyTimer);
+    curRid = r.id; strokes = []; cur = null; myImg = null; myRate = null;
+    $("word").textContent = r.word;
+    const t0 = fresh ? Date.now() : r.startAt;
+    endAt = t0 + READY + r.dur;
+    const left = t0 + READY - Date.now();
+    if (left > 400) countdown(Math.min(3, Math.ceil(left / 1000))); else enterDraw();
+  }
+
+  function countdown(n) {
+    show("ready"); vib(15);
+    const el = $("num"); el.textContent = n;
+    el.animate([{ transform: "scale(.5)", opacity: 0 }, { opacity: 1, offset: .35 }, { transform: "none", opacity: 1 }], { duration: 700, easing: "cubic-bezier(.2,.8,.2,1)" });
+    readyTimer = setTimeout(() => n > 1 ? countdown(n - 1) : enterDraw(), 1000);
+  }
+
+  function enterDraw() { show("draw"); fit(); redraw(); vib(40); tick(); }
+
+  function tick() {
+    if (phase !== "draw") return;
+    const left = endAt - Date.now();
+    if (left <= 0) return finish();
+    const s = Math.ceil(left / 1000);
+    $("timer").textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+    $("timer").classList.toggle("hot", s <= 10);
+  }
+  setInterval(tick, 250);
+
+  function finish() {
+    if (phase !== "draw") return;
+    myImg = cv.toDataURL("image/jpeg", 0.72);
+    vib([30, 40, 30]);
+    show("wait");
+    if (online) fetch(`${base}/art/${me}.json`, { method: "PUT", body: JSON.stringify({ rid: curRid, img: myImg, t: Date.now(), name: getName() }) }).catch(() => {});
+    checkReveal();
+  }
+
+  function checkReveal() {
+    if (phase !== "wait") return;
+    if (!online) return showReveal(null);
+    const art = db.art || {};
+    for (const k in art) if (k !== me && art[k] && art[k].rid === curRid) return showReveal(art[k].img, art[k].name);
+  }
+
+  function showReveal(other, otherName) {
+    $("rword").textContent = db.round ? db.round.word : "";
+    $("imgMine").src = myImg;
+    $("capMine").textContent = getName() || "ти";
+    hasOther = !!other;
+    $("figOther").style.display = other ? "" : "none";
+    if (other) { $("imgOther").src = other; $("capOther").textContent = otherName || "друга половинка"; }
+    document.querySelectorAll("#reveal figure").forEach((f, i) => { f.classList.remove("rv", "late"); void f.offsetWidth; f.classList.add("rv"); if (i === 1 && other) f.classList.add("late"); });
+    show("reveal"); $("reveal").scrollTop = 0; renderRates();
+    vib([20, 60, 20, 60, 50]);
+  }
+
+  /* оцінки */
+  function renderRates() {
+    if (phase !== "reveal") return;
+    document.querySelectorAll("#rateOther button").forEach(b => b.classList.toggle("on", b.dataset.v === myRate));
+    const box = $("rateMine");
+    box.style.display = hasOther ? "" : "none";
+    if (!hasOther) return;
+    let got = null;
+    const r = db.rate || {};
+    for (const k in r) if (k !== me && r[k] && r[k].rid === curRid) got = r[k].v;
+    box.textContent = "";
+    if (got) { const c = document.createElement("span"); c.className = "chip"; c.textContent = got; box.appendChild(c); }
+    else box.textContent = "чекаю оцінку…";
+  }
+  document.querySelectorAll("#rateOther button").forEach(b => b.addEventListener("click", () => {
+    myRate = b.dataset.v; vib(10); renderRates();
+    if (online) fetch(`${base}/rate/${me}.json`, { method: "PUT", body: JSON.stringify({ rid: curRid, v: myRate }) }).catch(() => {});
+  }));
+
+  /* імʼя і кольори */
+  const nameEl = $("name");
+  nameEl.value = store.get("name") || "";
+  nameEl.addEventListener("input", () => store.set("name", nameEl.value));
+  nameEl.addEventListener("keydown", e => e.key === "Enter" && nameEl.blur());
+  function getName() { return nameEl.value.trim().slice(0, 20); }
+
+  COLORS.forEach((c, i) => {
+    const b = document.createElement("button");
+    b.className = "sw" + (i === 0 ? " on" : "");
+    b.style.background = c;
+    b.setAttribute("aria-label", "колір " + (i + 1));
+    b.addEventListener("click", () => {
+      color = c;
+      if (tool === "erase") {
+        tool = lastPen;
+        document.querySelectorAll("[data-tool]").forEach(x => x.classList.toggle("on", x.dataset.tool === tool));
+      }
+      document.querySelectorAll(".sw").forEach(x => x.classList.toggle("on", x === b));
+    });
+    $("palette").appendChild(b);
+  });
+
+  $("start").addEventListener("click", startGame);
+  $("again1").addEventListener("click", startGame);
+  $("again2").addEventListener("click", startGame);
+
+  /* ───── звʼязок із Firebase ───── */
+  function apply(type, msg) {
+    const parts = (msg.path || "/").split("/").filter(Boolean);
+    if (!parts.length) { db = type === "put" ? (msg.data || {}) : Object.assign(db, msg.data || {}); return; }
+    let o = db;
+    for (let i = 0; i < parts.length - 1; i++) o = o[parts[i]] = o[parts[i]] || {};
+    const k = parts[parts.length - 1];
+    if (type === "put") { if (msg.data === null) delete o[k]; else o[k] = msg.data; }
+    else o[k] = Object.assign(o[k] || {}, msg.data);
+  }
+
+  let es;
+  function connect() {
+    if (!online) { $("status").textContent = "одиночний режим: додай Firebase, щоб грати вдвох"; return; }
+    if (es) es.close();
+    $("status").textContent = "зʼєдную…";
+    es = new EventSource(base + ".json");
+    es.onopen = () => $("status").textContent = "на звʼязку ✓";
+    es.onerror = () => $("status").textContent = "шукаю звʼязок…";
+    ["put", "patch"].forEach(type => es.addEventListener(type, e => {
+      try { apply(type, JSON.parse(e.data)); sync(); } catch (err) {}
+    }));
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) connect(); });
+  connect();
+</script>
+</body>
+</html>
