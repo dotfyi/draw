@@ -210,8 +210,8 @@
   const vib = p => navigator.vibrate && navigator.vibrate(p);
 
   const PEOPLE = {
-    v: { name: "вадим", role: "чоловік", emoji: "🤵🏻‍♂️", won: "переміг", g: "вгадав" },
-    a: { name: "аліна", role: "дружина", emoji: "👰🏻‍♀️", won: "перемогла", g: "вгадала" }
+    v: { name: "вадим", role: "чоловік", emoji: "🤵🏻‍♂️", won: "переміг", g: "вгадав", gen: "вадима" },
+    a: { name: "аліна", role: "дружина", emoji: "👰🏻‍♀️", won: "перемогла", g: "вгадала", gen: "аліни" }
   };
   const RATE = { "погано": { e: "😖", p: 1 }, "не дуже": { e: "😐", p: 3 }, "смішно": { e: "🤣", p: 4 }, "чудово": { e: "😍", p: 5 }, "вгадав": { e: "✅", p: 5 }, "не вгадав": { e: "❌", p: 1 } };
   const otherOf = w => w === "v" ? "a" : "v";
@@ -394,7 +394,7 @@
     const o = otherOf(me), pr = db.presence && db.presence[o], on = !!pr && nowS() - pr < 45000;
     if (on && !wasOn) notify(`${PEOPLE[o].name} зараз тут 👋`);
     wasOn = on;
-    $("pres").textContent = on ? `🟢 ${PEOPLE[o].name} в грі` : `⚪ ${PEOPLE[o].name} поки нема`;
+    $("pres").textContent = on ? `🟢 ${PEOPLE[o].name} в грі` : `⚪ ${PEOPLE[o].gen} поки нема`;
     const T = totals();
     $("score").textContent = T.v + T.a ? `🏆 ${PEOPLE.v.emoji} ${T.v} : ${T.a} ${PEOPLE.a.emoji}` : "";
     const m0 = db.match;
@@ -600,9 +600,9 @@
   function connect() {
     if (!online) { $("status").textContent = "додай Firebase, щоб грати вдвох"; return; }
     if (es) es.close();
-    $("status").textContent = "зʼєдную…";
+    $("status").textContent = "";
     es = new EventSource(base + ".json");
-    es.onopen = () => $("status").textContent = "на звʼязку ✓";
+    es.onopen = () => $("status").textContent = "";
     es.onerror = () => $("status").textContent = "шукаю звʼязок…";
     ["put", "patch"].forEach(type => es.addEventListener(type, e => {
       try { apply(type, JSON.parse(e.data)); update(); } catch (err) {}
