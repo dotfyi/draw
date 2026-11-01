@@ -31,7 +31,16 @@
   .muted { color: var(--muted); font-size: 14px; }
 
   /* лобі */
-  #lobby { justify-content: center; gap: 16px; text-align: center; position: relative; }
+  #lobby { justify-content: safe center; gap: 14px; text-align: center; position: relative; overflow-y: auto; padding: 4px 0; }
+  .opts { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+  .ol { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .og { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .chip2 { padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--pill); font-size: 14px; color: var(--muted); transition: border-color .2s, color .2s; }
+  .chip2.on { border-color: var(--fg); color: var(--fg); font-weight: 600; }
+  #rask { margin-top: 12px; font-size: 14px; color: var(--muted); }
+  .cf { position: fixed; top: -30px; left: var(--x); font-size: 22px; animation: fall var(--d) linear forwards; pointer-events: none; z-index: 9; }
+  @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+  @keyframes pulse { 50% { transform: scale(1.25); } }
   .big { font-size: 52px; line-height: 1; }
   h1 { font-family: var(--serif); font-size: 32px; font-weight: 600; text-wrap: balance; }
   .who { display: flex; gap: 12px; margin: 4px 0 2px; }
@@ -51,7 +60,7 @@
 
   /* малювання */
   #timer { font-size: 15px; font-weight: 500; color: var(--muted); height: 20px; font-variant-numeric: tabular-nums; transition: color .3s; }
-  #timer.hot { color: var(--fg); font-weight: 700; }
+  #timer.hot { color: var(--fg); font-weight: 700; animation: pulse 1s infinite; }
   #word { font-family: var(--serif); font-size: 30px; font-weight: 600; text-align: center; margin: 6px 0 14px; text-wrap: balance; }
   .cwrap { flex: 1; min-height: 0; width: 100%; display: flex; align-items: center; justify-content: center; }
   canvas { background: #fff; border: 1px solid var(--line); border-radius: 16px; touch-action: none; display: block; }
@@ -89,7 +98,7 @@
   .rv.late { animation-delay: .8s; }
   @keyframes rv { from { opacity: 0; filter: blur(14px); transform: scale(.96); } to { opacity: 1; filter: blur(0); transform: none; } }
 
-  @media (prefers-reduced-motion: reduce) { .rv, #wait .big { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .rv, #wait .big, #timer.hot, .cf { animation: none; } }
 
   /* фінал */
   #final { justify-content: center; gap: 16px; text-align: center; }
@@ -112,7 +121,15 @@
     <button class="who-b" data-who="v" aria-label="вадим"><span class="e">🤵🏻‍♂️</span><span>вадим</span></button>
     <button class="who-b" data-who="a" aria-label="аліна"><span class="e">👰🏻‍♀️</span><span>аліна</span></button>
   </div>
+  <div class="opts">
+    <div><div class="ol">режим</div><div class="og" id="gMode"></div></div>
+    <div><div class="ol">раунди</div><div class="og" id="gRounds"></div></div>
+    <div><div class="ol">час на малюнок</div><div class="og" id="gDur"></div></div>
+    <div><div class="ol">слова</div><div class="og" id="gCat"></div></div>
+  </div>
   <button class="go" id="start" disabled>почати</button>
+  <div class="muted" id="pres"></div>
+  <div class="muted" id="score"></div>
   <div class="muted" id="status"></div>
 </section>
 
@@ -148,11 +165,8 @@
   <div class="rword" id="rword"></div>
   <figure>
     <div class="frame"><img id="imgOther" alt="малюнок другої половинки"><figcaption id="capOther"></figcaption></div>
-    <div class="rate" id="rateOther">
-      <button data-v="погано">😖 погано</button>
-      <button data-v="не дуже">😐 не дуже</button>
-      <button data-v="чудово">😍 чудово</button>
-    </div>
+    <div id="rask"></div>
+    <div class="rate" id="rateOther"></div>
     <div class="rinfo" id="rinfo"></div>
   </figure>
 </section>
@@ -161,8 +175,10 @@
   <div class="big">🎉</div>
   <h1 id="ftitle"></h1>
   <div class="board" id="board"></div>
+  <p class="muted" id="ftotal"></p>
   <p class="muted">оцінка + бонус за швидкість</p>
   <button class="go" id="again">грати знову</button>
+  <button class="ghost-btn" id="tomenu">головне меню</button>
 </section>
 
 <script>
@@ -171,17 +187,33 @@
   const ROOM = "k7Qm2xVp9Lr4Tz8n";          // той самий довгий рядок, що й у календарику
 
   const WORDS = ["кіт у шапці","сова","равлик","пінгвін","їжак","крокодил","мавпа","жираф","восьминіг","єдиноріг","панда","корова на ковзанах","мурашник","лінивець","фламінго","морський коник","павук","качка в окулярах","хомʼяк","борсук","медуза","слон","змія","лелека","білка","жаба в короні","бегемот","дельфін","їжак на велосипеді","кенгуру","дракончик","сонний ведмідь","курка","лисиця","песик у светрі","борщ","піца","торт","кавун","морозиво","вареники","банан","гамбургер","суші","яєчня","морква","ананас","гарбуз","макарони","шоколад","попкорн","пончик","бутерброд","апельсин","печиво","сир із дірками","кукурудза","цибуля, що плаче","авокадо","шашлик","млинці","хот-дог","лимон","парасолька","пилосос","годинник","окуляри","гітара","ліжко","ключ","свічка","дзеркало","телефон","намет","зубна щітка","шкарпетка","холодильник","тостер","валіза","лампа","рюкзак","сковорідка","ножиці","капці","мʼясорубка","пральна машина","стілець","мило","рушник","підзорна труба","глобус","мікрофон","мʼяч","скейтборд","дрон","навушники","розетка","ліхтарик","компас","крісло-гойдалка","чайник","вулкан","замок","маяк","океан","хмара","місяць","райдуга","острів","водоспад","гора","пустеля","печера","ліс","болото","місто вночі","повітряна куля","сніговик","ялинка","смерч","блискавка","північне сяйво","кемпінг","пляж","ферма","космічна станція","підводний човен","літак","ракета","велосипед","потяг","трамвай","вертоліт","яхта","самокат","тролейбус","підйомний кран","човен","літаюча тарілка","екскаватор","поліцейська машина","космонавт","пірат","привид","робот","дракон","фокусник","лікар","кухар","пожежник","ніндзя","відьма","принцеса","лицар","вампір","клоун","детектив","мумія","рибалка","таксист","супергерой","інопланетянин","русалка","чарівник","водолаз","художник","діджей","садівник","пікнік","день народження","танці під дощем","кава вранці","селфі","спізнення на потяг","блекаут","довга черга","сюрприз","вечеря при свічках","мандри з наметом","прання","прибирання","феєрверк","шопінг","пробка на дорозі","спека","бульбашки","сніжки","гойдалка","дитинство","лінь","кіно вдвох","поцілунок","обійми","весільна сукня","обручка","подорож удвох","ранкова пробіжка","перша зустріч","ідея","тиша","щастя","нудьга","страх","сон","музика","вітер","секрет","монстр під ліжком","мрія","запах кави","літо","осінь","зима","весна","понеділок","відпустка","дедлайн","зарплата","інтернет","кіт, що дивиться на тебе","привид у підвалі"];
-  const DUR = 60000, READY = 3000, GAP = 2200, ROUNDS = 5, W = 600, H = 800;
+  const US = ["наше перше побачення","сніданок у ліжку","спільний плейлист","фільм під пледом","танець на кухні","романтична вечеря","наша мрія","масаж","вихідні вдвох","подарунок","прогулянка під зорями","спільне селфі"];
+  const seg = (a, b) => WORDS.slice(WORDS.indexOf(a), WORDS.indexOf(b));
+  const CATS = [
+    ["🐾", "тварини", seg("кіт у шапці", "борщ").concat("кіт, що дивиться на тебе")],
+    ["🍕", "їжа", seg("борщ", "парасолька")],
+    ["🏠", "речі", seg("парасолька", "вулкан")],
+    ["🌋", "природа", seg("вулкан", "космічна станція")],
+    ["🚀", "транспорт", seg("космічна станція", "космонавт")],
+    ["🧙", "професії й герої", seg("космонавт", "пікнік")],
+    ["🎈", "події", seg("пікнік", "ідея").concat("привид у підвалі")],
+    ["💭", "відчуття", seg("ідея", "кіт, що дивиться на тебе")],
+    ["💕", "про нас", US],
+    ["🎲", "всі слова", WORDS.concat(US)]
+  ];
+  let DUR = 60000, ROUNDS = 5;
+  const READY = 3000, GAP = 2200, W = 600, H = 800;
+  const shuf = a => [...a].sort(() => Math.random() - .5);
   const online = !!(FIREBASE_URL && ROOM && window.EventSource);
   const base = `${FIREBASE_URL}/rooms/${ROOM}/draw`;
   const $ = id => document.getElementById(id);
   const vib = p => navigator.vibrate && navigator.vibrate(p);
 
   const PEOPLE = {
-    v: { name: "вадим", role: "чоловік", emoji: "🤵🏻‍♂️", won: "переміг" },
-    a: { name: "аліна", role: "дружина", emoji: "👰🏻‍♀️", won: "перемогла" }
+    v: { name: "вадим", role: "чоловік", emoji: "🤵🏻‍♂️", won: "переміг", g: "вгадав" },
+    a: { name: "аліна", role: "дружина", emoji: "👰🏻‍♀️", won: "перемогла", g: "вгадала" }
   };
-  const RATE = { "погано": { e: "😖", p: 1 }, "не дуже": { e: "😐", p: 3 }, "чудово": { e: "😍", p: 5 } };
+  const RATE = { "погано": { e: "😖", p: 1 }, "не дуже": { e: "😐", p: 3 }, "смішно": { e: "🤣", p: 4 }, "чудово": { e: "😍", p: 5 }, "вгадав": { e: "✅", p: 5 }, "не вгадав": { e: "❌", p: 1 } };
   const otherOf = w => w === "v" ? "a" : "v";
 
   const store = {
@@ -191,7 +223,45 @@
   let me = store.get("who");
   if (!PEOPLE[me]) me = null;
 
-  let db = {}, phase = "lobby", rv = null, drawKey = "", lastNum = 0;
+  const cfg = { mode: store.get("c_mode") || "same", rounds: +store.get("c_rounds") || 5, dur: +store.get("c_dur") || 60000, cat: store.get("c_cat") || "всі слова" };
+  function chips(id, items, key) {
+    const box = $(id);
+    const paint = () => box.childNodes.forEach(b => b.classList.toggle("on", b._v === cfg[key]));
+    items.forEach(([v, l]) => {
+      const b = document.createElement("button"); b.className = "chip2"; b.textContent = l; b._v = v;
+      b.addEventListener("click", () => { cfg[key] = v; store.set("c_" + key, v); paint(); });
+      box.appendChild(b);
+    });
+    paint();
+  }
+  chips("gMode", [["same", "🖼 одна картинка"], ["guess", "🕵️ вгадай"]], "mode");
+  chips("gRounds", [[3, "3"], [5, "5"], [10, "10"]], "rounds");
+  chips("gDur", [[30000, "30 с"], [60000, "60 с"], [90000, "90 с"]], "dur");
+  chips("gCat", CATS.map(c => [c[1], c[0] + " " + c[1]]), "cat");
+
+  let ac, lastTick = 0;
+  addEventListener("pointerdown", () => { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === "suspended") ac.resume(); } catch (e) {} });
+  function snd(notes, d = .12, type = "sine", vol = .07) {
+    if (!ac) return;
+    notes.forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + i * d;
+      o.type = type; o.frequency.value = f;
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + d * 1.6);
+      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + d * 1.7);
+    });
+  }
+  function confetti() {
+    const em = ["🎉", "✨", "🎊", "💖", "⭐"];
+    for (let i = 0; i < 28; i++) {
+      const sp = document.createElement("span"); sp.className = "cf"; sp.textContent = em[i % em.length];
+      sp.style.setProperty("--x", Math.random() * 100 + "vw"); sp.style.setProperty("--d", 2.5 + Math.random() * 2.5 + "s");
+      sp.style.animationDelay = Math.random() * 1.2 + "s";
+      document.body.appendChild(sp); setTimeout(() => sp.remove(), 6500);
+    }
+  }
+  function notify(t) { try { if (document.hidden && window.Notification && Notification.permission === "granted") new Notification(t); } catch (e) {} }
+
+  let db = {}, phase = "lobby", rv = null, drawKey = "", lastNum = 0, wasOn = false;
   const joined = new Set();
 
   function show(name) {
@@ -277,7 +347,11 @@
   /* ───── дані гри ───── */
   const node = (root, mid, r, w) => { const x = db[root]; return (x && x[mid] && x[mid]["r" + r] && x[mid]["r" + r][w]) || null; };
   const A = (mid, r, w) => node("art", mid, r, w);    // малюнок гравця w у раунді r
-  const R = (mid, r, w) => node("rate", mid, r, w);   // оцінка, яку поставив гравець w
+  const R = (mid, r, w) => node("rate", mid, r, w);
+  const wordFor = (m, r, w) => m.mode === "guess" && w === "a" ? m.wa[r] : m.words[r];
+  function totals() { const T = { v: 0, a: 0 }; Object.values(db.total || {}).forEach(x => { if (x && T[x.w] !== undefined) T[x.w]++; }); return T; }
+  function beat() { if (me && online) put("presence/" + me, nowS()); }
+  setInterval(beat, 15000);   // оцінка, яку поставив гравець w
   const gapAfter = (mid, r) => Math.max(R(mid, r, "v").t, R(mid, r, "a").t) + GAP;
   const roundStart = (m, r) => r ? gapAfter(m.id, r - 1) : m.startAt;
 
@@ -291,11 +365,15 @@
     if (!me || !online || starting) return;
     starting = true;
     await syncClock();
-    const words = [...WORDS].sort(() => Math.random() - .5).slice(0, ROUNDS);
-    const match = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), words, startAt: nowS() + 800, by: me };
+    const n = cfg.rounds, g = cfg.mode === "guess";
+    const cat = CATS.find(c => c[1] === cfg.cat) || CATS[CATS.length - 1];
+    let pool = shuf(cat[2]);
+    if (pool.length < n * (g ? 2 : 1)) pool = pool.concat(shuf(WORDS.filter(w => !pool.includes(w))));
+    const match = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), words: pool.slice(0, n), startAt: nowS() + 800, by: me, mode: cfg.mode, rounds: n, dur: cfg.dur };
+    if (g) match.wa = pool.slice(n, 2 * n);
     joined.add(match.id);
-    db = { match };
-    fetch(base + ".json", { method: "PUT", body: JSON.stringify({ match }) }).catch(() => {});
+    db = { match, total: db.total, presence: db.presence };
+    fetch(base + ".json", { method: "PATCH", body: JSON.stringify({ match, art: null, rate: null }) }).catch(() => {});
     starting = false;
     update();
   }
@@ -304,6 +382,7 @@
   function curRound() {
     const m = db.match;
     if (!m || !m.id || !m.words) return null;
+    ROUNDS = m.rounds || 5; DUR = m.dur || 60000;
     for (let r = 0; r < ROUNDS; r++)
       if (!(R(m.id, r, "v") && R(m.id, r, "a"))) return { m, r, start: roundStart(m, r) };
     return { m, r: ROUNDS, done: true, start: gapAfter(m.id, ROUNDS - 1) };
@@ -312,6 +391,12 @@
   /* екран завжди виводиться з даних і серверного часу */
   function update() {
     if (!me) return;
+    const o = otherOf(me), pr = db.presence && db.presence[o], on = !!pr && nowS() - pr < 45000;
+    if (on && !wasOn) notify(`${PEOPLE[o].name} зараз тут 👋`);
+    wasOn = on;
+    $("pres").textContent = on ? `🟢 ${PEOPLE[o].name} в грі` : `⚪ ${PEOPLE[o].name} поки нема`;
+    const T = totals();
+    $("score").textContent = T.v + T.a ? `🏆 ${PEOPLE.v.emoji} ${T.v} : ${T.a} ${PEOPLE.a.emoji}` : "";
     const m0 = db.match;
     if (m0 && m0.over) { if (phase !== "lobby") { show("lobby"); paintWho(); } return; }   // гру завершили
     const c = curRound(); if (!c) return;
@@ -320,6 +405,7 @@
     if (!joined.has(m.id)) {
       if (c.done || t - c.start > 15 * 60000) return;   // стару гру ігноруємо
       joined.add(m.id);
+      if (m.by !== me) notify("починаємо малювати! 🎨");
     }
 
     if (c.done) {
@@ -353,21 +439,22 @@
     const s = Math.ceil((drawEnd - t) / 1000);
     $("timer").textContent = `${c.r + 1}/${ROUNDS} · ` + Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
     $("timer").classList.toggle("hot", s <= 10);
+    if (s <= 5 && s !== lastTick) { lastTick = s; snd([880], .07, "square", .03); }
   }
 
   function setNum(r, n) {
     $("rlabel").textContent = `раунд ${r + 1} з ${ROUNDS}`;
     if (lastNum === n) return;
     lastNum = n;
-    const el = $("num"); el.textContent = n; vib(15);
+    const el = $("num"); el.textContent = n; vib(15); snd([660], .1);
     el.animate([{ transform: "scale(.5)", opacity: 0 }, { opacity: 1, offset: .35 }, { transform: "none", opacity: 1 }], { duration: 700, easing: "cubic-bezier(.2,.8,.2,1)" });
   }
 
   function enterDraw(m, r) {
     const key = m.id + ":" + r;
     if (drawKey !== key) { drawKey = key; strokes = []; cur = null; }
-    $("word").textContent = m.words[r];
-    show("draw"); fit(); redraw(); vib(40);
+    $("word").textContent = wordFor(m, r, me); lastTick = 0;
+    show("draw"); fit(); redraw(); vib(40); snd([523, 784]);
   }
 
   function finish() {
@@ -376,22 +463,27 @@
     if (phase !== "draw") { strokes = []; cur = null; redraw(); }
     const drawEnd = c.start + READY + DUR;
     const img = cv.toDataURL("image/jpeg", 0.72);
-    vib([30, 40, 30]);
+    vib([30, 40, 30]); snd([784, 988]);
     put(`art/${c.m.id}/r${c.r}/${me}`, { img, t: Math.min(nowS(), drawEnd) });
     update();
   }
 
   /* ───── показ малюнка іншого й оцінка ───── */
   function openReveal(m, r, theirs) {
-    rv = { mid: m.id, r };
-    $("rword").textContent = m.words[r];
+    rv = { mid: m.id, r, m };
+    const g = m.mode === "guess", o = otherOf(me);
+    $("rword").textContent = g ? "вгадай, що це 🤔" : m.words[r];
+    $("rask").textContent = g ? `твоє слово «${wordFor(m, r, me)}» — ${PEOPLE[o].name} ${PEOPLE[o].g}?` : "";
+    const rb = $("rateOther"); rb.textContent = "";
+    (g ? [["вгадав", "✅ вгадав"], ["не вгадав", "❌ не вгадав"]] : [["погано", "😖 погано"], ["не дуже", "😐 не дуже"], ["смішно", "🤣 смішно"], ["чудово", "😍 чудово"]])
+      .forEach(([v, l]) => { const b = document.createElement("button"); b.dataset.v = v; b.textContent = l; rb.appendChild(b); });
     $("imgOther").src = theirs.img;
     $("capOther").textContent = PEOPLE[otherOf(me)].role;
     const f = document.querySelector("#reveal figure");
     f.classList.remove("rv"); void f.offsetWidth; f.classList.add("rv");
     $("rinfo").dataset.k = "";
     show("reveal"); $("reveal").scrollTop = 0;
-    vib([20, 60, 20, 60, 50]);
+    vib([20, 60, 20, 60, 50]); snd([392, 523, 659, 784]);
   }
 
   function renderRates() {
@@ -402,18 +494,21 @@
       b.disabled = !!mine;
     });
     const info = $("rinfo");
-    const txt = !mine ? "оціни малюнок" : !got ? "чекаю оцінку…" : "тобі: " + ((RATE[got.v] || {}).e || "") + " " + got.v;
+    const txt = rv.m.mode === "guess"
+      ? (!mine ? "" : !got ? "чекаю відповіді…" : "слово було: " + wordFor(rv.m, rv.r, otherOf(me)))
+      : (!mine ? "оціни малюнок" : !got ? "чекаю оцінку…" : "тобі: " + ((RATE[got.v] || {}).e || "") + " " + got.v);
     if (info.dataset.k === txt) return;
     info.dataset.k = txt; info.textContent = "";
     if (mine && got) { const c = document.createElement("span"); c.className = "chip"; c.textContent = txt; info.appendChild(c); }
     else info.textContent = txt;
   }
-  document.querySelectorAll("#rateOther button").forEach(b => b.addEventListener("click", () => {
-    if (!rv || R(rv.mid, rv.r, me)) return;
-    vib(10);
+  $("rateOther").addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b || !rv || R(rv.mid, rv.r, me)) return;
+    vib(10); snd([700], .06);
     put(`rate/${rv.mid}/r${rv.r}/${me}`, { v: b.dataset.v, t: nowS() });
     update();
-  }));
+  });
 
   /* ───── фінал ───── */
   function showFinal(m) {
@@ -421,17 +516,20 @@
     for (let r = 0; r < ROUNDS; r++) {
       const ds = roundStart(m, r) + READY;
       for (const w of ["v", "a"]) {
-        const art = A(m.id, r, w), rt = R(m.id, r, otherOf(w));
+        const art = A(m.id, r, w), rt = R(m.id, r, m.mode === "guess" ? w : otherOf(w));
         if (!art || !rt) continue;
         const el = Math.max(0, Math.min(DUR, art.t - ds));
         S[w].pts += (RATE[rt.v] ? RATE[rt.v].p : 0) + Math.round(3 * (1 - el / DUR));   // оцінка + бонус за швидкість (0–3)
-        if (rt.v === "чудово") S[w].great++;
+        if (rt.v === "чудово" || rt.v === "вгадав") S[w].great++;
         S[w].time += el;
       }
     }
     const tie = S.v.pts === S.a.pts;
     const win = S.v.pts > S.a.pts ? "v" : "a";
     $("ftitle").textContent = tie ? "нічия, вітаю обох" : `вітаю, ${PEOPLE[win].name} ${PEOPLE[win].won}`;
+    put("total/" + m.id, { w: tie ? "t" : win });
+    const T = totals();
+    $("ftotal").textContent = `🏆 за весь час: ${PEOPLE.v.emoji} ${T.v} : ${T.a} ${PEOPLE.a.emoji}`;
     const board = $("board"); board.textContent = "";
     ["v", "a"].sort((x, y) => S[y].pts - S[x].pts).forEach(w => {
       const row = document.createElement("div");
@@ -439,12 +537,12 @@
       const em = document.createElement("div"); em.className = "em"; em.textContent = PEOPLE[w].emoji;
       const nm = document.createElement("div"); nm.className = "nm"; nm.textContent = PEOPLE[w].name;
       const sub = document.createElement("div"); sub.className = "sub";
-      sub.textContent = `😍 ${S[w].great} · ⏱ ${Math.round(S[w].time / ROUNDS / 1000)}с`;
+      sub.textContent = `${m.mode === "guess" ? "✅" : "😍"} ${S[w].great} · ⏱ ${Math.round(S[w].time / ROUNDS / 1000)}с`;
       nm.appendChild(sub);
       const pts = document.createElement("div"); pts.className = "pts"; pts.textContent = S[w].pts;
       row.append(em, nm, pts); board.appendChild(row);
     });
-    show("final"); vib([30, 50, 30, 50, 90]);
+    show("final"); vib([30, 50, 30, 50, 90]); snd([523, 659, 784, 1047], .15); confetti();
   }
 
   /* ───── лобі ───── */
@@ -453,7 +551,8 @@
     $("start").disabled = !me || !online;
   }
   document.querySelectorAll(".who-b").forEach(b => b.addEventListener("click", () => {
-    me = b.dataset.who; store.set("who", me); paintWho(); update();
+    me = b.dataset.who; store.set("who", me); paintWho(); beat(); update();
+    try { if (window.Notification && Notification.permission === "default") Notification.requestPermission(); } catch (e) {}
   }));
   paintWho();
 
@@ -483,6 +582,7 @@
 
   $("start").addEventListener("click", startMatch);
   $("again").addEventListener("click", startMatch);
+  $("tomenu").addEventListener("click", () => { if (db.match) joined.delete(db.match.id); show("lobby"); paintWho(); });
   setInterval(update, 200);
 
   /* ───── звʼязок із Firebase ───── */
@@ -508,8 +608,8 @@
       try { apply(type, JSON.parse(e.data)); update(); } catch (err) {}
     }));
   }
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) { syncClock(); connect(); } });
-  syncClock();
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { syncClock(); connect(); beat(); } });
+  syncClock().then(beat);
   connect();
 </script>
 </body>
