@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbfbfa">
+<link rel="apple-touch-icon" href="IMG_2010.jpeg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐊</text></svg>">
+<title>крокодил · draw &amp; more</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#37352f;--muted:#9b9a97;--line:#e4e4e1;--pill:#fff;--inv-bg:#37352f;--inv-fg:#fff;--ok:#0f7b6c;--bad:#e03e3e;--serif:"Iowan Old Style","Palatino Linotype",Georgia,"Times New Roman",serif}
+@media(prefers-color-scheme:dark){:root{--bg:#191919;--fg:#ebebea;--muted:#7f7f7c;--line:#303030;--pill:#202020;--inv-bg:#ebebea;--inv-fg:#191919}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{height:100dvh;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 8px) 10px calc(env(safe-area-inset-bottom,0px) + 10px)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+#bar{display:flex;flex-direction:column;gap:2px;padding-bottom:8px}
+#meta{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+#back{color:var(--muted);font-size:14px;padding:4px 6px 4px 0}
+#word{font-family:var(--serif);font-size:30px;font-weight:600;text-align:center;min-height:40px;line-height:40px;text-wrap:balance;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#word.sm{font-size:22px;color:var(--muted);font-weight:500}
+#wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+canvas{background:#fff;border:1px solid var(--line);border-radius:14px;touch-action:none;display:block}
+#tools{display:none;justify-content:center;align-items:center;gap:2px;margin-top:8px;padding:5px 8px;border:1px solid var(--line);border-radius:999px;background:var(--pill);align-self:center}
+#tools.on{display:flex}
+.t{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;transition:background .2s,color .2s}
+.t.on{background:var(--inv-bg);color:var(--inv-fg)}
+.t svg{width:21px;height:21px}
+.sep{width:1px;height:24px;background:var(--line);margin:0 6px}
+.sws{display:flex;gap:9px;align-items:center;padding:0 4px}
+.sw{width:22px;height:22px;border-radius:50%;transition:transform .15s,box-shadow .15s}
+.sw.on{transform:scale(1.12);box-shadow:0 0 0 2px var(--pill),0 0 0 3px var(--fg)}
+#bot{padding-top:10px;min-height:62px;display:flex;gap:10px;align-items:center}
+.btn{flex:1;padding:17px 0;border-radius:999px;font-size:16px;font-weight:600;border:1px solid var(--line);background:var(--pill);transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn.yes{background:var(--inv-bg);color:var(--inv-fg);border-color:var(--inv-bg)}
+#msg{width:100%;text-align:center;color:var(--muted);font-size:15px}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translate(-50%,-10px);opacity:0;pointer-events:none;background:var(--inv-bg);color:var(--inv-fg);padding:10px 18px;border-radius:999px;font-size:15px;font-weight:500;transition:opacity .25s,transform .25s;z-index:5;white-space:nowrap}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.ov{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;z-index:6}
+.ov.on{display:flex}
+.ov>*{width:100%;max-width:340px}
+.ov .big{font-size:56px;line-height:1}
+.ov h2{font-family:var(--serif);font-size:28px;font-weight:600;text-wrap:balance}
+.row{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border:1.5px solid var(--line);border-radius:18px;font-weight:600;background:var(--pill)}
+.row.win{border-color:var(--fg)}
+.row b{font:700 26px var(--serif)}
+.muted{color:var(--muted);font-size:14px}
+.go{background:var(--inv-bg);color:var(--inv-fg);padding:15px 0;border-radius:999px;font-size:16px;font-weight:500}
+.ghost{border:1px solid var(--line);background:var(--pill);padding:14px 0;border-radius:999px;font-size:15px;font-weight:500}
+</style>
+</head>
+<body>
+
+<div id="bar">
+<div id="meta"><button id="back">‹ меню</button><span id="info"></span></div>
+<div id="word"></div>
+</div>
+<div id="wrap"><canvas id="cv"></canvas></div>
+<div id="tools">
+<button class="t on" data-tool="thin" aria-label="тонкий олівець"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5" fill="currentColor"/></svg></button>
+<button class="t" data-tool="thick" aria-label="товстий олівець"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5" fill="currentColor"/></svg></button>
+<button class="t" data-tool="erase" aria-label="гумка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="8.5" width="15" height="8" rx="2" transform="rotate(-35 12 12.5)"/><path d="M9 19.5h10"/></svg></button>
+<div class="sep"></div>
+<div class="sws" id="sws"></div>
+</div>
+<div id="bot"></div>
+<div id="toast"></div>
+
+<div class="ov" id="ov"></div>
+
+<script>
+const FB = "https://draw-8cb08-default-rtdb.europe-west1.firebasedatabase.app", ROOM = "k7Qm2xVp9Lr4Tz8n";
+const $ = id => document.getElementById(id);
+const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } } };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rnd = () => Math.random().toString(36).slice(2, 8);
+const vib = p => navigator.vibrate && navigator.vibrate(p);
+const other = s => s === "v" ? "a" : "v";
+
+const room = ls.get("dm_room"), me = ls.get("dm_slot");
+let L = null; try { L = JSON.parse(ls.get("dm_launch")); } catch (e) {}
+if (!room || (me !== "v" && me !== "a") || !L || !L.id) location.replace("index.html");
+const cb = `${FB}/rooms/${ROOM}/dm/${room}/croc`;
+
+const PEOPLE = { a: { name: "аліна", emoji: "🦊" }, v: { name: "вадим", emoji: "👻" } };
+fetch(`${FB}/rooms/${ROOM}/dm/${room}/players.json`).then(r => r.json()).then(p => {
+  if (p) for (const s of ["v", "a"]) if (p[s] && p[s].name) PEOPLE[s] = { name: p[s].name, emoji: p[s].emoji || PEOPLE[s].emoji };
+  render();
+}).catch(() => {});
+
+const WORDS = ["кіт","собака","слон","жираф","мавпа","пінгвін","равлик","кролик","курка","змія","акула","метелик","павук","краб","сова","лебідь","корова","їжак","жаба","дельфін",
+"борщ","піца","морозиво","банан","торт","кавун","сосиска","яєчня","морква","гриб","пончик","суші","попкорн","бутерброд","цибуля","ананас",
+"парасолька","окуляри","годинник","телефон","ліжко","ключ","свічка","дзеркало","холодильник","пилосос","гітара","валіза","ножиці","чайник","рюкзак","капці","праска","телевізор","зубна щітка","пральна машина",
+"вулкан","водоспад","місяць","райдуга","острів","пустеля","печера","сніговик","блискавка","маяк","гора","хмара","ялинка","пляж","намет",
+"літак","велосипед","ракета","потяг","яхта","трактор","вертоліт","підводний човен","самокат","повітряна куля","трамвай","екскаватор",
+"лікар","пірат","привид","робот","дракон","космонавт","кухар","клоун","відьма","принцеса","рибалка","фокусник","водолаз","вампір","ніндзя","русалка",
+"день народження","селфі","феєрверк","дощ","пікнік","танці","спека","прибирання","весілля","фотографія","кіно","подорож","масаж","поцілунок","обійми","сюрприз","сніжки","пробіжка",
+"замок","міст","вітряк","піраміда","хатинка","церква","стадіон","цирк","карусель","колесо огляду","літаюча тарілка","скарб"];
+
+/* ───── стан ───── */
+let db = {}, roundKey = "", isDrawer = false, ar = 4 / 3, strokes = [], cur = null;
+let toastTimer = 0, seenToast = "", resBusy = "";
+const shuf = a => [...a].sort(() => Math.random() - .5);
+const game = () => { const g = db.g; return g && g.launch === L.id ? g : null; };
+const drawerOf = g => g.r % 2 === 0 ? g.first : other(g.first);
+
+function put(path, val) {
+  apply("put", { path: "/" + path, data: val });
+  return fetch(`${cb}/${path}.json`, { method: "PUT", body: JSON.stringify(val), keepalive: true }).catch(() => {});
+}
+function apply(type, msg) {
+  const parts = (msg.path || "/").split("/").filter(Boolean);
+  if (!parts.length) { db = type === "put" ? (msg.data || {}) : Object.assign(db, msg.data || {}); return; }
+  let o = db;
+  for (let i = 0; i < parts.length - 1; i++) o = o[parts[i]] = o[parts[i]] || {};
+  const k = parts[parts.length - 1];
+  if (type === "put") { if (msg.data === null) delete o[k]; else o[k] = msg.data; }
+  else o[k] = Object.assign(o[k] || {}, msg.data);
+}
+let es;
+function connect() {
+  if (es) es.close();
+  es = new EventSource(cb + ".json");
+  ["put", "patch"].forEach(t => es.addEventListener(t, e => { try { apply(t, JSON.parse(e.data)); } catch (err) { return; } render(); }));
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) connect(); });
+
+function newGame(first) {
+  const n = +(L.cfg && L.cfg.crocN) || 6;
+  return put("g", { id: rnd(), launch: L.id, n, words: shuf(WORDS).slice(0, n), first, r: 0, score: { v: 0, a: 0 } });
+}
+async function ensureGame() {
+  try {
+    const g = await (await fetch(cb + "/g.json")).json();
+    if (g && g.launch === L.id) return;
+  } catch (e) {}
+  newGame(L.by);
+}
+
+/* ───── полотно ───── */
+const cv = $("cv"), ctx = cv.getContext("2d");
+let scale = 1;
+const SIZE = { thin: 8, thick: 22, erase: 50 };
+const COLORS = ["#1f1e1b", "#e03e3e", "#0b6e99", "#0f7b6c", "#d9730d"];
+let tool = "thin", lastPen = "thin", color = COLORS[0];
+COLORS.forEach((c, i) => {
+  const b = document.createElement("button"); b.className = "sw" + (i ? "" : " on"); b.style.background = c; b.setAttribute("aria-label", "колір " + (i + 1));
+  b.onclick = () => {
+    color = c;
+    if (tool === "erase") { tool = lastPen; paintTools(); }
+    document.querySelectorAll(".sw").forEach(x => x.classList.toggle("on", x === b));
+  };
+  $("sws").appendChild(b);
+});
+function paintTools() { document.querySelectorAll("[data-tool]").forEach(x => x.classList.toggle("on", x.dataset.tool === tool)); }
+document.querySelectorAll("[data-tool]").forEach(b => b.addEventListener("click", () => { tool = b.dataset.tool; if (tool !== "erase") lastPen = tool; paintTools(); }));
+
+function layout() {
+  const b = $("wrap").getBoundingClientRect(), aw = b.width, ah = b.height;
+  if (!aw || !ah) return;
+  const w = Math.min(aw, ah / ar), h = w * ar, dpr = window.devicePixelRatio || 1;
+  cv.style.width = w + "px"; cv.style.height = h + "px";
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  scale = cv.width / 1000;
+  redraw();
+}
+addEventListener("resize", layout);
+
+function drawStroke(st) {
+  const p = st.p; if (!p || p.length < 2) return;
+  ctx.lineCap = ctx.lineJoin = "round"; ctx.strokeStyle = ctx.fillStyle = st.e ? "#fff" : (st.c || COLORS[0]); ctx.lineWidth = st.w || SIZE.thin;
+  if (p.length === 2) { ctx.beginPath(); ctx.arc(p[0], p[1], (st.w || SIZE.thin) / 2, 0, 7); ctx.fill(); return; }
+  ctx.beginPath(); ctx.moveTo(p[0], p[1]);
+  for (let i = 2; i < p.length - 2; i += 2) {
+    const mx = (p[i] + p[i + 2]) / 2, my = (p[i + 1] + p[i + 3]) / 2;
+    ctx.quadraticCurveTo(p[i], p[i + 1], mx, my);
+  }
+  ctx.lineTo(p[p.length - 2], p[p.length - 1]); ctx.stroke();
+}
+function dbStrokes(g) {
+  const r = db.d && db.d[g.id] && db.d[g.id]["r" + g.r];
+  if (!r) return [];
+  return Object.keys(r).filter(k => /^s\d+$/.test(k)).sort((a, b) => a.slice(1) - b.slice(1)).map(k => r[k]).filter(s => s && s.p);
+}
+function redraw() {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  const g = game(); if (!g || g.done) return;
+  (isDrawer ? strokes : dbStrokes(g)).forEach(drawStroke);
+}
+
+/* ───── малювання (тільки той, хто малює) ───── */
+const dirty = new Set();
+let syncTimer = 0, inflight = false, again = false, lastSend = 0;
+function pt(e) { const r = cv.getBoundingClientRect(); return [Math.round((e.clientX - r.left) / r.width * 1000), Math.round((e.clientY - r.top) / r.height * ar * 1000)]; }
+function sync() {
+  const g = game(); clearTimeout(syncTimer); syncTimer = 0;
+  if (!g || !isDrawer || !dirty.size) return;
+  if (inflight) { again = true; return; }
+  const body = {}; dirty.forEach(i => { body["s" + i] = { w: strokes[i].w, c: strokes[i].c, e: strokes[i].e ? 1 : 0, p: strokes[i].p }; }); dirty.clear();
+  inflight = true; lastSend = Date.now();
+  fetch(`${cb}/d/${g.id}/r${g.r}.json`, { method: "PATCH", body: JSON.stringify(body), keepalive: true }).catch(() => {})
+    .finally(() => { inflight = false; if (again || dirty.size) { again = false; sync(); } });
+}
+function soon() { if (!syncTimer) syncTimer = setTimeout(sync, Math.max(0, 80 - (Date.now() - lastSend))); }
+
+cv.addEventListener("pointerdown", e => {
+  const g = game(); if (!g || g.done || !isDrawer) return;
+  cv.setPointerCapture(e.pointerId);
+  const [x, y] = pt(e);
+  cur = { w: SIZE[tool], c: color, e: tool === "erase", p: [x, y] }; strokes.push(cur); dirty.add(strokes.length - 1);
+  ctx.setTransform(scale, 0, 0, scale, 0, 0); drawStroke(cur); soon();
+});
+cv.addEventListener("pointermove", e => {
+  if (!cur) return;
+  const [x, y] = pt(e), p = cur.p, n = p.length;
+  if (Math.abs(x - p[n - 2]) + Math.abs(y - p[n - 1]) < 2) return;
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  ctx.lineCap = ctx.lineJoin = "round"; ctx.strokeStyle = cur.e ? "#fff" : cur.c; ctx.lineWidth = cur.w;
+  ctx.beginPath(); ctx.moveTo(p[n - 2], p[n - 1]); ctx.lineTo(x, y); ctx.stroke();
+  p.push(x, y); dirty.add(strokes.length - 1); soon();
+});
+const up = () => { if (!cur) return; cur = null; redraw(); sync(); };
+cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+
+/* ───── гра ───── */
+function toast(t) {
+  const el = $("toast"); el.textContent = t; el.classList.add("on");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("on"), 2600);
+}
+
+function startRound(g, first) {
+  roundKey = g.id + ":" + g.r; resBusy = ""; cur = null; dirty.clear();
+  isDrawer = drawerOf(g) === me;
+  const saved = db.d && db.d[g.id] && db.d[g.id]["r" + g.r];
+  if (isDrawer) {
+    strokes = dbStrokes(g).map(s => ({ w: s.w, c: s.c, e: !!s.e, p: s.p.slice() }));
+    if (saved && saved.ar) ar = saved.ar;
+    else { const b = $("wrap").getBoundingClientRect(); ar = b.width ? b.height / b.width : 4 / 3; put(`d/${g.id}/r${g.r}/ar`, ar); }
+  } else { strokes = []; ar = (saved && saved.ar) || ar; }
+  if (!first && g.last && g.last.k === g.r - 1 && seenToast !== g.id + g.last.k) {
+    seenToast = g.id + g.last.k; toast(`${g.last.ok ? "✅" : "❌"} ${g.last.w}`); vib(g.last.ok ? 20 : [20, 40, 20]);
+  }
+  layout();
+}
+
+function render() {
+  const g = game(), ov = $("ov");
+  if (!g) {
+    $("word").textContent = ""; $("info").textContent = ""; $("bot").innerHTML = `<div id="msg">чекаємо, поки гру запустить другий гравець…</div>`;
+    $("tools").classList.remove("on"); ov.classList.remove("on"); return;
+  }
+  const key = g.id + ":" + (g.done ? "done" : g.r);
+  if (g.done) {
+    if (roundKey !== key) { roundKey = key; isDrawer = false; redraw(); }
+    $("tools").classList.remove("on");
+    return showFinal(g);
+  }
+  ov.classList.remove("on");
+  $("tools").classList.toggle("on", drawerOf(g) === me);
+  if (roundKey !== g.id + ":" + g.r) startRound(g, !roundKey);
+  const dr = drawerOf(g), sc = g.score || {};
+  $("info").textContent = `${g.r + 1}/${g.n} · ${PEOPLE.a.emoji} ${sc.a || 0} · ${PEOPLE.v.emoji} ${sc.v || 0}`;
+  const w = $("word");
+  if (isDrawer) { w.classList.remove("sm"); w.textContent = g.words[g.r]; }
+  else { w.classList.add("sm"); w.textContent = `🕵️ вгадуй, що малює ${PEOPLE[dr].emoji}`; }
+  $("tools").classList.toggle("on", isDrawer);
+  const bot = $("bot");
+  if (isDrawer) {
+    if (!bot.querySelector(".btn")) bot.innerHTML = `<button class="btn" data-r="0">❌ не вгадав</button><button class="btn yes" data-r="1">✅ вгадав</button>`;
+  } else {
+    bot.innerHTML = `<div id="msg">${esc(PEOPLE[dr].emoji)} ${esc(PEOPLE[dr].name)} малює — кажи свої варіанти вголос</div>`;
+    const saved = db.d && db.d[g.id] && db.d[g.id]["r" + g.r];
+    if (saved && saved.ar && Math.abs(saved.ar - ar) > 1e-6) { ar = saved.ar; layout(); } else redraw();
+  }
+}
+
+$("bot").addEventListener("click", e => {
+  const b = e.target.closest("button[data-r]"), g = game();
+  if (!b || !g || g.done || !isDrawer || resBusy === roundKey) return;
+  resBusy = roundKey; sync(); vib(15);
+  const ok = b.dataset.r === "1", ng = JSON.parse(JSON.stringify(g));
+  ng.score = { v: (g.score && g.score.v) || 0, a: (g.score && g.score.a) || 0 };
+  if (ok) ng.score[other(me)]++;
+  ng.last = { k: g.r, w: g.words[g.r], ok };
+  ng.r = g.r + 1; if (ng.r >= g.n) { ng.done = true; ng.r = g.n - 1; }
+  put("g", ng);
+  render();
+});
+
+function showFinal(g) {
+  const sc = g.score || {}, a = sc.a || 0, v = sc.v || 0, win = a === v ? "" : a > v ? "a" : "v", ov = $("ov");
+  const html = `<div class="big">${win ? "🏆" : "🤝"}</div><h2>${win ? `перемагає ${esc(PEOPLE[win].emoji)} ${esc(PEOPLE[win].name)}` : "нічия"}</h2>` +
+    `<div class="muted">вгадано ${a + v} з ${g.n}</div>` +
+    ["a", "v"].map(s => `<div class="row${s === win ? " win" : ""}"><span>${esc(PEOPLE[s].emoji)} ${esc(PEOPLE[s].name)}</span><b>${sc[s] || 0}</b></div>`).join("") +
+    `<button class="go" data-a="again">ще раз</button><button class="ghost" data-a="menu">в меню</button>`;
+  if (ov.dataset.k !== g.id) { ov.dataset.k = g.id; ov.innerHTML = html; vib([30, 50, 30, 50, 90]); }
+  ov.classList.add("on");
+}
+$("ov").addEventListener("click", e => {
+  const a = e.target.closest("button")?.dataset.a, g = game();
+  if (a === "menu") location.href = "index.html";
+  else if (a === "again" && g) { $("ov").dataset.k = ""; newGame(other(g.first)); }
+});
+$("back").addEventListener("click", () => { location.href = "index.html"; });
+
+connect();
+layout();
+if (L && L.by === me) ensureGame();
+</script>
+</body>
+</html>
