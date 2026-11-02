@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff">
+<title>морський бій · draw & more</title>
+<style>
+:root{--bg:#fff;--fg:#1b1b1a;--muted:#9b9a97;--line:#e7e7e4;--soft:#f7f7f5;--serif:"Iowan Old Style","Palatino Linotype",Georgia,serif;--hit:#d95757;--miss:#8da6b8;--ok:#0f7b6c}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{min-height:100dvh;padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;justify-content:center}
+main{width:100%;max-width:460px;display:flex;flex-direction:column;gap:16px}
+button,input{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.back{font-size:14px;color:var(--muted);padding:8px 0}
+.brand{font:600 19px var(--serif)}
+h1{font:600 32px var(--serif);text-align:center}
+.sub{text-align:center;color:var(--muted);font-size:14px;line-height:1.45}
+.panel{border:1px solid var(--line);border-radius:22px;padding:16px;background:#fff}
+.row{display:flex;gap:9px;align-items:center}
+.row>*{min-width:0}
+.primary,.secondary{border-radius:999px;padding:14px 20px;font-size:15px;font-weight:550}
+.primary{background:#111;color:white}
+.secondary{border:1px solid var(--line);background:#fff}
+.primary:disabled{opacity:.35;cursor:default}
+input{width:100%;border:1px solid var(--line);border-radius:14px;padding:13px 14px;font-size:17px;outline:none;user-select:text}
+input:focus{border-color:#777}
+.muted{color:var(--muted);font-size:13px;text-align:center}
+.status{text-align:center;min-height:22px;color:var(--muted);font-size:14px}
+#setup,#game,#result{display:none}
+#setup.on,#game.on,#result.on{display:flex;flex-direction:column;gap:15px}
+#lobby{display:flex;flex-direction:column;gap:15px;margin:auto 0}
+#lobby .panel{display:flex;flex-direction:column;gap:12px}
+.players{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.player{padding:10px 12px;border:1px solid var(--line);border-radius:14px;flex:1}
+.player b{display:block;font-size:15px;margin-bottom:3px}
+.shiplist{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+.ship{border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:13px;color:var(--muted)}
+.ship.active{border-color:var(--fg);color:var(--fg);font-weight:600}
+.ship.done{background:var(--soft);color:var(--fg)}
+.board-wrap{display:flex;flex-direction:column;gap:7px}
+.board-title{display:flex;justify-content:space-between;align-items:center;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:3px;aspect-ratio:1;width:100%;touch-action:manipulation}
+.cell{min-width:0;aspect-ratio:1;border:1px solid #e9e9e6;border-radius:5px;background:#fafaf9;display:grid;place-items:center;font-size:clamp(10px,3.4vw,17px);position:relative}
+.cell:disabled{cursor:default}
+.cell.shipcell{background:#deded9;border-color:#c9c9c2}
+.cell.hit{background:#fae4e1;border-color:#e9b6ae;color:var(--hit)}
+.cell.miss{background:#edf2f5;border-color:#d2dfe6;color:#66869b}
+.cell.sunk{background:#f4d3ce;border-color:#dfaaa1}
+.cell.preview{background:#e4eee9;border-color:#8bb29d}
+.cell.invalid{background:#f7e3e3;border-color:#d99}
+.legend{display:flex;justify-content:center;gap:14px;color:var(--muted);font-size:12px}
+.legend span{display:flex;align-items:center;gap:5px}
+.dot{width:9px;height:9px;border-radius:3px;background:#deded9}
+.dot.hit{background:#e9b6ae}.dot.miss{background:#d2dfe6}
+.controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.controls button{padding:11px 15px}
+#message{text-align:center;font-size:15px;min-height:22px}
+#turn{text-align:center;font:600 20px var(--serif)}
+#enemyGrid .cell:not(.hit):not(.miss){background:#fafaf9}
+#enemyGrid .cell:not(.hit):not(.miss):not(:disabled):active{background:#e9eee9}
+#result{text-align:center;align-items:center;justify-content:center;margin:auto 0}
+#result .emoji{font-size:64px}
+#result h2{font:600 30px var(--serif)}
+@media(min-width:430px){.cell{border-radius:7px}}
+</style>
+</head>
+<body>
+<main>
+<header><button class="back" id="back">‹ меню сайту</button><div class="brand">draw &amp; more</div><span style="width:76px"></span></header>
+
+<section id="lobby">
+<div style="text-align:center;margin:12px 0 4px"><div style="font-size:48px">🚢</div><h1>морський бій</h1><p class="sub">дві половинки · один флот · хто кого?</p></div>
+<div class="panel">
+<div class="players"><div class="player" id="meLabel"><b>ти</b>підключення…</div><div class="player" id="opLabel"><b>суперник</b>очікуємо…</div></div>
+<div class="muted" id="roomLabel"></div>
+<div class="status" id="lobbyStatus">підключаюсь до кімнати…</div>
+<button class="primary" id="begin" disabled>розставити кораблі</button>
+</div>
+<p class="muted">Гра використовує ту саму кімнату, що й інші ігри на сайті.</p>
+</section>
+
+<section id="setup">
+<h1>твій флот</h1>
+<p class="sub">Обери корабель і торкнись поля. Поворот — кнопкою нижче.</p>
+<div class="shiplist" id="shipList"></div>
+<div class="board-wrap"><div class="board-title"><b>твоє поле</b><span class="muted" id="placedCount">0 / 10 палуб</span></div><div class="grid" id="ownGrid"></div></div>
+<div class="controls"><button class="secondary" id="rotate">↻ повернути</button><button class="secondary" id="auto">авторозстановка</button><button class="secondary" id="clear">очистити</button></div>
+<button class="primary" id="ready" disabled>готово, чекаю суперника</button>
+<p class="status" id="setupStatus"></p>
+</section>
+
+<section id="game">
+<div id="turn">твій хід</div>
+<p class="sub" id="gameHint">Обери клітинку на полі суперника.</p>
+<div class="board-wrap"><div class="board-title"><b>поле суперника</b><span class="muted" id="enemyCount">кораблі: 10</span></div><div class="grid" id="enemyGrid"></div></div>
+<div class="legend"><span><i class="dot hit"></i> влучання</span><span><i class="dot miss"></i> промах</span><span><i class="dot"></i> невідомо</span></div>
+<div id="message"></div>
+<div class="board-wrap"><div class="board-title"><b>твоє поле</b><span class="muted" id="ownDamage"></span></div><div class="grid" id="gameOwnGrid"></div></div>
+</section>
+
+<section id="result">
+<div class="emoji" id="resultEmoji">🏆</div><h2 id="resultTitle">перемога!</h2><p class="sub" id="resultText"></p>
+<button class="primary" id="again">зіграти ще раз</button><button class="secondary" id="toLobby">до кімнати</button>
+</section>
+</main>
+<script>
+(() => {
+"use strict";
+const FB="https://draw-8cb08-default-rtdb.europe-west1.firebasedatabase.app";
+const ROOMKEY="k7Qm2xVp9Lr4Tz8n";
+const $=id=>document.getElementById(id);
+const read=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const user=(()=>{try{return JSON.parse(read("dm_user")||"null")}catch(e){return null}})();
+const room=read("dm_room");
+const FLEET=[{n:"авіаносець",s:4,c:1},{n:"лінкор",s:3,c:2},{n:"крейсер",s:2,c:3},{n:"катер",s:1,c:4}];
+const CELLS=100, other=s=>s==="v"?"a":"v";
+const root=()=>`${FB}/rooms/${ROOMKEY}/dm/${room}/battleship`;
+const pub=()=>root()+"/public";
+const priv=s=>root()+"/private/"+s;
+let slot=null, players={}, state={}, myShips=[], enemyShots=[], myShots=[], selected=0, vertical=false, ready=false, es=null, ownEs=null, handling="";
+const allShips=()=>FLEET.flatMap(x=>Array(x.c).fill(x.s));
+function say(id,t){$(id).textContent=t}
+function screen(id){["lobby","setup","game","result"].forEach(x=>$(x).style.display=x===id?(x==="lobby"?"flex":"flex"):"none")}
+async function req(url,method="GET",data){const r=await fetch(url+".json",{method,headers:{"Content-Type":"application/json"},body:data===undefined?undefined:JSON.stringify(data)});if(!r.ok)throw Error("Firebase "+r.status);return r.json()}
+function put(path,data){return req(root()+"/"+path,"PUT",data).catch(e=>{console.error(e);say("lobbyStatus","помилка звʼязку з Firebase")})}
+function makeGrid(id,click,kind){const g=$(id);g.textContent="";for(let i=0;i<100;i++){const b=document.createElement("button");b.className="cell";b.type="button";b.dataset.i=i;b.setAttribute("aria-label",`рядок ${Math.floor(i/10)+1}, стовпець ${i%10+1}`);b.onclick=()=>click(i);g.appendChild(b)}}
+function drawOwn(id,ships,shots=[],allow=false){const g=$(id);[...g.children].forEach((b,i)=>{b.className="cell";b.textContent="";b.disabled=!allow;const hit=shots.find(x=>x.i===i);if(hit){b.classList.add(hit.hit?"hit":"miss");b.textContent=hit.hit?"×":"·"}else if(ships.some(s=>s.cells.includes(i))){b.classList.add("shipcell");if(id==="ownGrid")b.textContent="";}})}
+function cellsFor(start,size,vert){const r=Math.floor(start/10),c=start%10,out=[];for(let k=0;k<size;k++){const rr=r+(vert?k:0),cc=c+(vert?0:k);if(rr>9||cc>9)return null;out.push(rr*10+cc)}return out}
+function canPlace(cells){if(!cells)return false;const occupied=new Set(myShips.flatMap(s=>s.cells));for(const i of cells){const r=Math.floor(i/10),c=i%10;for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const rr=r+dr,cc=c+dc;if(rr>=0&&rr<10&&cc>=0&&cc<10&&occupied.has(rr*10+cc))return false}}return true}
+function renderFleet(){const box=$("shipList");box.textContent="";const list=allShips();let idx=0;FLEET.forEach(f=>{for(let n=0;n<f.c;n++,idx++){const b=document.createElement("button");b.className="ship"+(myShips.some(s=>s.id===idx)?" done":"")+(selected===idx?" active":"");b.textContent=(myShips.some(s=>s.id===idx)?"✓ ":"")+f.n+" · "+f.s;b.onclick=()=>{selected=idx;renderFleet();drawPlacement()};box.append(b)}});$("placedCount").textContent=`${myShips.reduce((n,s)=>n+s.size,0)} / 20 палуб`;$("ready").disabled=myShips.length!==10}
+function drawPlacement(preview=null){drawOwn("ownGrid",myShips,[],false);if(preview){const cells=cellsFor(preview,allShips()[selected],vertical);if(cells){const valid=canPlace(cells);cells.forEach(i=>{const b=$("ownGrid").children[i];b.classList.add(valid?"preview":"invalid")})}}}
+function place(i){if(myShips.some(s=>s.id===selected))return;const size=allShips()[selected],cells=cellsFor(i,size,vertical);if(!canPlace(cells)){say("setupStatus","кораблі не можуть торкатись одне одного");return}myShips.push({id:selected,size,cells});const next=allShips().findIndex((_,idx)=>!myShips.some(s=>s.id===idx));if(next>=0)selected=next;renderFleet();drawPlacement();say("setupStatus","")}
+function randomFleet(){myShips=[];for(let id=0;id<10;id++){const size=allShips()[id];let ok=false,tries=0;while(!ok&&tries++<3000){const start=Math.floor(Math.random()*100),vert=Math.random()<.5,cells=cellsFor(start,size,vert);if(canPlace(cells)){myShips.push({id,size,cells});ok=true}}if(!ok){myShips=[];return randomFleet()}}selected=0;renderFleet();drawPlacement();say("setupStatus","флот готовий")}
+function paintEnemy(){const g=$("enemyGrid");[...g.children].forEach((b,i)=>{b.className="cell";b.textContent="";const x=(state.shots||[]).find(s=>s.by===slot&&s.i===i);if(x){b.classList.add(x.hit?"hit":"miss");b.textContent=x.hit?"×":"·";}b.disabled=!state.started||state.turn!==slot||!!x||!!state.over});}
+function paintOwn(){drawOwn("gameOwnGrid",myShips,state.shots||[],false);const hits=(state.shots||[]).filter(s=>s.by!==slot&&s.hit).length;say("ownDamage",`${hits} влучань по тобі`)}
+function refresh(){players=state.players||players;const op=players[other(slot)];say("meLabel",`${user.emoji||"🙂"} ${user.name}`);say("opLabel",op?`${op.emoji||"🙂"} ${op.name}`:"очікуємо другого гравця…");say("roomLabel",`кімната ${room||"—"}`);if(state.over){showResult();return}if(state.started){screen("game");const mineTurn=state.turn===slot;say("turn",mineTurn?"твій хід":"хід суперника");say("gameHint",mineTurn?"Обери клітинку на полі суперника.":"Очікуємо постріл суперника…");paintEnemy();paintOwn();say("message",state.last?`${state.last.by===slot?"ти":"суперник"}: ${state.last.hit?"влучання!":"промах"}`:"");return}if(state.ready&&state.ready[slot]){screen("setup");say("setupStatus",state.ready[other(slot)]?"обидва готові — запускаємо…":"готово! чекаємо суперника");} }
+function showResult(){screen("result");const won=state.winner===slot;say("resultEmoji",won?"🏆":"💛");say("resultTitle",won?"ти переміг!":"цього разу суперник переміг");say("resultText","гарна партія! можна зіграти ще раз.");}
+async function handlePending(){const p=state.pending;if(!p||p.by===slot||p.result||!myShips.length||handling===p.id)return;handling=p.id;const hit=myShips.some(s=>s.cells.includes(p.i));const updated={...p,result:hit?"hit":"miss",resolvedBy:slot};await put("public/pending",updated);const shots=(state.shots||[]).concat([{id:p.id,by:p.by,i:p.i,hit}]);const sunk=myShips.filter(s=>s.cells.every(i=>shots.some(x=>x.by===other(slot)&&x.i===i&&x.hit))).length;const over=sunk===10;await put("public/shots",shots);await put("public/last",{by:p.by,i:p.i,hit});if(over)await put("public/over",{winner:p.by});await put("public/turn",hit?p.by:slot);handling="";}
+async function shoot(i){if(!state.started||state.turn!==slot||state.over)return;if((state.shots||[]).some(s=>s.by===slot&&s.i===i))return;const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);await put("public/pending",{id,by:slot,i,at:Date.now()});say("message","постріл зроблено…");}
+function onPublic(d){state=d||{};if(state.over)state.over=typeof state.over==="object"?state.over:null;refresh();handlePending();}
+async function connect(){if(es)es.close();es=new EventSource(pub()+".json");es.addEventListener("put",e=>{try{const x=JSON.parse(e.data);if(x.path==="/")onPublic(x.data);else{const parts=x.path.split("/").filter(Boolean);let o=state;for(let i=0;i<parts.length-1;i++)o=o[parts[i]]=o[parts[i]]||{};const k=parts.at(-1);if(x.data===null)delete o[k];else o[k]=x.data;refresh();handlePending()}}catch(err){console.error(err)}});es.onerror=()=>say("lobbyStatus","перепідключення…");try{state=await req(pub())||{};refresh()}catch(e){say("lobbyStatus","не вдалося прочитати кімнату")}}
+async function loadPrivate(){try{const x=await req(priv(slot));myShips=x?.ships||[];enemyShots=x?.shots||[]}catch(e){myShips=[]}}
+async function init(){if(!user||!room){say("lobbyStatus","спершу увійди на головній сторінці та зайди в кімнату");$("begin").disabled=true;return}const roomData=await req(`${FB}/rooms/${ROOMKEY}/dm/${room}`).catch(()=>null);if(!roomData?.players){say("lobbyStatus","кімнату не знайдено — спершу створи її на головній сторінці");return}players=roomData.players;slot=Object.keys(players).find(s=>players[s]?.uid===user.uid)||null;if(!slot){say("lobbyStatus","твій акаунт не знайдений у цій кімнаті");return}say("lobbyStatus","кімната підключена");$("begin").disabled=false;await loadPrivate();await connect();if(state.started)screen("game");}
+$("begin").onclick=()=>{myShips=[];selected=0;vertical=false;renderFleet();drawPlacement();screen("setup")};
+$("ownGrid").addEventListener("click",e=>{const b=e.target.closest("button[data-i]");if(b)place(+b.dataset.i)});
+$("ownGrid").addEventListener("pointerover",e=>{const b=e.target.closest("button[data-i]");if(b&&e.pointerType==="mouse")drawPlacement(+b.dataset.i)});
+$("ownGrid").addEventListener("pointerout",()=>drawPlacement());
+$("rotate").onclick=()=>{vertical=!vertical;say("setupStatus",vertical?"орієнтація: вертикально":"орієнтація: горизонтально")};
+$("auto").onclick=randomFleet;
+$("clear").onclick=()=>{myShips=[];renderFleet();drawPlacement();say("setupStatus","")};
+$("ready").onclick=async()=>{if(myShips.length!==10)return;await req(priv(slot),"PUT",{ships:myShips});await put("public/ready/"+slot,true);say("setupStatus","чекаємо суперника…");if(state.ready?.[other(slot)]){await put("public/started",true);await put("public/turn","v");}refresh()};
+makeGrid("ownGrid",place,"own");makeGrid("enemyGrid",shoot,"enemy");makeGrid("gameOwnGrid",()=>{},"own");
+$("enemyGrid").addEventListener("click",e=>{const b=e.target.closest("button[data-i]");if(b)shoot(+b.dataset.i)});
+$("again").onclick=async()=>{await put("public",null);await req(priv(slot),"PUT",null);myShips=[];state={};screen("lobby");await connect()};
+$("toLobby").onclick=()=>{screen("lobby");refresh()};
+$("back").onclick=()=>{location.href="index.html"};
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)connect()});
+init().catch(e=>say("lobbyStatus","помилка запуску: "+e.message));
+})();
+</script>
+</body>
+</html>
