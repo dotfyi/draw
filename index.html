@@ -100,7 +100,8 @@ h2{font-family:var(--serif);font-size:28px;font-weight:600;text-align:center}
 .gc .ch{color:var(--muted);font-size:24px;padding-right:4px}
 
 /* нижнє меню */
-#dock{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);width:auto;max-width:none;display:flex;gap:4px;padding:6px;border-radius:999px;background:color-mix(in srgb,var(--pill) 82%,transparent);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid var(--line);box-shadow:0 12px 32px var(--sh);z-index:6}
+#dock{display:none;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);width:auto;max-width:none;display:flex;gap:4px;padding:6px;border-radius:999px;background:var(--pill);border:1px solid var(--line);box-shadow:0 12px 32px var(--sh);z-index:6}
+body.menu-on #dock{display:flex}
 .dk{display:flex;align-items:center;gap:7px;padding:12px 16px;border-radius:999px;font-size:14px;font-weight:600;color:var(--muted);transition:background .25s,color .25s}
 .dk svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .dk span{display:none}
@@ -108,10 +109,10 @@ h2{font-family:var(--serif);font-size:28px;font-weight:600;text-align:center}
 .dk.on span{display:inline;animation:fi .25s both}
 
 /* картка гри (шторка) */
-#scrim{position:fixed;inset:0;width:auto;max-width:none;background:rgba(0,0,0,.38);opacity:0;pointer-events:none;transition:opacity .3s;z-index:8}
-#sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:480px;transform:translate(-50%,105%);transition:transform .42s cubic-bezier(.2,.8,.2,1);background:var(--bg);border-radius:28px 28px 0 0;padding:10px 22px calc(env(safe-area-inset-bottom,0px) + 22px);z-index:9;display:flex;flex-direction:column;gap:14px;max-height:90dvh;overflow-y:auto;box-shadow:0 -12px 44px rgba(0,0,0,.22)}
-.sh-open #scrim{opacity:1;pointer-events:auto}
-.sh-open #sheet{transform:translate(-50%,0)}
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.38);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s,visibility 0s .3s;z-index:8}
+#sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:480px;transform:translate(-50%,100%);visibility:hidden;transition:transform .42s cubic-bezier(.2,.8,.2,1),visibility 0s .42s;background:var(--bg);border-radius:28px 28px 0 0;padding:10px 22px calc(env(safe-area-inset-bottom,0px) + 22px);z-index:9;display:flex;flex-direction:column;gap:14px;max-height:90dvh;overflow-y:auto;box-shadow:0 -12px 44px rgba(0,0,0,.22)}
+.sh-open #scrim{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .3s}
+.sh-open #sheet{transform:translate(-50%,0);visibility:visible;transition:transform .42s cubic-bezier(.2,.8,.2,1)}
 .grab{width:42px;height:5px;border-radius:9px;background:var(--line);align-self:center}
 .shh{display:flex;align-items:center;gap:14px}
 .shh .gt{width:62px;height:62px;font-size:34px;border-radius:20px}
@@ -126,13 +127,15 @@ h2{font-family:var(--serif);font-size:28px;font-weight:600;text-align:center}
 /* налаштування */
 .card2{background:var(--pill);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 4px 14px var(--sh)}
 .ro{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;font-size:15px}
-.ro+.ro,.prof+.ro,.ro+.ems{border-top:1px solid var(--line)}
+.ro+.ro,.prof+.ro{border-top:1px solid var(--line)}
 .ro.col{flex-direction:column;align-items:stretch}
 .ro .lnk{padding:4px 0}
 .prof{display:flex;align-items:center;gap:14px;padding:16px}
 .prof b{display:block;font-size:18px}
 .prof small{font-size:13px;color:var(--muted)}
-.ems{display:flex;flex-wrap:wrap;gap:4px;padding:8px 12px 12px}
+.ems{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:2px 12px 12px;justify-items:center}
+#nmEdit{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;font-size:15px;outline:none;background:var(--bg);user-select:text;-webkit-user-select:text}
+#nmEdit:focus{border-color:var(--fg)}
 .ems button{font-size:24px;padding:6px 8px;border-radius:12px}
 .ems button.on{background:var(--soft);box-shadow:inset 0 0 0 1.5px var(--fg)}
 .seg{display:flex;background:var(--soft);border-radius:999px;padding:3px}
@@ -254,6 +257,8 @@ h2{font-family:var(--serif);font-size:28px;font-weight:600;text-align:center}
 <section class="pane" id="p-stats"></section>
 <section class="pane" id="p-set"></section>
 
+</div>
+
 <nav id="dock">
 <button class="dk on" data-tab="games"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span>ігри</span></button>
 <button class="dk" data-tab="stats"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></svg><span>статистика</span></button>
@@ -268,7 +273,6 @@ h2{font-family:var(--serif);font-size:28px;font-weight:600;text-align:center}
 <div id="dSet"></div>
 <button class="blk" id="startBtn">почати гру</button>
 <button class="lnk" id="shClose">закрити</button>
-</div>
 </div>
 
 <div class="s" id="s-hang">
@@ -290,7 +294,11 @@ const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return
 const otherOf = s => s === "v" ? "a" : "v";
 const rnd = () => Math.random().toString(36).slice(2, 8);
 const vib = p => { if (ls.get("dm_vib") === "0") return; navigator.vibrate && navigator.vibrate(p); };
-function go(id) { document.querySelectorAll(".s").forEach(s => s.classList.toggle("on", s.id === id)); }
+function go(id) {
+  document.querySelectorAll(".s").forEach(s => s.classList.toggle("on", s.id === id));
+  document.body.classList.toggle("menu-on", id === "s-menu");
+  if (id !== "s-menu") document.body.classList.remove("sh-open");
+}
 const cur = () => document.querySelector(".s.on").id;
 
 /* ───── тема ───── */
@@ -306,6 +314,8 @@ try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", appl
 /* ───── акаунти ───── */
 const CODES = { "2512": { pref: "a", name: "аліна", emoji: "🦊" }, "1974": { pref: "v", name: "вадим", emoji: "👻" } };
 const GUEST_EMOJI = ["🐼", "🦉", "🐙", "🍀", "🌵", "🐸", "🦄", "🐻", "🦁", "🐧"];
+const EMOJIS = ["🦊", "👻", "🐼", "🦉", "🐙", "🍀", "🌵", "🐸", "🦄", "🐻", "🦁", "🐧", "🐯", "🐰", "🦋", "🐳", "🌸", "🍓"];
+let editName = false;
 const DUO = "duo";
 let user = null;
 try { user = JSON.parse(ls.get("dm_user")); } catch (e) {}
@@ -383,7 +393,11 @@ async function joinDuo() {
     if (!room || !room.players) {
       await fetch(rb(DUO) + ".json", { method: "PUT", body: JSON.stringify({ created: Date.now(), players: { [user.pref]: me() } }) });
       enter(DUO, user.pref, true);
-    } else enter(DUO, user.pref);
+    } else {
+      const p = room.players[user.pref];   // збережений профіль у кімнаті — головний
+      if (p && p.name) { user.name = p.name; user.emoji = p.emoji || user.emoji; ls.set("dm_user", JSON.stringify(user)); }
+      enter(DUO, user.pref);
+    }
   } catch (e) { return "нема звʼязку"; }
 }
 $("hCreate").onclick = () => openCode("придумай код гри", "створити", "4 цифри · однаковий код = одна гра", "s-home", async code => {
@@ -446,7 +460,7 @@ const GAMES = [
   { id: "guess", e: "🕵️", n: "вгадай малюнок", s: "ти малюєш — другий вгадує", c: "140,110,230", g: 0, d: "У кожного своє слово. Ти малюєш — другий вгадує, що це." },
   { id: "relay", e: "🔄", n: "естафета", s: "малюнки міняються кожні 30 с", c: "40,170,150", g: 0, d: "30 секунд малюєш — і малюнки міняються місцями. 5 раундів, а в кінці побачите спільний шедевр." },
   { id: "croc", e: "🐊", n: "крокодил", s: "малюй наживо, вгадуй вголос", c: "86,170,92", g: 0, d: "Один малює слово, другий бачить малюнок наживо й вгадує вголос. Малювальник тисне «вгадав» або «не вгадав» — і ви міняєтесь ролями." },
-  { id: "word", e: "🔤", n: "вгадай слово", s: "вікторина з квадратиками", c: "232,160,40", g: 1, d: "Питання зверху, відповідь — у квадратиках. Відкривайте літери по черзі, першою ходить 🦊 аліна. Можна одразу вгадувати слово!" },
+  { id: "word", e: "🔤", n: "вгадай слово", s: "вікторина з квадратиками", c: "232,160,40", g: 1, d: "Питання зверху, відповідь — у квадратиках. Відкривайте літери по черзі, першим(ою) ходить {a}. Можна одразу вгадувати слово!" },
   { id: "ships", e: "🚢", n: "морський бій", s: "класичний флот 10×10", c: "60,130,220", g: 1, d: "Розставте кораблі на полі 10×10 і по черзі шукайте флот суперника. Влучання дає додатковий постріл, а промах передає хід супернику." }
 ];
 const GMETA = Object.fromEntries(GAMES.map(g => [g.id, g]));
@@ -479,7 +493,7 @@ function renderMenu() { renderHeader(); if (tab === "stats") renderStats(); }
 /* ───── вкладки ───── */
 let tab = "games";
 function setTab(t) {
-  tab = t;
+  tab = t; editName = false;
   ["games", "stats", "set"].forEach(x => { $("p-" + x).classList.toggle("on", x === t); document.querySelector(`[data-tab="${x}"]`).classList.toggle("on", x === t); });
   if (t === "stats") renderStats(); else if (t === "set") renderSettings();
   renderHeader(); $("s-menu").scrollTop = 0;
@@ -495,14 +509,14 @@ function chips(label, key, vals, store) {
 }
 function openSheet(i) {
   picked = GAMES[i];
-  $("shT").textContent = picked.e; $("shT").style.setProperty("--c", picked.c); $("shN").textContent = picked.n; $("dDesc").textContent = picked.d;
+  $("shT").textContent = picked.e; $("shT").style.setProperty("--c", picked.c); $("shN").textContent = picked.n; $("dDesc").textContent = picked.d.replace("{a}", `${pl("a").emoji} ${pl("a").name}`);
   $("dSet").textContent = "";
   if (picked.id === "word") $("dSet").append(chips("питань", "n", [3, 5, 10], "h_n"), chips("спроб на помилки", "lives", [6, 8, 10], "h_l"));
   if (picked.id === "croc") $("dSet").append(chips("раундів", "crocN", [4, 6, 10], "c_n"));
   if (picked.id === "same" || picked.id === "guess") $("dSet").append(chips("раунди", "rounds", [3, 5, 10], "d_rounds"), chips("час на малюнок", "dur", [[30000, "30 с"], [60000, "60 с"], [90000, "90 с"]], "d_dur"), chips("слова", "cat", DCATS, "d_cat"));
-  $("s-menu").classList.add("sh-open"); vib(10);
+  document.body.classList.add("sh-open"); vib(10);
 }
-function closeSheet() { picked = null; $("s-menu").classList.remove("sh-open"); }
+function closeSheet() { picked = null; document.body.classList.remove("sh-open"); }
 $("scrim").onclick = $("shClose").onclick = () => closeSheet();
 $("startBtn").onclick = () => {
   if (!picked) return;
@@ -576,7 +590,8 @@ function renderSettings() {
   const duo = rc === DUO, th = ls.get("dm_theme") || "auto", vb = ls.get("dm_vib") !== "0", sn = ls.get("dm_snd") !== "0";
   $("p-set").innerHTML = `<h1 class="pt">меню</h1>
 <div class="card2"><div class="prof"><div class="av big">${user.emoji}</div><div><b>${esc(user.name)}</b><small>${duo ? "💞 ваша спільна кімната" : "гість · 🔑 " + esc(rc)}</small></div></div>
-${duo ? "" : `<div class="ro"><span>імʼя</span><button class="lnk" data-s="name">змінити</button></div><div class="ems">${GUEST_EMOJI.map(e => `<button data-em="${e}"${e === user.emoji ? ' class="on"' : ""}>${e}</button>`).join("")}</div>`}</div>
+${editName ? `<div class="ro"><input id="nmEdit" maxlength="12" value="${esc(user.name)}" autocomplete="off"><button class="lnk" data-s="saveName">зберегти</button></div>` : `<div class="ro"><span>імʼя</span><button class="lnk" data-s="name">змінити</button></div>`}
+<div class="ro col"><span>емодзі</span></div><div class="ems">${EMOJIS.map(e => `<button data-em="${e}"${e === user.emoji ? ' class="on"' : ""}>${e}</button>`).join("")}</div></div>
 <div class="sec">вигляд</div>
 <div class="card2"><div class="ro col"><span>тема</span><div class="seg">${[["auto", "авто"], ["light", "світла"], ["dark", "темна"]].map(([k, l]) => `<button data-th="${k}"${th === k ? ' class="on"' : ""}>${l}</button>`).join("")}</div></div></div>
 <div class="sec">відгук</div>
@@ -593,7 +608,8 @@ $("p-set").onclick = e => {
   else if (em) { user.emoji = em; ls.set("dm_user", JSON.stringify(user)); put("players/" + mySlot, me()); renderSettings(); renderHeader(); vib(8); }
   else if (s === "vib") { ls.set("dm_vib", ls.get("dm_vib") === "0" ? "1" : "0"); renderSettings(); vib(20); }
   else if (s === "snd") { ls.set("dm_snd", ls.get("dm_snd") === "0" ? "1" : "0"); renderSettings(); }
-  else if (s === "name") { const n = (prompt("нове імʼя", user.name) || "").trim().slice(0, 12); if (n) { user.name = n; ls.set("dm_user", JSON.stringify(user)); put("players/" + mySlot, me()); renderSettings(); renderHeader(); } }
+  else if (s === "name") { editName = true; renderSettings(); const i = $("nmEdit"); if (i) { i.focus(); i.select(); } }
+  else if (s === "saveName") { const n = ($("nmEdit").value || "").trim().slice(0, 12); editName = false; if (n) { user.name = n; ls.set("dm_user", JSON.stringify(user)); put("players/" + mySlot, me()); renderHeader(); } renderSettings(); }
   else if (s === "reset") { if (confirm("точно скинути всю статистику ігор?")) { put("stats", null); renderSettings(); } }
   else if (s === "leave") { if (confirm("вийти з кімнати?")) leaveRoom(); }
   else if (s === "out") { if (confirm("вийти з акаунта?")) logout(); }
@@ -680,8 +696,15 @@ const QS = [
 ];
 const ABC = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ";
 let gKey = "", gmode = false, draft = [], ovKey = "";
+function shuffle(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function newHang(c) {
-  const idx = QS.map((_, i) => i).sort(() => Math.random() - .5).slice(0, c.n);
+  // питання, що вже були у вашій кімнаті, не повторюємо, доки не закінчаться всі
+  const used = db.usedQs || {};
+  let pool = QS.map((_, i) => i).filter(i => !used["q" + i]), fresh = false;
+  if (pool.length < c.n) { pool = QS.map((_, i) => i); fresh = true; }
+  const idx = shuffle(pool).slice(0, c.n), nu = fresh ? {} : { ...used };
+  idx.forEach(i => { nu["q" + i] = 1; });
+  put("usedQs", nu);
   return { id: rnd(), qs: idx, n: c.n, lives: c.lives, r: 0, tried: "", turn: "a", score: { v: 0, a: 0 } };
 }
 const cloneG = () => { const g = JSON.parse(JSON.stringify(db.game)); g.tried = g.tried || ""; g.score = g.score || {}; g.score.v = g.score.v || 0; g.score.a = g.score.a || 0; return g; };
