@@ -461,15 +461,16 @@ const GAMES = [
   { id: "relay", e: "🔄", n: "естафета", s: "малюнки міняються кожні 30 с", c: "40,170,150", g: 0, d: "30 секунд малюєш — і малюнки міняються місцями. 5 раундів, а в кінці побачите спільний шедевр." },
   { id: "croc", e: "🐊", n: "крокодил", s: "малюй наживо, вгадуй вголос", c: "86,170,92", g: 0, d: "Один малює слово, другий бачить малюнок наживо й вгадує вголос. Малювальник тисне «вгадав» або «не вгадав» — і ви міняєтесь ролями." },
   { id: "word", e: "🔤", n: "вгадай слово", s: "вікторина з квадратиками", c: "232,160,40", g: 1, d: "Питання зверху, відповідь — у квадратиках. Відкривайте літери по черзі, першим(ою) ходить {a}. Можна одразу вгадувати слово!" },
+  { id: "find", e: "🔢", n: "знайди число", s: "хто швидше знайде число", c: "235,105,70", g: 1, d: "На полі хаотично розкидані числа. Зверху зʼявляється число — хто першим його знайде й торкнеться, той отримує бал. Помилився — пауза 1,5 с. Грають до заданої кількості очок." },
   { id: "ships", e: "🚢", n: "морський бій", s: "класичний флот 10×10", c: "60,130,220", g: 1, d: "Розставте кораблі на полі 10×10 і по черзі шукайте флот суперника. Влучання дає додатковий постріл, а промах передає хід супернику." }
 ];
 const GMETA = Object.fromEntries(GAMES.map(g => [g.id, g]));
-const cfg = { n: +ls.get("h_n") || 5, lives: +ls.get("h_l") || 8, rounds: +ls.get("d_rounds") || 5, crocN: +ls.get("c_n") || 6, dur: +ls.get("d_dur") || 60000, cat: ls.get("d_cat") || "всі слова" };
+const cfg = { n: +ls.get("h_n") || 5, lives: +ls.get("h_l") || 8, rounds: +ls.get("d_rounds") || 5, crocN: +ls.get("c_n") || 6, findN: +ls.get("f_n") || 10, dur: +ls.get("d_dur") || 60000, cat: ls.get("d_cat") || "всі слова" };
 const DCATS = ["🐾 тварини", "🍕 їжа", "🏠 речі", "🌋 природа", "🚀 транспорт", "🧙 професії й герої", "🎈 спорт і розваги", "🏰 будівлі та місця", "🎲 різне", "💕 про нас", "🎯 всі слова"].map(x => [x.slice(x.indexOf(" ") + 1), x]);
 let picked = null;
 (() => {
   const box = $("glist");
-  [["малювання", 0], ["слова й стратегія", 1]].forEach(([title, grp]) => {
+  [["малювання", 0], ["слова й кмітливість", 1]].forEach(([title, grp]) => {
     const h = document.createElement("div"); h.className = "sec"; h.textContent = title; box.appendChild(h);
     GAMES.forEach((g, i) => {
       if (g.g !== grp) return;
@@ -513,6 +514,7 @@ function openSheet(i) {
   $("dSet").textContent = "";
   if (picked.id === "word") $("dSet").append(chips("питань", "n", [3, 5, 10], "h_n"), chips("спроб на помилки", "lives", [6, 8, 10], "h_l"));
   if (picked.id === "croc") $("dSet").append(chips("раундів", "crocN", [4, 6, 10], "c_n"));
+  if (picked.id === "find") $("dSet").append(chips("до скількох очок", "findN", [5, 10, 15], "f_n"));
   if (picked.id === "same" || picked.id === "guess") $("dSet").append(chips("раунди", "rounds", [3, 5, 10], "d_rounds"), chips("час на малюнок", "dur", [[30000, "30 с"], [60000, "60 с"], [90000, "90 с"]], "d_dur"), chips("слова", "cat", DCATS, "d_cat"));
   document.body.classList.add("sh-open"); vib(10);
 }
@@ -520,7 +522,7 @@ function closeSheet() { picked = null; document.body.classList.remove("sh-open")
 $("scrim").onclick = $("shClose").onclick = () => closeSheet();
 $("startBtn").onclick = () => {
   if (!picked) return;
-  const l = { id: rnd(), game: picked.id, by: mySlot, cfg: { n: cfg.n, lives: cfg.lives, rounds: cfg.rounds, dur: cfg.dur, cat: cfg.cat, crocN: cfg.crocN } };
+  const l = { id: rnd(), game: picked.id, by: mySlot, cfg: { n: cfg.n, lives: cfg.lives, rounds: cfg.rounds, dur: cfg.dur, cat: cfg.cat, crocN: cfg.crocN, findN: cfg.findN } };
   if (l.game === "word") put("game", newHang(l.cfg));
   launchSeen = l.id; put("launch", l); run(l);
 };
@@ -528,6 +530,7 @@ function run(l) {
   closeSheet();
   if (l.game === "word") { gKey = ""; go("s-hang"); renderHang(); }
   else if (l.game === "ships") location.href = "battleship.html";
+  else if (l.game === "find") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "find.html"; }
   else if (l.game === "croc") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "crocodile.html"; }
   else { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "draw.html"; }
 }
