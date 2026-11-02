@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<link rel="apple-touch-icon" href="IMG_2010.jpeg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
+<title>draw &amp; more</title>
+<style>
+:root{--bg:#fff;--fg:#1b1b1a;--muted:#9b9a97;--line:#e7e7e4;--ok:#0f7b6c;--bad:#e03e3e;--serif:"Iowan Old Style","Palatino Linotype",Georgia,serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{height:100dvh;position:relative;color:var(--fg);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input{font:inherit;color:inherit}
+.s{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 18px) 22px calc(env(safe-area-inset-bottom,0px) + 22px);overflow-y:auto}
+.s.on{display:flex}
+.s>*{width:100%;max-width:400px;position:relative;z-index:1}
+.blk{background:#111;color:#fff;border-radius:999px;padding:16px 28px;font-size:16px;font-weight:500;text-align:center;transition:transform .15s,opacity .2s}
+.blk:active{transform:scale(.97)}
+.blk:disabled{opacity:.3;cursor:default}
+.blk.sm{padding:12px 18px;font-size:15px}
+.wht{background:#fff;border:1px solid var(--line);border-radius:999px;padding:16px 28px;font-size:16px;font-weight:500;text-align:center}
+.wht:active{transform:scale(.97)}
+.lnk{color:var(--muted);font-size:14px;padding:8px}
+.muted{color:var(--muted);font-size:14px}
+h2{font-family:var(--serif);font-size:28px;font-weight:600;text-align:center}
+.err{min-height:20px;color:var(--bad);font-size:14px;text-align:center}
+/* welcome */
+#float{position:absolute;inset:0;overflow:hidden;pointer-events:none;max-width:none}
+#float span{position:absolute;opacity:.2;animation:lev var(--d) ease-in-out infinite alternate}
+@keyframes lev{from{transform:translateY(8px) rotate(-5deg)}to{transform:translateY(-16px) rotate(5deg)}}
+.brand{margin:auto;font-family:var(--serif);font-size:22px;letter-spacing:.6px;text-align:center;width:auto}
+/* code */
+#s-code,#s-name{gap:16px}
+.back{align-self:flex-start;font-size:28px;color:var(--muted);width:auto;padding:0 8px;line-height:1}
+#cells{display:flex;gap:12px;justify-content:center;margin-top:8px}
+#cells i{width:58px;height:68px;border:1.5px solid var(--line);border-radius:16px;display:grid;place-items:center;font:600 30px var(--serif);font-style:normal;transition:border-color .2s}
+#cells i.f{border-color:var(--fg)}
+#cells.shake{animation:sh .35s}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+#pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:auto}
+#pad button{height:54px;border:1px solid var(--line);border-radius:16px;font-size:22px;font-weight:500;background:#fff}
+#pad button:active{background:#f1f1ef}
+.hint{text-align:center;color:var(--muted);font-size:13px}
+#nm{border:1.5px solid var(--line);border-radius:16px;padding:16px;font-size:18px;text-align:center;outline:none;user-select:text;-webkit-user-select:text}
+#nm:focus{border-color:var(--fg)}
+/* home */
+.me{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:600}
+.me b{font-size:26px;font-weight:400}
+.mid{margin:auto 0;display:flex;flex-direction:column;gap:12px}
+/* menu */
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.top .st{font-size:13px;color:var(--muted);text-align:right;flex:1}
+#mm{flex:1;width:100%;display:flex;flex-direction:column;transition:padding-top .5s cubic-bezier(.2,.8,.2,1)}
+#cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;height:312px;transition:height .5s cubic-bezier(.2,.8,.2,1);align-content:start}
+.card{height:150px;border:1.5px solid var(--line);border-radius:24px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;box-shadow:0 6px 18px rgba(0,0,0,.05);transition:transform .5s cubic-bezier(.2,.8,.2,1),opacity .35s}
+.card:active{transform:scale(.97)}
+.ce{font-size:54px;line-height:1}
+.cn{font-size:15px;font-weight:600}
+#detail{display:none;margin-top:20px;text-align:center;flex-direction:column;gap:14px;align-items:center}
+.pick #detail{display:flex;animation:fi .5s .25s both}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#dDesc{font-size:15px;line-height:1.45;color:#55534e}
+.og{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.ol{font-size:12px;color:var(--muted)}
+.chip{padding:8px 16px;border:1px solid var(--line);border-radius:999px;font-size:14px;color:var(--muted)}
+.chip.on{border-color:var(--fg);color:var(--fg);font-weight:600}
+#startBtn{display:none}
+.pick #startBtn{display:block}
+/* hangman */
+.hbar{display:flex;align-items:center;justify-content:space-between}
+#hgInfo{font-size:14px;color:var(--muted)}
+#hgPl{display:flex;gap:10px;margin-top:6px}
+.pc{flex:1;display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1.5px solid var(--line);border-radius:16px;font-size:14px;font-weight:600;transition:border-color .2s}
+.pc.turn{border-color:var(--fg)}
+.pc b{font:700 22px var(--serif)}
+#hgQ{font-family:var(--serif);font-size:22px;font-weight:600;text-align:center;margin:18px 0 16px;text-wrap:balance}
+#hgBox{display:flex;gap:6px;justify-content:center;margin-bottom:12px}
+#hgBox i{flex:1 1 0;min-width:0;max-width:40px;aspect-ratio:1;border:2px solid var(--fg);border-radius:10px;display:grid;place-items:center;font:700 20px var(--serif);font-style:normal}
+#hgBox i.o{background:#f1f1ef}
+#hgBox i.d{border-style:dashed;color:var(--muted)}
+#hgBox i.m{color:var(--bad);border-color:var(--line)}
+#hgSt{min-height:44px;text-align:center;font-size:14px;color:#55534e;line-height:1.5;margin-bottom:10px}
+#hgKb{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.k{width:calc((100% - 40px)/9);height:42px;border:1px solid var(--line);border-radius:10px;font-weight:600;background:#fff}
+.k.ok{background:#e3f4ef;border-color:var(--ok);color:var(--ok)}
+.k.bad{opacity:.25;text-decoration:line-through}
+.k:disabled{opacity:.4;cursor:default}
+.k.ok:disabled{opacity:1}
+.k.bad:disabled{opacity:.25}
+#hgAct{display:flex;gap:8px;justify-content:center;margin-top:12px;min-height:50px}
+#hgAct .wht,#hgAct .blk{padding:12px 18px;font-size:15px}
+.ov{position:absolute;inset:0;max-width:none!important;background:rgba(255,255,255,.96);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;z-index:5!important}
+.ov.on{display:flex}
+.ov>*{width:100%;max-width:340px}
+.ov .big{font-size:56px;line-height:1}
+.row{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border:1.5px solid var(--line);border-radius:18px;font-weight:600}
+.row.win{border-color:var(--fg)}
+.row b{font:700 26px var(--serif)}
+.wd{font:700 30px var(--serif);letter-spacing:3px}
+</style>
+</head>
+<body>
+
+<div class="s on" id="s-welcome">
+<div id="float"></div>
+<div class="brand">draw &amp; more</div>
+<button class="blk" id="toAuth">авторизуватись</button>
+</div>
+
+<div class="s" id="s-code">
+<button class="back" id="cback">‹</button>
+<h2 id="ctitle"></h2>
+<div id="cells"><i></i><i></i><i></i><i></i></div>
+<div class="err" id="cerr"></div>
+<div id="pad"></div>
+<button class="blk" id="cgo" disabled>увійти</button>
+<div class="hint" id="chint"></div>
+</div>
+
+<div class="s" id="s-name">
+<h2>як тебе звати?</h2>
+<input id="nm" maxlength="12" placeholder="імʼя" autocomplete="off">
+<button class="blk" id="nmGo">далі</button>
+</div>
+
+<div class="s" id="s-home">
+<div class="me" id="hMe"></div>
+<div class="mid">
+<button class="blk" id="hCreate">створити гру</button>
+<button class="wht" id="hJoin">приєднатись</button>
+</div>
+<button class="lnk" id="hOut">вийти з акаунта</button>
+</div>
+
+<div class="s" id="s-menu">
+<div class="top"><div class="me" id="mMe"></div><div class="st" id="mSt"></div><button class="lnk" id="mExit" aria-label="вийти з кімнати">✕</button></div>
+<div id="mm">
+<div id="cards"></div>
+<div id="detail">
+<button class="lnk" id="mBack">‹ усі ігри</button>
+<div id="dDesc"></div>
+<div id="dSet"></div>
+</div>
+</div>
+<button class="blk" id="startBtn">почати гру</button>
+</div>
+
+<div class="s" id="s-hang">
+<div class="hbar"><button class="lnk" id="hgBack" style="padding-left:0">‹ меню</button><div id="hgInfo"></div></div>
+<div id="hgPl"></div>
+<div id="hgQ"></div>
+<div id="hgBox"></div>
+<div id="hgSt"></div>
+<div id="hgKb"></div>
+<div id="hgAct"></div>
+<div class="ov" id="hgOv"></div>
+</div>
+
+<script>
+const FB = "https://draw-8cb08-default-rtdb.europe-west1.firebasedatabase.app", ROOM = "k7Qm2xVp9Lr4Tz8n";
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
+const otherOf = s => s === "v" ? "a" : "v";
+const rnd = () => Math.random().toString(36).slice(2, 8);
+const vib = p => navigator.vibrate && navigator.vibrate(p);
+function go(id) { document.querySelectorAll(".s").forEach(s => s.classList.toggle("on", s.id === id)); }
+const cur = () => document.querySelector(".s.on").id;
+
+/* ───── акаунти ───── */
+const CODES = { "2512": { pref: "a", name: "аліна", emoji: "🦊" }, "1974": { pref: "v", name: "вадим", emoji: "👻" } };
+const GUEST_EMOJI = ["🐼", "🦉", "🐙", "🍀", "🌵", "🐸", "🦄"];
+let user = null;
+try { user = JSON.parse(ls.get("dm_user")); } catch (e) {}
+const meHtml = u => `<b>${u.emoji}</b><span>${esc(u.name)}</span>`;
+
+/* ───── плаваючі смайли на старті ───── */
+(() => {
+  const em = ["🎨", "✏️", "🖍️", "🔤", "❓", "🧩", "🖌️", "💡", "🎲", "✨", "🖼️", "🕵️", "🔄", "📝"];
+  em.forEach((e, i) => {
+    const s = document.createElement("span");
+    s.textContent = e;
+    s.style.cssText = `left:${(i * 37 + 8) % 86}%;top:${(i * 23 + 5) % 82}%;font-size:${28 + (i * 13) % 30}px;--d:${4 + (i * 7) % 5}s;animation-delay:-${(i * 1.3) % 6}s`;
+    $("float").appendChild(s);
+  });
+})();
+
+/* ───── екран коду ───── */
+let codeVal = "", codeCb = null, backTo = "s-welcome";
+(() => { "123456789 0⌫".split("").forEach(k => { const b = document.createElement("button"); if (k === " ") { b.style.visibility = "hidden"; } else { b.textContent = k; b.dataset.k = k; } $("pad").appendChild(b); }); })();
+function paintCode() { [...$("cells").children].forEach((c, i) => { c.textContent = codeVal[i] || ""; c.classList.toggle("f", i === codeVal.length); }); $("cgo").disabled = codeVal.length < 4; }
+function openCode(title, btn, hint, back, cb) { codeVal = ""; codeCb = cb; backTo = back; $("ctitle").textContent = title; $("cgo").textContent = btn; $("chint").textContent = hint; $("cerr").textContent = ""; paintCode(); go("s-code"); }
+function keyIn(k) { if (k === "⌫") codeVal = codeVal.slice(0, -1); else if (codeVal.length < 4) codeVal += k; $("cerr").textContent = ""; paintCode(); }
+$("pad").onclick = e => { const b = e.target.closest("button[data-k]"); if (b) { vib(8); keyIn(b.dataset.k); } };
+addEventListener("keydown", e => { if (cur() !== "s-code") return; if (/^\d$/.test(e.key)) keyIn(e.key); else if (e.key === "Backspace") keyIn("⌫"); else if (e.key === "Enter" && codeVal.length === 4) $("cgo").click(); });
+$("cback").onclick = () => go(backTo);
+$("cgo").onclick = async () => {
+  $("cgo").disabled = true;
+  const err = await codeCb(codeVal);
+  if (err) { $("cerr").textContent = err; $("cells").classList.remove("shake"); void $("cells").offsetWidth; $("cells").classList.add("shake"); vib([20, 40, 20]); codeVal = ""; paintCode(); }
+};
+
+/* ───── вхід ───── */
+$("toAuth").onclick = () => openCode("введи код", "увійти", "ваш код для входу — 0000", "s-welcome", code => {
+  if (CODES[code]) return login({ ...CODES[code], uid: "u_" + CODES[code].pref });
+  if (code === "0000") { $("nm").value = ""; go("s-name"); return; }
+  return "невірний код";
+});
+$("nmGo").onclick = () => {
+  const name = $("nm").value.trim(); if (!name) return;
+  login({ name, emoji: GUEST_EMOJI[Math.floor(Math.random() * GUEST_EMOJI.length)], pref: null, uid: "g_" + rnd() + rnd() });
+};
+function login(u) { user = u; ls.set("dm_user", JSON.stringify(u)); showHome(); }
+function showHome() { $("hMe").innerHTML = meHtml(user); go("s-home"); }
+$("hOut").onclick = () => { user = null; ls.del("dm_user"); ls.del("dm_room"); go("s-welcome"); };
+
+/* ───── кімнати ───── */
+const rb = c => `${FB}/rooms/${ROOM}/dm/${c}`;
+let rc = null, mySlot = null, db = {}, es = null, launchSeen = null, firstEv = true;
+async function getRoom(c) { const r = await fetch(rb(c) + ".json"); return r.json(); }
+const me = () => ({ name: user.name, emoji: user.emoji, uid: user.uid });
+const pl = s => (db.players && db.players[s]) || { name: "…", emoji: "❔" };
+function slotFor(room) {
+  const p = room.players || {};
+  for (const s of ["v", "a"]) if (p[s] && p[s].uid === user.uid) return s;
+  const pref = user.pref || "v";
+  for (const s of [pref, otherOf(pref)]) if (!p[s]) return s;
+  return null;
+}
+$("hCreate").onclick = () => openCode("придумай код гри", "створити", "4 цифри · однаковий код = одна гра", "s-home", async code => {
+  try {
+    const room = await getRoom(code), t = Date.now();
+    if (room && room.presence && Object.entries(room.presence).some(([s, ts]) => room.players && room.players[s] && room.players[s].uid !== user.uid && t - ts < 45000)) return "цей код зараз зайнятий";
+    const slot = user.pref || "v";
+    await fetch(rb(code) + ".json", { method: "PUT", body: JSON.stringify({ created: t, players: { [slot]: me() } }) });
+    enter(code, slot, true);
+  } catch (e) { return "нема звʼязку"; }
+});
+$("hJoin").onclick = () => openCode("код гри", "приєднатись", "введи код, який придумав(ла) другий гравець", "s-home", async code => {
+  try {
+    const room = await getRoom(code);
+    if (!room || !room.players) return "гри з таким кодом нема";
+    const slot = slotFor(room);
+    if (!slot) return "кімната вже заповнена";
+    enter(code, slot);
+  } catch (e) { return "нема звʼязку"; }
+});
+function enter(code, slot, fresh) {
+  rc = code; mySlot = slot; db = {}; firstEv = true; ls.set("dm_room", code);
+  if (!fresh) fetch(`${rb(code)}/players/${slot}.json`, { method: "PUT", body: JSON.stringify(me()) }).catch(() => {});
+  connect(); beat(); unpick(true); renderMenuTop(); go("s-menu"); layoutMenu();
+}
+function put(path, val) { apply("put", { path: "/" + path, data: val }); fetch(`${rb(rc)}/${path}.json`, { method: "PUT", body: JSON.stringify(val) }).catch(() => {}); }
+function beat() { if (rc) put("presence/" + mySlot, Date.now()); }
+setInterval(beat, 15000);
+function apply(type, msg) {
+  const parts = (msg.path || "/").split("/").filter(Boolean);
+  if (!parts.length) { db = type === "put" ? (msg.data || {}) : Object.assign(db, msg.data || {}); return; }
+  let o = db;
+  for (let i = 0; i < parts.length - 1; i++) o = o[parts[i]] = o[parts[i]] || {};
+  const k = parts[parts.length - 1];
+  if (type === "put") { if (msg.data === null) delete o[k]; else o[k] = msg.data; } else o[k] = Object.assign(o[k] || {}, msg.data);
+}
+function connect() {
+  if (es) es.close();
+  es = new EventSource(rb(rc) + ".json");
+  ["put", "patch"].forEach(type => es.addEventListener(type, e => {
+    try { apply(type, JSON.parse(e.data)); } catch (err) { return; }
+    if (firstEv) { firstEv = false; launchSeen = db.launch && db.launch.id; }
+    onData();
+  }));
+}
+function onData() {
+  if (!rc) return;
+  const L = db.launch;
+  if (L && L.id !== launchSeen) { launchSeen = L.id; if (L.by !== mySlot) run(L); }
+  const c = cur();
+  if (c === "s-menu") renderMenuTop(); else if (c === "s-hang") renderHang();
+}
+function leaveRoom() { rc = null; if (es) es.close(); ls.del("dm_room"); showHome(); }
+$("mExit").onclick = () => { if (confirm("вийти з кімнати?")) leaveRoom(); };
+setInterval(() => { if (rc && cur() === "s-menu") renderMenuTop(); }, 5000);
+
+/* ───── головне меню ───── */
+const GAMES = [
+  { id: "same", e: "🖼️", n: "одна картинка", d: "Обоє малюєте одне й те саме слово, а потім оцінюєте малюнки одне одного." },
+  { id: "guess", e: "🕵️", n: "вгадай малюнок", d: "У кожного своє слово. Ти малюєш — другий вгадує, що це." },
+  { id: "relay", e: "🔄", n: "естафета", d: "30 секунд малюєш — і малюнки міняються місцями. 5 раундів, а в кінці побачите спільний шедевр." },
+  { id: "word", e: "🔤", n: "вгадай слово", d: "Питання зверху, відповідь — у квадратиках. Відкривайте літери по черзі, першою ходить 🦊 аліна (завжди). Можна одразу вгадувати слово!" },
+  { id: "ships", e: "🚢", n: "морський бій", d: "Розставте кораблі на полі 10×10 і по черзі шукайте флот суперника. Після двох потоплених кораблів відкривається спеціальний залп." }
+];
+const cfg = { n: +ls.get("h_n") || 5, lives: +ls.get("h_l") || 8 };
+let picked = null;
+GAMES.forEach((g, i) => {
+  const b = document.createElement("button"); b.className = "card";
+  b.innerHTML = `<span class="ce">${g.e}</span><span class="cn">${g.n}</span>`;
+  b.onclick = () => pick(i); $("cards").appendChild(b);
+});
+function renderMenuTop() {
+  $("mMe").innerHTML = meHtml(user);
+  const o = otherOf(mySlot), p = db.players && db.players[o], pr = db.presence && db.presence[o];
+  const on = p && pr && Date.now() - pr < 45000;
+  $("mSt").textContent = `🔑 ${rc} · ` + (p ? (on ? `🟢 ${p.name}` : `⚪ ${p.name}`) : "чекаємо другого гравця…");
+}
+function layoutMenu() { const mm = $("mm"); mm.style.paddingTop = picked ? "6px" : Math.max(6, (mm.offsetHeight - 312) / 2) + "px"; }
+addEventListener("resize", layoutMenu);
+function chips(label, key, vals, store) {
+  const d = document.createElement("div");
+  d.innerHTML = `<div class="ol">${label}</div><div class="og"></div>`;
+  vals.forEach(v => { const c = document.createElement("button"); c.className = "chip" + (cfg[key] === v ? " on" : ""); c.textContent = v; c.onclick = () => { cfg[key] = v; ls.set(store, v); [...d.lastChild.children].forEach(x => x.classList.toggle("on", x === c)); }; d.lastChild.appendChild(c); });
+  return d;
+}
+function pick(i) {
+  picked = GAMES[i];
+  const cs = [...$("cards").children], cw = cs[0].offsetWidth, ch = 150, gap = 12;
+  $("cards").style.height = ch + "px";
+  cs.forEach((c, k) => {
+    if (k === i) c.style.transform = `translate(${(i % 2 ? -1 : 1) * (cw + gap) / 2}px,${-(i >> 1) * (ch + gap)}px)`;
+    else { c.style.opacity = 0; c.style.transform = "scale(.85)"; c.style.pointerEvents = "none"; }
+  });
+  $("dDesc").textContent = picked.d;
+  $("dSet").textContent = "";
+  if (picked.id === "word") { $("dSet").append(chips("питань", "n", [3, 5, 10], "h_n"), chips("спроб на помилки", "lives", [6, 8, 10], "h_l")); }
+  $("s-menu").classList.add("pick"); layoutMenu(); vib(10);
+}
+function unpick(instant) {
+  picked = null;
+  [...$("cards").children].forEach(c => { c.style.transform = ""; c.style.opacity = ""; c.style.pointerEvents = ""; });
+  $("cards").style.height = ""; $("s-menu").classList.remove("pick"); if (!instant) layoutMenu();
+}
+$("mBack").onclick = () => unpick();
+$("startBtn").onclick = () => {
+  if (!picked) return;
+  const l = { id: rnd(), game: picked.id, by: mySlot, cfg: { n: cfg.n, lives: cfg.lives } };
+  if (l.game === "word") put("game", newHang(l.cfg));
+  launchSeen = l.id; put("launch", l); run(l);
+};
+function run(l) {
+  if (l.game === "word") { gKey = ""; go("s-hang"); renderHang(); }
+  else if (l.game === "ships") location.href = "battleship.html";
+  else location.href = "draw.html";
+}
+
+/* ───── гра: вгадай слово ───── */
+const QS = [
+["Яка країна має найбільшу кількість часових поясів?", "ФРАНЦІЯ"],
+["Який хімічний елемент має символ W?", "ВОЛЬФРАМ"],
+["Хто написав роман «Злочин і кара»?", "ДОСТОЄВСЬКИЙ"],
+["Яка протока розділяє Європу та Африку?", "ГІБРАЛТАР"],
+["Яка планета має найбільшу кількість кілець?", "САТУРН"],
+["У якому році розпочалася Перша світова війна?", "1914"],
+["Яка найдовша річка Європи?", "ВОЛГА"],
+["Хто відкрив пеніцилін?", "ФЛЕМІНГ"],
+["Яка столиця Канади?", "ОТТАВА"],
+["Який орган людського тіла виробляє інсулін?", "ПІДШЛУНКОВА"],
+["Яка пустеля є найбільшою у світі?", "АНТАРКТИЧНА"],
+["Хто створив картину «Мона Ліза»?", "ДАВІНЧІ"],
+["Який газ переважає в атмосфері Землі?", "АЗОТ"],
+["Яка найменша незалежна держава світу?", "ВАТИКАН"],
+["Як називається наука про землетруси?", "СЕЙСМОЛОГІЯ"],
+["Який метал є рідким за кімнатної температури?", "РТУТЬ"],
+["Хто був першим президентом України?", "КРАВЧУК"],
+["Яка гора є найвищою в Африці?", "КІЛІМАНДЖАРО"],
+["Яка частина клітини містить спадкову інформацію?", "ЯДРО"],
+["У якому місті розташований Колізей?", "РИМ"],
+["Який океан є найглибшим?", "ТИХИЙ"],
+["Хто написав «Лісову пісню»?", "ЛЕСЯУКРАЇНКА"],
+["Яка країна подарувала США Статую Свободи?", "ФРАНЦІЯ"],
+["Який математик сформулював теорему про прямокутний трикутник?", "ПІФАГОР"],
+["Яка кровоносна судина несе кров від серця?", "АРТЕРІЯ"],
+["Який континент перетинають усі меридіани?", "АНТАРКТИДА"],
+["Яка столиця Австралії?", "КАНБЕРРА"],
+["Як називається процес перетворення води на пару?", "ВИПАРОВУВАННЯ"],
+["Яка тварина є найбільшою на планеті?", "СИНІЙКИТ"],
+["Хто написав трагедію «Гамлет»?", "ШЕКСПІР"],
+["Який український князь охрестив Русь?", "ВОЛОДИМИР"],
+["Який елемент позначається символом Au?", "ЗОЛОТО"],
+["Яке озеро є найглибшим у світі?", "БАЙКАЛ"],
+["Яка країна відома як батьківщина піци?", "ІТАЛІЯ"],
+["Як називається центр атома?", "ЯДРО"],
+["Хто винайшов телефон?", "БЕЛЛ"],
+["Яка столиця Норвегії?", "ОСЛО"],
+["Який птах є символом миру?", "ГОЛУБ"],
+["Скільки кісток має доросла людина?", "206"],
+["Яка планета обертається навколо Сонця найдовше?", "НЕПТУН"],
+["Хто написав «Кайдашеву сім'ю»?", "НЕЧУЙЛЕВИЦЬКИЙ"],
+["Який материк є найсухішим?", "АНТАРКТИДА"],
+["Яка наука вивчає гриби?", "МІКОЛОГІЯ"],
+["Який газ необхідний для дихання людини?", "КИСЕНЬ"],
+["Яка столиця Бразилії?", "БРАЗИЛІА"],
+["Хто створив періодичну систему хімічних елементів?", "МЕНДЕЛЄЄВ"],
+["Яка країна має форму чобота?", "ІТАЛІЯ"],
+["Яка найменша кістка людського тіла?", "СТРЕМІНЦЕ"],
+["Як називається найближча до Землі зоря?", "СОНЦЕ"],
+["Який український гетьман очолив Національно-визвольну війну 1648 року?", "ХМЕЛЬНИЦЬКИЙ"],
+["Яка столиця Ісландії?", "РЕЙК'ЯВІК"],
+["Який прилад вимірює атмосферний тиск?", "БАРОМЕТР"],
+["Яка тварина має три серця?", "ВОСЬМИНІГ"],
+["Хто написав роман «Тигролови»?", "БАГРЯНИЙ"],
+["Який метал є основою сталі?", "ЗАЛІЗО"],
+["Яка річка протікає через Лондон?", "ТЕМЗА"],
+["Як називається наука про спадковість?", "ГЕНЕТИКА"],
+["Яка країна першою відправила людину в космос?", "СРСР"],
+["Який вчений сформулював закони руху?", "НЬЮТОН"],
+["Яка найбільша внутрішня пустеля Азії?", "ГОБІ"],
+["Який художник написав «Зоряну ніч»?", "ВАНГОГ"],
+["Яка столиця Швейцарії?", "БЕРН"],
+["Який орган відповідає за вироблення жовчі?", "ПЕЧІНКА"],
+["Яка мова має найбільшу кількість носіїв як рідна?", "КИТАЙСЬКА"],
+["Хто був автором першої конституції України 1710 року?", "ОРЛИК"],
+["Яка країна має найбільшу площу у світі?", "РОСІЯ"],
+["Який природний супутник має найбільшу планету Сонячної системи?", "ГАНІМЕД"],
+["Як називається перехід твердого тіла одразу в газ?", "СУБЛІМАЦІЯ"],
+["Яка найвища вершина України?", "ГОВЕРЛА"],
+["Хто відкрив Америку для європейців у 1492 році?", "КОЛУМБ"],
+["Який вітамін виробляється в шкірі під дією сонця?", "ВІТАМІНД"],
+["Яка столиця Португалії?", "ЛІСАБОН"],
+["Який океан омиває східне узбережжя Африки?", "ІНДІЙСЬКИЙ"],
+["Як називається найдавніша форма письма в Месопотамії?", "КЛИНОПИС"],
+["Яка частинка має негативний електричний заряд?", "ЕЛЕКТРОН"],
+["Який український композитор створив «Щедрик»?", "ЛЕОНТОВИЧ"]
+];
+const ABC = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ";
+let gKey = "", gmode = false, draft = [], ovKey = "";
+function newHang(c) {
+  const idx = QS.map((_, i) => i).sort(() => Math.random() - .5).slice(0, c.n);
+  return { id: rnd(), qs: idx, n: c.n, lives: c.lives, r: 0, tried: "", turn: "a", score: { v: 0, a: 0 } };
+}
+const cloneG = () => { const g = JSON.parse(JSON.stringify(db.game)); g.tried = g.tried || ""; g.score = g.score || {}; g.score.v = g.score.v || 0; g.score.a = g.score.a || 0; return g; };
+const wordOf = g => QS[g.qs[g.r]][1];
+function hangMove(ch) {
+  const g = cloneG(), w = wordOf(g);
+  if (g.res || g.turn !== mySlot || g.tried.includes(ch)) return;
+  g.tried += ch;
+  const hits = [...w].filter(c => c === ch).length;
+  g.last = { by: mySlot, t: "l", v: ch, ok: hits > 0 };
+  if (hits) {
+    g.score[mySlot] += hits;
+    if ([...w].every(c => g.tried.includes(c))) { g.score[mySlot] += 2; g.res = { w: mySlot }; }
+  } else if ([...g.tried].filter(c => !w.includes(c)).length >= g.lives) g.res = { w: "" };
+  if (!g.res) g.turn = otherOf(g.turn);
+  vib(hits ? 15 : [20, 30, 20]); put("game", g);
+}
+function hangWord() {
+  const g = cloneG(), w = wordOf(g);
+  const bl = [...w].filter(c => !g.tried.includes(c));
+  if (g.res || g.turn !== mySlot || draft.length < bl.length) return;
+  let i = 0; const s = [...w].map(c => g.tried.includes(c) ? c : draft[i++]).join("");
+  if (s === w) { g.score[mySlot] += bl.length + 2; g.res = { w: mySlot }; g.last = null; }
+  else { g.score[mySlot] = Math.max(0, g.score[mySlot] - 1); g.last = { by: mySlot, t: "w", v: s }; g.turn = otherOf(g.turn); }
+  gmode = false; draft = []; put("game", g);
+}
+function nextRound() {
+  const g = cloneG(), nr = g.r + 1;
+  if (nr >= g.n) { g.done = true; put("game", g); return; }
+  g.r = nr; g.tried = ""; g.turn = "a"; delete g.res; delete g.last; put("game", g);
+}
+function renderHang() {
+  const g = db.game;
+  if (!g || !g.qs) { $("hgQ").textContent = "чекаємо початок гри…"; $("hgBox").textContent = $("hgKb").textContent = $("hgAct").textContent = $("hgPl").textContent = $("hgSt").textContent = ""; return; }
+  const T = g.tried || "", w = wordOf(g), res = g.res, sc = g.score || {};
+  const key = g.id + ":" + g.r; if (key !== gKey) { gKey = key; gmode = false; draft = []; }
+  if (g.turn !== mySlot || res) { gmode = false; draft = []; }
+  const wrong = [...T].filter(c => !w.includes(c)).length, left = Math.max(0, g.lives - wrong);
+  $("hgInfo").textContent = `${g.r + 1}/${g.n} · ${"❤️".repeat(left)}${"🖤".repeat(g.lives - left)}`;
+  $("hgPl").innerHTML = ["a", "v"].map(s => `<div class="pc${g.turn === s && !res ? " turn" : ""}"><span>${esc(pl(s).emoji)} ${esc(pl(s).name)}</span><b>${sc[s] || 0}</b></div>`).join("");
+  $("hgQ").textContent = QS[g.qs[g.r]][0];
+  const bl = [...w].filter(c => !T.includes(c));
+  let di = 0;
+  $("hgBox").innerHTML = [...w].map(c => T.includes(c) ? `<i class="o">${c}</i>` : res ? `<i class="m">${c}</i>` : gmode ? `<i class="d">${draft[di++] || ""}</i>` : "<i></i>").join("");
+  const L = g.last; let st = "";
+  if (L) st = L.t === "l" ? `${esc(pl(L.by).emoji)} літера «${L.v}» — ${L.ok ? "є ✅" : "нема ❌"}` : `${esc(pl(L.by).emoji)} слово «${esc(L.v)}» — не те ❌ (−1)`;
+  if (!res) st += `<br><b>${g.turn === mySlot ? "твоя черга" : `ходить ${esc(pl(g.turn).emoji)} ${esc(pl(g.turn).name)}`}</b>`;
+  $("hgSt").innerHTML = st;
+  $("hgKb").innerHTML = [...ABC].map(c => {
+    const t = T.includes(c), good = t && w.includes(c);
+    const dis = t || res || g.turn !== mySlot || (gmode && draft.length >= bl.length);
+    return `<button class="k${good ? " ok" : t ? " bad" : ""}" data-k="${c}"${dis ? " disabled" : ""}>${c}</button>`;
+  }).join("");
+  const my = g.turn === mySlot && !res;
+  $("hgAct").innerHTML = !my ? "" : gmode
+    ? `<button class="wht" data-a="back">⌫</button><button class="wht" data-a="cancel">скасувати</button><button class="blk sm" data-a="ok"${draft.length < bl.length ? " disabled" : ""}>підтвердити</button>`
+    : `<button class="wht" data-a="word">вгадати слово</button>`;
+  const ok = key + ":" + (g.done ? "d" : res ? "r" : ""), ov = $("hgOv");
+  if (ok !== ovKey) {
+    ovKey = ok;
+    if (g.done) {
+      const a = sc.a || 0, v = sc.v || 0, win = a === v ? "" : a > v ? "a" : "v";
+      ov.innerHTML = `<div class="big">${win ? "🏆" : "🤝"}</div><h2>${win ? `перемагає ${esc(pl(win).emoji)} ${esc(pl(win).name)}` : "нічия"}</h2>` +
+        ["a", "v"].map(s => `<div class="row${s === win ? " win" : ""}"><span>${esc(pl(s).emoji)} ${esc(pl(s).name)}</span><b>${sc[s] || 0}</b></div>`).join("") +
+        `<button class="blk" data-a="again">ще раз</button><button class="wht" data-a="menu">в меню</button>`;
+      ov.classList.add("on"); vib([30, 50, 30, 50, 90]);
+    } else if (res) {
+      ov.innerHTML = `<div class="big">${res.w ? "🎉" : "💔"}</div><h2>${res.w ? `${esc(pl(res.w).emoji)} ${esc(pl(res.w).name)} відгадує слово!` : "спроби закінчились"}</h2><div class="wd">${w}</div>` +
+        `<button class="blk" data-a="next">${g.r + 1 >= g.n ? "підсумок" : "далі"}</button>`;
+      ov.classList.add("on"); vib([30, 50, 30]);
+    } else ov.classList.remove("on");
+  }
+}
+$("hgKb").onclick = e => { const b = e.target.closest("button"); if (!b || b.disabled) return; if (gmode) { draft.push(b.dataset.k); renderHang(); } else hangMove(b.dataset.k); };
+$("hgAct").onclick = e => {
+  const b = e.target.closest("button"); if (!b || b.disabled) return; const a = b.dataset.a;
+  if (a === "word") { gmode = true; draft = []; renderHang(); }
+  else if (a === "cancel") { gmode = false; draft = []; renderHang(); }
+  else if (a === "back") { draft.pop(); renderHang(); }
+  else if (a === "ok") hangWord();
+};
+$("hgOv").onclick = e => {
+  const a = e.target.closest("button")?.dataset.a;
+  if (a === "next") nextRound();
+  else if (a === "again") { const g = db.game; put("game", newHang({ n: g.n, lives: g.lives })); }
+  else if (a === "menu") { $("hgOv").classList.remove("on"); go("s-menu"); renderMenuTop(); layoutMenu(); }
+};
+$("hgBack").onclick = () => { go("s-menu"); renderMenuTop(); layoutMenu(); };
+
+/* ───── старт ───── */
+(async () => {
+  if (!user) return;
+  showHome();
+  const c = ls.get("dm_room"); if (!c) return;
+  try {
+    const room = await getRoom(c), slot = room && room.players && slotFor(room);
+    if (slot && room.players[slot] && room.players[slot].uid === user.uid) enter(c, slot);
+    else ls.del("dm_room");
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
