@@ -2,15 +2,17 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><script>(function(){try{var t=localStorage.getItem("dm_theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()</script>
 <meta name="theme-color" content="#fbfbfa">
 <link rel="apple-touch-icon" href="IMG_2010.jpeg">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐊</text></svg>">
 <title>крокодил · draw &amp; more</title>
 <style>
 :root{--bg:#fbfbfa;--fg:#37352f;--muted:#9b9a97;--line:#e4e4e1;--pill:#fff;--inv-bg:#37352f;--inv-fg:#fff;--ok:#0f7b6c;--bad:#e03e3e;--serif:"Iowan Old Style","Palatino Linotype",Georgia,"Times New Roman",serif}
-@media(prefers-color-scheme:dark){:root{--bg:#191919;--fg:#ebebea;--muted:#7f7f7c;--line:#303030;--pill:#202020;--inv-bg:#ebebea;--inv-fg:#191919}}
+:root[data-theme="dark"]{--bg:#191919;--fg:#ebebea;--muted:#7f7f7c;--line:#303030;--pill:#202020;--inv-bg:#ebebea;--inv-fg:#191919}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#191919;--fg:#ebebea;--muted:#7f7f7c;--line:#303030;--pill:#202020;--inv-bg:#ebebea;--inv-fg:#191919}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{touch-action:manipulation}
 html,body{height:100%;overflow:hidden}
 body{height:100dvh;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 8px) 10px calc(env(safe-area-inset-bottom,0px) + 10px)}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
@@ -75,13 +77,19 @@ const $ = id => document.getElementById(id);
 const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } } };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const rnd = () => Math.random().toString(36).slice(2, 8);
-const vib = p => navigator.vibrate && navigator.vibrate(p);
+const vib = p => { try { if (localStorage.getItem("dm_vib") === "0") return; } catch (e) {} navigator.vibrate && navigator.vibrate(p); };
 const other = s => s === "v" ? "a" : "v";
 
 const room = ls.get("dm_room"), me = ls.get("dm_slot");
 let L = null; try { L = JSON.parse(ls.get("dm_launch")); } catch (e) {}
 if (!room || (me !== "v" && me !== "a") || !L || !L.id) location.replace("index.html");
 const cb = `${FB}/rooms/${ROOM}/dm/${room}/croc`;
+function logStat(id, rec) {
+  if (!room || !id) return;
+  rec.t = rec.t || Date.now();
+  fetch(`${FB}/rooms/${ROOM}/dm/${room}/stats/log/${id}.json`, { method: "PUT", body: JSON.stringify(rec), keepalive: true }).catch(() => {});
+}
+
 
 const PEOPLE = { a: { name: "аліна", emoji: "🦊" }, v: { name: "вадим", emoji: "👻" } };
 fetch(`${FB}/rooms/${ROOM}/dm/${room}/players.json`).then(r => r.json()).then(p => {
@@ -296,7 +304,7 @@ function showFinal(g) {
     `<div class="muted">вгадано ${a + v} з ${g.n}</div>` +
     ["a", "v"].map(s => `<div class="row${s === win ? " win" : ""}"><span>${esc(PEOPLE[s].emoji)} ${esc(PEOPLE[s].name)}</span><b>${sc[s] || 0}</b></div>`).join("") +
     `<button class="go" data-a="again">ще раз</button><button class="ghost" data-a="menu">в меню</button>`;
-  if (ov.dataset.k !== g.id) { ov.dataset.k = g.id; ov.innerHTML = html; vib([30, 50, 30, 50, 90]); }
+  if (ov.dataset.k !== g.id) { ov.dataset.k = g.id; ov.innerHTML = html; vib([30, 50, 30, 50, 90]); logStat(g.id, { g: "croc", w: win, s: { v, a }, n: g.n }); }
   ov.classList.add("on");
 }
 $("ov").addEventListener("click", e => {
