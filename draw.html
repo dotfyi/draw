@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <link rel="apple-touch-icon" href="IMG_2010.jpeg">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><script>(function(){try{var t=localStorage.getItem("dm_theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()</script>
 <meta name="theme-color" content="#fbfbfa">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
 <title>draw to me</title>
@@ -13,11 +13,12 @@
 --inv-bg: #37352f; --inv-fg: #ffffff;
 --serif: "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
 }
+:root[data-theme="dark"] { --bg: #191919; --fg: #ebebea; --muted: #7f7f7c; --line: #303030; --pill: #202020; --inv-bg: #ebebea; --inv-fg: #191919; }
 @media (prefers-color-scheme: dark) {
-:root { --bg: #191919; --fg: #ebebea; --muted: #7f7f7c; --line: #303030; --pill: #202020; --inv-bg: #ebebea; --inv-fg: #191919; }
+:root:not([data-theme="light"]) { --bg: #191919; --fg: #ebebea; --muted: #7f7f7c; --line: #303030; --pill: #202020; --inv-bg: #ebebea; --inv-fg: #191919; }
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; }
+html, body { height: 100%; overflow: hidden; touch-action: manipulation; }
 body {
 height: 100dvh; background: var(--bg); color: var(--fg);
 font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -328,7 +329,13 @@ const shuf = a => [...a].sort(() => Math.random() - .5);
 const online = !!(FIREBASE_URL && ROOM && window.EventSource);
 const base = `${FIREBASE_URL}/rooms/${ROOM}/draw`;
 const $ = id => document.getElementById(id);
-const vib = p => navigator.vibrate && navigator.vibrate(p);
+const vib = p => { try { if (localStorage.getItem("dm_vib") === "0") return; } catch (e) {} navigator.vibrate && navigator.vibrate(p); };
+function logStat(id, rec) {
+  const r = localStorage.getItem("dm_room"); if (!r || !id) return;
+  rec.t = rec.t || Date.now();
+  fetch(`${FIREBASE_URL}/rooms/${ROOM}/dm/${r}/stats/log/${id}.json`, { method: "PUT", body: JSON.stringify(rec), keepalive: true }).catch(() => {});
+}
+
 const PEOPLE = {
 v: { name: "вадим", role: "чоловік", emoji: "🤵🏻‍♂️", won: "переміг", g: "вгадав", gen: "вадима" },
 a: { name: "аліна", role: "дружина", emoji: "👰🏻‍♀️", won: "перемогла", g: "вгадала", gen: "аліни" }
@@ -352,6 +359,7 @@ let ac, lastTick = 0;
 addEventListener("pointerdown", () => { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === "suspended") ac.resume(); } catch (e) {} });
 function snd(notes, d = .12, type = "sine", vol = .07) {
 if (!ac) return;
+try { if (localStorage.getItem("dm_snd") === "0") return; } catch (e) {}
 notes.forEach((f, i) => {
 const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + i * d;
 o.type = type; o.frequency.value = f;
@@ -621,6 +629,7 @@ const tie = S.v.pts === S.a.pts;
 const win = S.v.pts > S.a.pts ? "v" : "a";
 $("ftitle").textContent = tie ? "нічия, вітаю обох" : `вітаю, ${PEOPLE[win].name} ${PEOPLE[win].won}`;
 put("total/" + m.id, { w: tie ? "t" : win });
+logStat(m.id, { g: m.mode === "guess" ? "guess" : "same", w: tie ? "" : win, s: { v: S.v.pts, a: S.a.pts } });
 const T = totals();
 $("ftotal").textContent = `🏆 за весь час: ${PEOPLE.v.emoji} ${T.v} : ${T.a} ${PEOPLE.a.emoji}`;
 const board = $("board"); board.textContent = "";
@@ -716,6 +725,7 @@ put(`relay/art/r${r}/${me}`, { img, t: Math.min(nowS(), end + 4000) });
 }
 function showRelayFinal() {
 relayDone = true;
+logStat(relayId, { g: "relay", w: "" });
 // показуємо тільки той малюнок, який почав(ла) інший
 const o = otherOf(me), a = rArt(RN - 1, o);
 $("rfA").src = a ? a.img : "";
