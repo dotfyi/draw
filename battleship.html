@@ -2,10 +2,74 @@
 <html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#fff"><title>морський бій · draw & more</title>
 <style>
 :root{--bg:#fff;--fg:#1b1b1a;--muted:#92918d;--line:#e7e7e4;--bad:#e34b4b;--serif:"Iowan Old Style","Palatino Linotype",Georgia,serif}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}html,body{height:100%;overflow:hidden;background:var(--bg)}body{height:100dvh;color:var(--fg);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;display:flex;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top) + 8px) 12px calc(env(safe-area-inset-bottom) + 8px);user-select:none}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}.app{width:100%;max-width:480px;height:100%;min-height:0;display:flex;flex-direction:column;gap:7px}.top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:28px}.link{color:var(--muted);font-size:14px;padding:5px}.status{font-size:12px;color:var(--muted);text-align:right}.heading{font:600 24px var(--serif);text-align:center}.sub{font-size:12px;color:var(--muted);text-align:center;line-height:1.35}.stats{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}.board-wrap{width:100%;display:flex;justify-content:center;align-items:center;flex:1;min-height:0}.board{width:min(100%,calc(100dvh - 260px));max-width:430px;aspect-ratio:1;display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:repeat(10,1fr);gap:2px;background:#e9e9e6;padding:2px;border-radius:12px;touch-action:manipulation}.cell{background:#fff;border-radius:3px;display:grid;place-items:center;min-width:0;min-height:0;font-size:clamp(10px,3.3vw,17px);font-weight:650;position:relative}.cell.ship{background:#d9d9d5}.cell.blocked{background:#f5f5f2}.cell.preview{background:#c9d8d3}.cell.miss{color:#777670}.cell.miss::after{content:"";width:34%;height:34%;min-width:4px;min-height:4px;border-radius:50%;background:#777670}.cell.hit{background:#f7dada;color:#d43f3f}.cell.sunk{background:#e8baba;color:#a92626}.cell:disabled{cursor:default}.controls{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}.pill{border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:12px;color:var(--muted)}.pill.on{border-color:var(--fg);color:var(--fg);font-weight:650}.pill:disabled{opacity:.28}.primary{background:#111;color:white;border-radius:999px;padding:11px 22px;font-size:14px}.primary:disabled{opacity:.3}.actions{display:flex;justify-content:center;gap:8px;align-items:center}.hint{font-size:11px;color:var(--muted);text-align:center;min-height:25px;line-height:1.35}.bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;min-height:88px;padding:2px 2px 0}.reactions{display:flex;gap:5px;align-items:center;align-self:flex-end;padding-bottom:8px}.reaction{border:1px solid var(--line);border-radius:50%;width:38px;height:38px;font-size:20px;display:grid;place-items:center}.reaction:active{transform:scale(.9)}.mini-wrap{width:104px;flex:0 0 104px}.mini-label{font-size:10px;color:var(--muted);text-align:center;margin-bottom:4px}.mini-board{width:100%;aspect-ratio:1;display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:repeat(10,1fr);gap:1px;background:#e9e9e6;padding:2px;border-radius:7px}.mini-cell{background:#fff;border-radius:1px;position:relative;display:grid;place-items:center;font-size:8px;font-weight:700}.mini-cell.ship{background:#d0d0cc}.mini-cell.miss{background:#fff}.mini-cell.miss:after{content:"";width:45%;height:45%;border-radius:50%;background:#777}.mini-cell.hit{background:#efbaba;color:#b21f1f}.mini-cell.sunk{background:#d88f8f;color:#861515}.overlay{position:fixed;inset:0;background:#ffffffed;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:24px;text-align:center;z-index:4}.overlay.show{display:flex}.overlay strong{font:600 32px var(--serif)}.float-reaction{position:fixed;z-index:9;left:50%;top:45%;font-size:76px;pointer-events:none;animation:pop 1.6s ease-out forwards}@keyframes pop{0%{opacity:0;transform:translate(-50%,20px) scale(.4)}25%{opacity:1;transform:translate(-50%,-10px) scale(1.2)}100%{opacity:0;transform:translate(-50%,-150px) scale(.8)}}
-@media(max-height:690px){.app{gap:4px}.heading{font-size:21px}.board{width:min(100%,calc(100dvh - 225px))}.bottom{min-height:72px}.mini-wrap{width:88px;flex-basis:88px}.reaction{width:34px;height:34px;font-size:18px}.pill{padding:7px 10px}}
-@media(max-width:360px){.mini-wrap{width:78px;flex-basis:78px}.reaction{width:31px;height:31px;font-size:17px}.reactions{gap:3px}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{height:100dvh;color:var(--fg);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;display:flex;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top) + 8px) 12px calc(env(safe-area-inset-bottom) + 8px);user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.app{width:100%;max-width:480px;height:100%;min-height:0;display:flex;flex-direction:column;gap:7px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:28px}
+.link{color:var(--muted);font-size:14px;padding:5px}
+.status{font-size:12px;color:var(--muted);text-align:right}
+.heading{font:600 24px var(--serif);text-align:center}
+.sub{font-size:12px;color:var(--muted);text-align:center;line-height:1.35}
+.stats{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.board-wrap{width:100%;display:flex;justify-content:center;align-items:center;flex:1;min-height:0}
+
+/* головне поле */
+.board{width:min(100%,calc(100dvh - 260px));max-width:430px;aspect-ratio:1;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));grid-template-rows:repeat(10,minmax(0,1fr));gap:2px;background:#e9e9e6;padding:2px;border-radius:12px;touch-action:manipulation}
+.cell{background:#fff;border-radius:3px;display:grid;place-items:center;min-width:0;min-height:0;overflow:hidden;font-size:clamp(10px,3.3vw,17px);font-weight:650;position:relative}
+.cell.ship{background:#d9d9d5}
+.cell.blocked{background:#f5f5f2}
+.cell.preview{background:#c9d8d3}
+.cell.miss::after{content:"";width:15%;height:15%;min-width:3px;min-height:3px;border-radius:50%;background:#9a9993}
+.cell.miss.auto::after{width:11%;height:11%;min-width:2px;min-height:2px;background:#c9c8c3}
+.cell.hit{background:#f7dada;color:#d43f3f}
+.cell.sunk{background:#e8baba;color:#a92626}
+.cell:disabled{cursor:default}
+
+.controls{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.pill{border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:12px;color:var(--muted)}
+.pill.on{border-color:var(--fg);color:var(--fg);font-weight:650}
+.pill:disabled{opacity:.28}
+.primary{background:#111;color:white;border-radius:999px;padding:11px 22px;font-size:14px}
+.primary:disabled{opacity:.3}
+.actions{display:flex;justify-content:center;gap:8px;align-items:center}
+.hint{font-size:11px;color:var(--muted);text-align:center;min-height:25px;line-height:1.35}
+
+/* низ: реакції зліва, мініполе справа */
+.bottom{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:88px;padding:2px 2px 0}
+.reactions{flex:1 1 auto;max-width:184px;margin:16px auto 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 6px;justify-items:center;align-content:center}
+.reaction{border:1px solid var(--line);border-radius:50%;width:100%;max-width:42px;aspect-ratio:1;font-size:20px;line-height:1;display:grid;place-items:center}
+.reaction:active{transform:scale(.9)}
+.mini-wrap{width:104px;flex:0 0 104px}
+.mini-label{font-size:10px;color:var(--muted);text-align:center;margin-bottom:4px}
+
+/* мініполе: жодного тексту в клітинках, тому сітка не зсувається */
+.mini-board{width:100%;aspect-ratio:1;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));grid-template-rows:repeat(10,minmax(0,1fr));gap:1px;background:#e9e9e6;padding:2px;border-radius:7px}
+.mini-cell{background:#fff;border-radius:1px;position:relative;display:grid;place-items:center;min-width:0;min-height:0;overflow:hidden;font-size:0;line-height:0}
+.mini-cell.ship{background:#d0d0cc}
+.mini-cell.miss::after{content:"";width:22%;height:22%;border-radius:50%;background:#b3b2ad}
+.mini-cell.miss.auto::after{width:16%;height:16%;background:#d2d1cc}
+.mini-cell.hit{background:#efbaba}
+.mini-cell.hit::after{content:"";width:38%;height:38%;border-radius:50%;background:#c23a3a}
+.mini-cell.sunk{background:#d88f8f}
+.mini-cell.sunk::after{content:"";width:38%;height:38%;border-radius:50%;background:#861515}
+
+/* кінець гри */
+.overlay{position:fixed;inset:0;background:#fffffff2;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:24px;text-align:center;z-index:4;overflow-y:auto}
+.overlay.show{display:flex}
+.overlay strong{font:600 32px var(--serif)}
+.stat-grid{width:100%;max-width:340px;display:grid;grid-template-columns:1fr 72px 72px;gap:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;text-align:center}
+.stat-grid>div{padding:11px 8px;font-size:15px;border-top:1px solid var(--line);color:var(--muted);font-variant-numeric:tabular-nums}
+.stat-grid>div.h{border-top:0;font-size:12px;padding:9px 8px;background:#fafaf8}
+.stat-grid>div.l{text-align:left;padding-left:16px}
+.stat-grid>div.best{color:var(--fg);font-weight:700}
+
+.float-reaction{position:fixed;z-index:9;left:50%;top:45%;font-size:76px;pointer-events:none;animation:pop 1.6s ease-out forwards}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,20px) scale(.4)}25%{opacity:1;transform:translate(-50%,-10px) scale(1.2)}100%{opacity:0;transform:translate(-50%,-150px) scale(.8)}}
+
+@media(max-height:690px){.app{gap:4px}.heading{font-size:21px}.board{width:min(100%,calc(100dvh - 225px))}.bottom{min-height:72px}.mini-wrap{width:88px;flex-basis:88px}.reaction{max-width:36px;font-size:18px}.reactions{gap:6px 5px}.pill{padding:7px 10px}}
+@media(max-width:360px){.mini-wrap{width:78px;flex-basis:78px}.reaction{max-width:32px;font-size:16px}.reactions{gap:5px 4px}}
 </style></head><body><main class="app">
 <header class="top"><button class="link" id="back">‹ меню</button><div class="status" id="room">кімната</div></header>
 <h1 class="heading" id="title">розстав кораблі</h1><div class="sub" id="subtitle">Обери корабель і постав його на поле</div>
@@ -13,14 +77,17 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}.app{w
 <div class="board-wrap"><div class="board" id="board"></div></div>
 <div class="controls" id="ships"></div><div class="actions" id="actions"></div><div class="hint" id="hint">Кораблі не можуть торкатися навіть по діагоналі.</div>
 <div class="bottom" id="bottom" style="display:none"><div class="reactions" id="reactions"></div><div class="mini-wrap"><div class="mini-label">мій флот</div><div class="mini-board" id="miniBoard"></div></div></div>
-</main><div class="overlay" id="overlay"><strong id="ovTitle"></strong><div class="sub" id="ovText"></div><button class="primary" id="again">до меню</button></div>
+</main>
+<div class="overlay" id="overlay"><strong id="ovTitle"></strong><div class="sub" id="ovText"></div><div class="stat-grid" id="ovStats"></div><button class="primary" id="again">до меню</button></div>
 <script>
 const FB="https://draw-8cb08-default-rtdb.europe-west1.firebasedatabase.app",ROOM="k7Qm2xVp9Lr4Tz8n";
 const $=id=>document.getElementById(id),room=localStorage.getItem("dm_room"),user=JSON.parse(localStorage.getItem("dm_user")||"null");
 if(!room||!user)location.href="index.html";
 const base=`${FB}/rooms/${ROOM}/dm/${room}`,other=s=>s==="v"?"a":"v";
 let slot=null,db={},es=null,phase="place",fleet=[],selected=4,vertical=false,seenReaction=0;
-const lengths=[4,3,3,2,2,2,1,1,1,1],reactionSet=["❤️","😮","😂","😡"];
+const lengths=[4,3,3,2,2,2,1,1,1,1];
+// верхній ряд — 4 старі, нижній — 4 нові
+const reactionSet=["❤️","😮","😂","😡","👏","😭","🔥","🎯"];
 const read=async path=>(await fetch(`${base}/${path}.json`)).json();
 const write=(path,val)=>fetch(`${base}/${path}.json`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(val)});
 function apply(msg){let p=(msg.path||"/").split("/").filter(Boolean),o=db;for(let i=0;i<p.length-1;i++)o=o[p[i]]=o[p[i]]||{};let k=p[p.length-1];if(!p.length)db=msg.data||{};else if(msg.data===null)delete o[k];else o[k]=msg.data;}
@@ -30,28 +97,163 @@ function occupied(){return new Set(fleet.flatMap(s=>s.cells))}
 function blocked(){let out=new Set();for(const sh of fleet)for(const i of sh.cells)for(const n of neighbours(i))out.add(n);return out}
 function canPlace(cells){if(!cells)return false;let forbidden=blocked();return cells.every(i=>!forbidden.has(i))}
 function placeAt(i){if(phase!=="place")return;let max=lengths.filter(x=>x===selected).length,done=fleet.filter(s=>s.len===selected).length;if(done>=max)return;let cs=cellsFor(i,selected,vertical);if(!canPlace(cs)){$("hint").textContent="Тут замало місця або корабель торкається іншого. Спробуй іншу клітинку.";return}fleet.push({len:selected,cells:cs});let next=[4,3,2,1].find(l=>fleet.filter(s=>s.len===l).length<lengths.filter(x=>x===l).length);if(next!==undefined)selected=next;render()}
-function renderBoard(){const b=$("board");b.innerHTML="";let occ=occupied(),block=blocked(),preview=cellsFor(0,selected,vertical);for(let i=0;i<100;i++){let el=document.createElement("button");el.type="button";el.className="cell";if(phase==="place"){if(occ.has(i))el.classList.add("ship");else if(block.has(i))el.classList.add("blocked");el.onclick=()=>placeAt(i)}else{let a=db.battle?.shots?.[slot]||{},s=a[i];if(s){el.classList.add(s.type);if(s.type==="hit")el.textContent="●";if(s.type==="sunk")el.textContent="×"}else if(db.battle?.turn===slot&&!db.battle?.finished){el.onclick=()=>fire(i)}else el.disabled=true}b.append(el)}}
-function renderMini(){let m=$("miniBoard");m.innerHTML="";let myShips=own().ships||[],shipCells=new Set(myShips.flatMap(s=>s.cells)),incoming=db.battle?.shots?.[other(slot)]||{};for(let i=0;i<100;i++){let el=document.createElement("div");el.className="mini-cell";if(shipCells.has(i))el.classList.add("ship");let s=incoming[i];if(s){el.classList.remove("ship");el.classList.add(s.type);if(s.type==="hit")el.textContent="●";if(s.type==="sunk")el.textContent="×"}m.append(el)}}
-function render(){renderBoard();$("ships").innerHTML="";$("actions").innerHTML="";if(phase==="place"){
- [4,3,2,1].forEach(len=>{let total=lengths.filter(x=>x===len).length,done=fleet.filter(x=>x.len===len).length,btn=document.createElement("button");btn.className="pill"+(selected===len?" on":"");btn.textContent=`${len} палуб · ${done}/${total}`;btn.disabled=done>=total;btn.onclick=()=>{selected=len;render()};$("ships").append(btn)});
- let rot=document.createElement("button");rot.className="pill on";rot.textContent=vertical?"↕ вертикально":"↔ горизонтально";rot.onclick=()=>{vertical=!vertical;render()};$("actions").append(rot);
- let ready=document.createElement("button");ready.className="primary";ready.textContent="готово";ready.disabled=fleet.length!==10;ready.onclick=submitFleet;$("actions").append(ready);
- $("title").textContent="розстав кораблі";$("subtitle").textContent="Вибери довжину внизу, орієнтацію та торкнись поля";$("fleet").textContent=`Розміщено: ${fleet.length}/10`;$ ("turn").textContent="";$("hint").textContent="Кораблі не можуть торкатися один одного, навіть по діагоналі.";$("bottom").style.display="none";
- }else{
- let btl=db.battle,readyCount=Object.values(btl.players||{}).filter(p=>p.ready).length;$("bottom").style.display="flex";$("reactions").innerHTML="";reactionSet.forEach(emoji=>{let btn=document.createElement("button");btn.className="reaction";btn.textContent=emoji;btn.title="Надіслати реакцію";btn.onclick=()=>sendReaction(emoji);$("reactions").append(btn)});
- $("title").textContent=btl.finished?(btl.winner===slot?"ти переміг(ла)!":"цього разу суперник переміг"):"морський бій";$("subtitle").textContent=btl.finished?"Гру завершено":readyCount<2?"Очікуємо готовність обох гравців":btl.turn===slot?"Твій хід — обери клітинку":"Хід суперника";
- $("fleet").textContent=`Потоплено: ${sunkCount()}/10`;$ ("turn").textContent=btl.turn===slot?"твій хід":"хід суперника";$("hint").textContent=btl.finished?"Дякуємо за гру":btl.turn===slot?"Влучив — стріляй ще раз. Промахнувся — хід суперника.":"Твої кораблі та влучання суперника видно на мініполі.";renderMini();
- }
+
+function renderBoard(){
+  const b=$("board");b.innerHTML="";
+  let occ=occupied(),block=blocked();
+  for(let i=0;i<100;i++){
+    let el=document.createElement("button");el.type="button";el.className="cell";
+    if(phase==="place"){
+      if(occ.has(i))el.classList.add("ship");else if(block.has(i))el.classList.add("blocked");
+      el.onclick=()=>placeAt(i)
+    }else{
+      let a=db.battle?.shots?.[slot]||{},s=a[i];
+      if(s){
+        el.classList.add(s.type);
+        if(s.auto)el.classList.add("auto");
+        if(s.type==="hit")el.textContent="●";
+        if(s.type==="sunk")el.textContent="×";
+        el.disabled=true
+      }else if(db.battle?.turn===slot&&!db.battle?.finished){el.onclick=()=>fire(i)}
+      else el.disabled=true
+    }
+    b.append(el)
+  }
 }
+
+function renderMini(){
+  let m=$("miniBoard");m.innerHTML="";
+  let myShips=own().ships||[],shipCells=new Set(myShips.flatMap(s=>s.cells)),incoming=db.battle?.shots?.[other(slot)]||{};
+  for(let i=0;i<100;i++){
+    let el=document.createElement("div");el.className="mini-cell";
+    if(shipCells.has(i))el.classList.add("ship");
+    let s=incoming[i];
+    if(s){el.classList.remove("ship");el.classList.add(s.type);if(s.auto)el.classList.add("auto")}
+    m.append(el)
+  }
+}
+
+function buildReactions(){
+  const box=$("reactions");
+  if(box.children.length===reactionSet.length)return;
+  box.innerHTML="";
+  reactionSet.forEach(emoji=>{let btn=document.createElement("button");btn.className="reaction";btn.textContent=emoji;btn.title="Надіслати реакцію";btn.onclick=()=>sendReaction(emoji);box.append(btn)})
+}
+
+function render(){
+  renderBoard();$("ships").innerHTML="";$("actions").innerHTML="";
+  if(phase==="place"){
+    [4,3,2,1].forEach(len=>{let total=lengths.filter(x=>x===len).length,done=fleet.filter(x=>x.len===len).length,btn=document.createElement("button");btn.className="pill"+(selected===len?" on":"");btn.textContent=`${len} палуб · ${done}/${total}`;btn.disabled=done>=total;btn.onclick=()=>{selected=len;render()};$("ships").append(btn)});
+    let rot=document.createElement("button");rot.className="pill on";rot.textContent=vertical?"↕ вертикально":"↔ горизонтально";rot.onclick=()=>{vertical=!vertical;render()};$("actions").append(rot);
+    let ready=document.createElement("button");ready.className="primary";ready.textContent="готово";ready.disabled=fleet.length!==10;ready.onclick=submitFleet;$("actions").append(ready);
+    $("title").textContent="розстав кораблі";$("subtitle").textContent="Вибери довжину внизу, орієнтацію та торкнись поля";$("fleet").textContent=`Розміщено: ${fleet.length}/10`;$("turn").textContent="";$("hint").textContent="Кораблі не можуть торкатися один одного, навіть по діагоналі.";$("bottom").style.display="none";
+  }else{
+    let btl=db.battle,readyCount=Object.values(btl.players||{}).filter(p=>p.ready).length;
+    $("bottom").style.display="flex";buildReactions();
+    $("title").textContent=btl.finished?(btl.winner===slot?"ти переміг(ла)!":"цього разу суперник переміг"):"морський бій";
+    $("subtitle").textContent=btl.finished?"Гру завершено":readyCount<2?"Очікуємо готовність обох гравців":btl.turn===slot?"Твій хід — обери клітинку":"Хід суперника";
+    $("fleet").textContent=`Потоплено: ${sunkCount()}/10`;$("turn").textContent=btl.turn===slot?"твій хід":"хід суперника";
+    $("hint").textContent=btl.finished?"Дякуємо за гру":btl.turn===slot?"Влучив — стріляй ще раз. Промахнувся — хід суперника.":"Твої кораблі та влучання суперника видно на мініполі.";
+    renderMini();
+  }
+}
+
 function sunkCount(){let ships=opp().ships||[],a=db.battle?.shots?.[slot]||{};return ships.filter(sh=>sh.cells.every(i=>a[i]?.hit)).length}
-function own(){return db.battle?.players?.[slot]||{}}function opp(){return db.battle?.players?.[other(slot)]||{}}
+function own(){return db.battle?.players?.[slot]||{}}
+function opp(){return db.battle?.players?.[other(slot)]||{}}
+
 async function submitFleet(){let payload={ships:fleet,ready:true};await write(`battle/players/${slot}`,payload);phase="wait";refresh()}
-async function fire(i){let b=db.battle;if(b.turn!==slot||b.finished)return;let prior=b.shots?.[slot]||{};if(prior[i])return;let ships=opp().ships||[],result={...prior},ship=ships.find(s=>s.cells.includes(i));result[i]={hit:!!ship,type:ship?"hit":"miss"};let sunkShip=ship&&ship.cells.every(x=>result[x]?.hit);if(sunkShip){for(const x of ship.cells)result[x]={hit:true,type:"sunk"};for(const x of ship.cells)for(const n of neighbours(x)){if(!result[n]&&!ship.cells.includes(n))result[n]={hit:false,type:"miss",auto:true}}}
- await write(`battle/shots/${slot}`,result);let allSunk=ships.length>0&&ships.every(sh=>sh.cells.every(x=>result[x]?.hit));if(allSunk){await write("battle/finished",true);await write("battle/winner",slot)}else if(!ship){await write("battle/turn",other(slot))}else{await write("battle/turn",slot)}
+
+async function fire(i){
+  let b=db.battle;if(b.turn!==slot||b.finished)return;
+  let prior=b.shots?.[slot]||{};if(prior[i])return;
+  let ships=opp().ships||[],result={...prior},ship=ships.find(s=>s.cells.includes(i)),now=Date.now();
+  result[i]={hit:!!ship,type:ship?"hit":"miss",t:now};
+  let sunkShip=ship&&ship.cells.every(x=>result[x]?.hit);
+  if(sunkShip){
+    for(const x of ship.cells)result[x]={hit:true,type:"sunk",t:(result[x]&&result[x].t)||now};
+    for(const x of ship.cells)for(const n of neighbours(x)){if(!result[n]&&!ship.cells.includes(n))result[n]={hit:false,type:"miss",auto:true}}
+  }
+  await write(`battle/shots/${slot}`,result);
+  let allSunk=ships.length>0&&ships.every(sh=>sh.cells.every(x=>result[x]?.hit));
+  if(allSunk){await write("battle/finished",true);await write("battle/winner",slot)}
+  else if(!ship){await write("battle/turn",other(slot))}
+  else{await write("battle/turn",slot)}
 }
+
 async function sendReaction(emoji){await write(`battle/reactions/${slot}/${Date.now()}`,emoji)}
 function showReaction(emoji){let el=document.createElement("div");el.className="float-reaction";el.textContent=emoji;document.body.append(el);setTimeout(()=>el.remove(),1700)}
-async function init(){let root=await read("");if(!root||!root.players){alert("Не знайшов кімнату. Повернись у меню та створи гру.");location.href="index.html";return}for(const s of ["v","a"])if(root.players[s]?.uid===user.uid)slot=s;if(!slot){alert("Цей профіль не є гравцем кімнати.");location.href="index.html";return}db=root;if(!db.battle)await write("battle",{players:{},shots:{},turn:"v",started:false});fleet=db.battle?.players?.[slot]?.ships||[];if(db.battle?.players?.[slot]?.ready)phase="wait";let old=db.battle?.reactions?.[other(slot)]||{};seenReaction=Math.max(0,...Object.keys(old).map(Number));es=new EventSource(base+".json");["put","patch"].forEach(t=>es.addEventListener(t,e=>{try{let before=seenReaction;apply(JSON.parse(e.data));let r=db.battle?.reactions?.[other(slot)]||{},keys=Object.keys(r).map(Number),latest=Math.max(0,...keys);if(latest>before){seenReaction=latest;showReaction(r[latest])}refresh()}catch(_){}}));$("room").textContent="🔑 "+room;refresh()}
-function refresh(){if(!db.battle)return;let b=db.battle,me=b.players?.[slot],op=b.players?.[other(slot)];if(me?.ready&&op?.ready)phase="match";else if(me?.ready)phase="wait";else phase="place";if(phase==="place"){fleet=me?.ships||fleet;render()}else if(phase==="wait"){ $("title").textContent="чекаємо суперника";$("subtitle").textContent="Твій флот готовий. Гра почнеться, щойно суперник завершить розстановку.";$("board").innerHTML="";$("ships").innerHTML="";$("actions").innerHTML="";$("bottom").style.display="none";$("fleet").textContent="готово ✓";$("turn").textContent=""}else render();if(b.finished){$("ovTitle").textContent=b.winner===slot?"перемога!":"гра завершена";$("ovText").textContent="Дякуємо за гру";$("overlay").classList.add("show")}}
-$("back").onclick=()=>{if(es)es.close();location.href="index.html"};$("again").onclick=()=>location.href="index.html";init();
+
+/* ───── статистика після гри ───── */
+function sideStats(s){
+  const shots=db.battle?.shots?.[s]||{},targets=db.battle?.players?.[other(s)]?.ships||[];
+  const real=Object.entries(shots).filter(([,x])=>x&&!x.auto);
+  const hits=real.filter(([,x])=>x.hit).length;
+  const sunk=targets.filter(sh=>sh.cells.every(i=>shots[i]?.hit)).length;
+  const timed=real.filter(([,x])=>x.t).sort((a,b)=>a[1].t-b[1].t);
+  let streak=null;
+  if(timed.length){streak=0;let cur=0;for(const [,x] of timed){if(x.hit){cur++;if(cur>streak)streak=cur}else cur=0}}
+  return{shots:real.length,hits,acc:real.length?Math.round(hits/real.length*100):0,sunk,streak,times:timed.map(([,x])=>x.t)};
+}
+function fmtTime(ms){let s=Math.round(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+function renderStats(){
+  const a=sideStats(slot),b=sideStats(other(slot)),g=$("ovStats");
+  const rows=[
+    ["пострілів",a.shots,b.shots,0],
+    ["влучань",a.hits,b.hits,1],
+    ["точність",a.acc+"%",b.acc+"%",1,a.acc,b.acc],
+    ["потоплено",a.sunk+"/10",b.sunk+"/10",1,a.sunk,b.sunk],
+    ["серія влучань",a.streak===null?"—":a.streak,b.streak===null?"—":b.streak,1,a.streak,b.streak]
+  ];
+  g.innerHTML="";
+  const add=(txt,cls)=>{const d=document.createElement("div");d.className=cls||"";d.textContent=txt;g.append(d);return d};
+  add("","h");add("ти","h");add("суперник","h");
+  rows.forEach(([name,x,y,cmp,nx,ny])=>{
+    add(name,"l");
+    const vx=nx!==undefined?nx:x,vy=ny!==undefined?ny:y;
+    const ok=cmp&&vx!==null&&vy!==null;
+    add(x,ok&&vx>vy?"best":"");add(y,ok&&vy>vx?"best":"");
+  });
+  const all=a.times.concat(b.times);
+  return all.length>1?"тривалість "+fmtTime(Math.max(...all)-Math.min(...all)):"";
+}
+
+async function init(){
+  let root=await read("");
+  if(!root||!root.players){alert("Не знайшов кімнату. Повернись у меню та створи гру.");location.href="index.html";return}
+  for(const s of ["v","a"])if(root.players[s]?.uid===user.uid)slot=s;
+  if(!slot){alert("Цей профіль не є гравцем кімнати.");location.href="index.html";return}
+  db=root;
+  if(!db.battle)await write("battle",{players:{},shots:{},turn:"v",started:false});
+  fleet=db.battle?.players?.[slot]?.ships||[];
+  if(db.battle?.players?.[slot]?.ready)phase="wait";
+  let old=db.battle?.reactions?.[other(slot)]||{};
+  seenReaction=Math.max(0,...Object.keys(old).map(Number));
+  es=new EventSource(base+".json");
+  ["put","patch"].forEach(t=>es.addEventListener(t,e=>{try{
+    let before=seenReaction;apply(JSON.parse(e.data));
+    let r=db.battle?.reactions?.[other(slot)]||{},keys=Object.keys(r).map(Number),latest=Math.max(0,...keys);
+    if(latest>before){seenReaction=latest;showReaction(r[latest])}
+    refresh()
+  }catch(_){}}));
+  $("room").textContent="🔑 "+room;refresh()
+}
+
+function refresh(){
+  if(!db.battle)return;
+  let b=db.battle,me=b.players?.[slot],op=b.players?.[other(slot)];
+  if(me?.ready&&op?.ready)phase="match";else if(me?.ready)phase="wait";else phase="place";
+  if(phase==="place"){fleet=me?.ships||fleet;render()}
+  else if(phase==="wait"){$("title").textContent="чекаємо суперника";$("subtitle").textContent="Твій флот готовий. Гра почнеться, щойно суперник завершить розстановку.";$("board").innerHTML="";$("ships").innerHTML="";$("actions").innerHTML="";$("bottom").style.display="none";$("fleet").textContent="готово ✓";$("turn").textContent=""}
+  else render();
+  if(b.finished){
+    $("ovTitle").textContent=b.winner===slot?"перемога!":"суперник переміг";
+    $("ovText").textContent=renderStats()||"Дякуємо за гру";
+    $("overlay").classList.add("show")
+  }
+}
+
+$("back").onclick=()=>{if(es)es.close();location.href="index.html"};
+$("again").onclick=()=>location.href="index.html";
+init();
 </script></body></html>
