@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <link rel="apple-touch-icon" href="IMG_2010.jpeg">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><script>(function(){try{var t=localStorage.getItem("dm_theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><script>(function(){try{var t=localStorage.getItem("dm_theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);var k=localStorage.getItem("dm_skin_eff");if(k&&k!=="none")document.documentElement.setAttribute("data-skin",k)}catch(e){}})()</script>
 <meta name="theme-color" content="#fbfbfa">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
 <title>draw to me</title>
@@ -122,6 +122,9 @@ body.relay #word { font-size: 20px; margin: 2px 0 8px; }
 body.relay #done { display: none; }
 #rl { overflow-y: auto; text-align: center; }
 .rlb { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; margin: auto 0; padding: 8px 0; }
+/* ── оформлення до свят ── */
+:root[data-skin="halloween"]{--bg:#150f1f;--fg:#f3ead9;--muted:#9a8aa8;--line:#33284a;--pill:#1e1630;--soft:#261c3b;--inv-bg:#ff8a1f;--inv-fg:#1a1024;--ok:#47c98b;--bad:#ff5d73;--sh:rgba(0,0,0,.5);--okbg:#173a31}
+:root[data-skin="winter"]{--bg:#eef5ff;--fg:#1c2b45;--muted:#6f84a6;--line:#d3e1f5;--pill:#fff;--soft:#e3eefc;--inv-bg:#2563c9;--inv-fg:#fff;--sh:rgba(40,80,140,.12);--okbg:#dcf3ea}
 </style>
 </head>
 <body>
