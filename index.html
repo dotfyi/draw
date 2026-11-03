@@ -131,6 +131,59 @@ body.preview #pvClose{display:block}
 #toast.on{opacity:1;visibility:visible;transform:translate(-50%,0)}
 #toast.bad{border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
 
+#noteNotice {
+  position: fixed;
+  left: 50%;
+  top: calc(env(safe-area-inset-top, 0px) + 18px);
+  transform: translate(-50%, -14px);
+  z-index: 50;
+  width: min(360px, calc(100vw - 32px));
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--pill);
+  color: var(--fg);
+  box-shadow: 0 12px 36px var(--sh);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .22s, transform .22s, visibility .22s;
+}
+
+#noteNotice.on {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+#noteNotice .nn-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 7px;
+}
+
+#noteNotice .nn-emoji {
+  font-size: 25px;
+  line-height: 1;
+}
+
+#noteNotice .nn-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+#noteNotice .nn-text {
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #noteNotice { transition: none; }
+}
+
 /* Власне підтвердження замість системного confirm */
 #confirmLayer{
   position:fixed;inset:0;z-index:35;
@@ -414,6 +467,13 @@ body.menu-on #dock{display:flex}
 </nav>
 
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="noteNotice" role="status" aria-live="polite">
+  <div class="nn-head">
+    <span class="nn-emoji"></span>
+    <span class="nn-name"></span>
+  </div>
+  <div class="nn-text"></div>
+</div>
 <div id="confirmLayer" role="presentation">
   <div id="confirmBox" role="dialog" aria-modal="true" aria-labelledby="confirmText">
     <p id="confirmText"></p>
@@ -447,7 +507,23 @@ body.menu-on #dock{display:flex}
 <script>
 const FB = "https://draw-8cb08-default-rtdb.europe-west1.firebasedatabase.app", ROOM = "k7Qm2xVp9Lr4Tz8n";
 const $ = id => document.getElementById(id);
-let toastTimer = 0, confirmResolve = null;
+let toastTimer = 0, confirmResolve = null, noteTimer = 0;
+
+function showNoteNotice(note) {
+  const el = $("noteNotice");
+  if (!el) return;
+
+  el.querySelector(".nn-emoji").textContent = note.emoji || "💌";
+  el.querySelector(".nn-name").textContent = note.name || "Вадим";
+  el.querySelector(".nn-text").textContent = note.text || "";
+
+  clearTimeout(noteTimer);
+  el.classList.add("on");
+
+  noteTimer = setTimeout(() => {
+    el.classList.remove("on");
+  }, 3000);
+}
 
 function toast(message, type = "ok") {
   const el = $("toast");
@@ -681,7 +757,8 @@ $("hOut").onclick = logout;
 
 /* ───── кімнати ───── */
 const rb = c => `${FB}/rooms/${ROOM}/dm/${c}`;
-let rc = null, mySlot = null, db = {}, es = null, launchSeen = null, firstEv = true;
+let rc = null, mySlot = null, db = {}, es = null,
+    launchSeen = null, firstEv = true, noticeSeen = null;
 async function getRoom(c) { const r = await fetch(rb(c) + ".json"); return r.json(); }
 const me = () => ({ name: user.name, emoji: user.emoji, uid: user.uid });
 const pl = s => (db.players && db.players[s]) || { name: "…", emoji: "❔" };
@@ -741,15 +818,29 @@ function apply(type, msg) {
 }
 function connect() {
   if (es) es.close();
+  noticeSeen = null;
   es = new EventSource(rb(rc) + ".json");
   ["put", "patch"].forEach(type => es.addEventListener(type, e => {
     try { apply(type, JSON.parse(e.data)); } catch (err) { return; }
-    if (firstEv) { firstEv = false; launchSeen = db.launch && db.launch.id; }
-    onData();
+    if (firstEv) {
+  firstEv = false;
+  launchSeen = db.launch && db.launch.id;
+  noticeSeen = db.message && db.message.id;
+}
+onData();
   }));
 }
 function onData() {
   if (!rc) return;
+  const note = db.message;
+
+if (note && note.id && note.id !== noticeSeen) {
+  noticeSeen = note.id;
+
+  if (mySlot === "a" && note.by === "v") {
+    showNoteNotice(note);
+  }
+}
   const L = db.launch;
   if (L && L.id !== launchSeen) { launchSeen = L.id; if (L.by !== mySlot) run(L); }
   const c = cur();
@@ -1017,7 +1108,23 @@ ${editName ? `<div class="ro"><input id="nmEdit" maxlength="12" value="${esc(use
 <div class="sec">дані</div>
 <div class="card2"><div class="ro"><span>скинути статистику</span><button class="lnk dng" data-s="reset">скинути</button></div>${duo ? "" : `<div class="ro"><span>кімната</span><button class="lnk" data-s="leave">вийти</button></div>`}</div>
 <div class="card2"><div class="ro"><span>акаунт</span><button class="lnk dng" data-s="out">вийти</button></div></div>
-${isAdmin() ? '<div class="sec">головний екран · тільки для тебе</div><div class="card2" id="admBox"></div>' : ""}
+${isAdmin() ? `
+<div class="sec">повідомлення Аліні · тільки для тебе</div>
+<div class="card2">
+  <div class="adl">
+    <b>💌 Написати Аліні</b>
+    <textarea id="noteToAlina"
+      maxlength="240"
+      rows="3"
+      placeholder="Напиши щось приємне…"></textarea>
+  </div>
+  <div class="adb">
+    <button class="blk sm" data-s="sendNote">надіслати</button>
+  </div>
+</div>
+<div class="sec">головний екран · тільки для тебе</div>
+<div class="card2" id="admBox"></div>
+` : ""}
 <div class="ver">draw &amp; more · зроблено для двох 💛</div>`;
   if (isAdmin()) buildAdmin();
 }
@@ -1045,6 +1152,26 @@ else if (s === "out") {
   if (await askConfirm("вийти з акаунта?")) {
     logout(); toast("ти вийшов(ла) з акаунта");
   }
+}
+else if (s === "sendNote" && isAdmin() && mySlot === "v") {
+  const message = ($("noteToAlina")?.value || "").trim().slice(0, 240);
+
+  if (!message) {
+    toast("спочатку напиши повідомлення", "bad");
+    return;
+  }
+
+  put("message", {
+    id: rnd() + Date.now().toString(36),
+    by: "v",
+    name: user.name,
+    emoji: user.emoji,
+    text: message,
+    t: Date.now()
+  });
+
+  $("noteToAlina").value = "";
+  toast("повідомлення надіслано 💌");
 }
 };
 
