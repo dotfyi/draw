@@ -922,10 +922,12 @@ const GAMES = [
   { id: "croc", e: "🐊", n: "крокодил", s: "малюй наживо, вгадуй вголос", c: "86,170,92", g: 0, d: "Один малює слово, другий бачить малюнок наживо й вгадує вголос. Малювальник тисне «вгадав» або «не вгадав» — і ви міняєтесь ролями." },
   { id: "word", e: "🔤", n: "вгадай слово", s: "вікторина з квадратиками", c: "232,160,40", g: 1, d: "Питання зверху, відповідь — у квадратиках. Відкривайте літери по черзі, першим(ою) ходить {a}. Можна одразу вгадувати слово!" },
   { id: "find", e: "🔢", n: "знайди число", s: "хто швидше знайде число", c: "235,105,70", g: 1, d: "На полі хаотично розкидані числа. Зверху зʼявляється число — хто першим його знайде й торкнеться, той отримує бал. Помилився — пауза 1,5 с. Грають до заданої кількості очок." },
+  { id: "xo", e: "❌", n: "хрестики-нулики", s: "серія до N перемог", c: "255,90,115", g: 1, d: "Класика на двох: поле 3×3, ходите по черзі, а хто ходить першим, чергується. Грайте серію до потрібної кількості перемог. Знизу видно статистику серії та за весь час." },
+  { id: "bomb", e: "💣", n: "розмінуй бомбу", s: "говоріть вголос — розмінуйте разом", c: "235,70,70", g: 1, d: "Один (сапер) бачить бомбу: дроти, кнопку, символи й кольори. Другий (штаб) має інструкцію, але нічого не бачить. Описуйте усе вголос і розмінуйте разом до того, як спливе час. Після кожної бомби ролі міняються, а гра триває до першого вибуху." },
   { id: "ships", e: "🚢", n: "морський бій", s: "класичний флот 10×10", c: "60,130,220", g: 1, d: "Розставте кораблі на полі 10×10 і по черзі шукайте флот суперника. Влучання дає додатковий постріл, а промах передає хід супернику." }
 ];
 const GMETA = Object.fromEntries(GAMES.map(g => [g.id, g]));
-const cfg = { n: +ls.get("h_n") || 5, lives: +ls.get("h_l") || 8, rounds: +ls.get("d_rounds") || 5, crocN: +ls.get("c_n") || 6, findN: +ls.get("f_n") || 10, dur: +ls.get("d_dur") || 60000, cat: ls.get("d_cat") || "всі слова" };
+const cfg = { n: +ls.get("h_n") || 5, lives: +ls.get("h_l") || 8, rounds: +ls.get("d_rounds") || 5, crocN: +ls.get("c_n") || 6, findN: +ls.get("f_n") || 10, xoN: +ls.get("x_n") || 3, bombLvl: +ls.get("b_l") || 2, dur: +ls.get("d_dur") || 60000, cat: ls.get("d_cat") || "всі слова" };
 const DCATS = ["🐾 тварини", "🍕 їжа", "🏠 речі", "🌋 природа", "🚀 транспорт", "🧙 професії й герої", "🎈 спорт і розваги", "🏰 будівлі та місця", "🎲 різне", "💕 про нас", "🎯 всі слова"].map(x => [x.slice(x.indexOf(" ") + 1), x]);
 let picked = null;
 (() => {
@@ -975,6 +977,8 @@ function openSheet(i) {
   if (picked.id === "word") $("dSet").append(chips("питань", "n", [3, 5, 10], "h_n"), chips("спроб на помилки", "lives", [6, 8, 10], "h_l"));
   if (picked.id === "croc") $("dSet").append(chips("раундів", "crocN", [4, 6, 10], "c_n"));
   if (picked.id === "find") $("dSet").append(chips("до скількох очок", "findN", [5, 10, 15], "f_n"));
+  if (picked.id === "xo") $("dSet").append(chips("до скількох перемог", "xoN", [2, 3, 5, 10], "x_n"));
+  if (picked.id === "bomb") $("dSet").append(chips("складність", "bombLvl", [[1, "легка · 2 модулі"], [2, "звичайна · 3"], [3, "складна · 4"]], "b_l"));
   if (picked.id === "same" || picked.id === "guess") $("dSet").append(chips("раунди", "rounds", [3, 5, 10], "d_rounds"), chips("час на малюнок", "dur", [[30000, "30 с"], [60000, "60 с"], [90000, "90 с"]], "d_dur"), chips("слова", "cat", DCATS, "d_cat"));
   document.body.classList.add("sh-open"); vib(10);
 }
@@ -982,7 +986,7 @@ function closeSheet() { picked = null; document.body.classList.remove("sh-open")
 $("scrim").onclick = $("shClose").onclick = () => closeSheet();
 $("startBtn").onclick = () => {
   if (!picked) return;
-  const l = { id: rnd(), game: picked.id, by: mySlot, cfg: { n: cfg.n, lives: cfg.lives, rounds: cfg.rounds, dur: cfg.dur, cat: cfg.cat, crocN: cfg.crocN, findN: cfg.findN } };
+  const l = { id: rnd(), game: picked.id, by: mySlot, cfg: { n: cfg.n, lives: cfg.lives, rounds: cfg.rounds, dur: cfg.dur, cat: cfg.cat, crocN: cfg.crocN, findN: cfg.findN, xoN: cfg.xoN, bombLvl: cfg.bombLvl } };
   if (l.game === "word") put("game", newHang(l.cfg));
   launchSeen = l.id; put("launch", l); run(l);
 };
@@ -990,13 +994,15 @@ function run(l) {
   closeSheet();
   if (l.game === "word") { gKey = ""; go("s-hang"); renderHang(); }
   else if (l.game === "ships") location.href = "battleship.html";
+  else if (l.game === "xo") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "xo.html"; }
+  else if (l.game === "bomb") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "bomb.html"; }
   else if (l.game === "find") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "find.html"; }
   else if (l.game === "croc") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "crocodile.html"; }
   else { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "draw.html"; }
 }
 
 /* ───── статистика ───── */
-const COOP = { relay: 1 };
+const COOP = { relay: 1, bomb: 1 };
 const MON = ["січ", "лют", "бер", "кві", "тра", "чер", "лип", "сер", "вер", "жов", "лис", "гру"];
 function when(t) {
   if (!t) return "";
@@ -1026,6 +1032,10 @@ function renderStats() {
   });
   if (ships) facts.push(["точність у морському бою", `${esc(pl("a").emoji)} ${pct(sh.a[1], sh.a[0])} · ${esc(pl("v").emoji)} ${pct(sh.v[1], sh.v[0])}`]);
   if (crocs) facts.push(["крокодил: вгадано", `${gOk} з ${gN} (${pct(gOk, gN)})`]);
+  const bl = log.filter(x => x.g === "bomb");
+  if (bl.length) facts.push(["бомб розміновано", `${bl.reduce((a, x) => a + (x.n || 0), 0)} · рекорд ${Math.max(...bl.map(x => x.n || 0))} поспіль`]);
+  const xl = log.filter(x => x.g === "xo");
+  if (xl.length) { let gv = 0, ga = 0, dr = 0; xl.forEach(x => { gv += (x.s && x.s.v) || 0; ga += (x.s && x.s.a) || 0; dr += x.n || 0; }); facts.push(["хрестики-нулики: партій", `${esc(pl("a").emoji)} ${ga} · ${esc(pl("v").emoji)} ${gv} · нічиїх ${dr}`]); }
   const first = log[0] && (log[0].w === "v" || log[0].w === "a") ? log[0].w : "";
   if (first) { for (const x of log) { if (x.w === first) st++; else break; } if (st > 1) facts.push(["поточна серія перемог", `${esc(pl(first).emoji)} ${st} підряд`]); }
   const days = new Set(log.map(x => new Date(x.t || 0).toDateString())).size;
