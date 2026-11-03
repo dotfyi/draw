@@ -37,27 +37,34 @@ h2{font-family:var(--serif);font-size:28px;font-weight:600;text-align:center}
 #s-welcome{justify-content:center;align-items:center;overflow:hidden}
 #float,.aura{position:absolute;inset:0;overflow:hidden;pointer-events:none;max-width:none!important;width:auto!important;z-index:0!important}
 .aura i{position:absolute;width:64vmax;height:64vmax;border-radius:50%;filter:blur(58px);opacity:.6;animation:drift 16s ease-in-out infinite alternate}
-.aura i:nth-child(1){background:radial-gradient(circle,#ffbcd0,transparent 66%);left:-26vmax;top:-22vmax}
-.aura i:nth-child(2){background:radial-gradient(circle,#b8d2ff,transparent 66%);right:-30vmax;top:16%;animation-delay:-6s}
-.aura i:nth-child(3){background:radial-gradient(circle,#ffe4a0,transparent 66%);left:-12vmax;bottom:-32vmax;animation-delay:-11s}
+.aura i:nth-child(1){background:radial-gradient(circle,var(--a1,#ffbcd0),transparent 66%);left:-26vmax;top:-22vmax}
+.aura i:nth-child(2){background:radial-gradient(circle,var(--a2,#b8d2ff),transparent 66%);right:-30vmax;top:16%;animation-delay:-6s}
+.aura i:nth-child(3){background:radial-gradient(circle,var(--a3,#ffe4a0),transparent 66%);left:-12vmax;bottom:-32vmax;animation-delay:-11s}
 :root[data-theme="dark"] .aura i{opacity:.3}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .aura i{opacity:.3}}
 @keyframes drift{to{transform:translate(9vmax,-7vmax) scale(1.18)}}
-#float span{position:absolute;opacity:.62;pointer-events:auto;cursor:pointer;animation:lev var(--d) ease-in-out infinite alternate;filter:drop-shadow(0 6px 8px rgba(0,0,0,.12))}
-#float span.pop{animation:pop .7s cubic-bezier(.2,.9,.3,1.4)}
-@keyframes lev{from{transform:translateY(10px) rotate(-6deg)}to{transform:translateY(-18px) rotate(6deg)}}
-@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.9) rotate(14deg)}100%{transform:scale(1)}}
+#float span{position:absolute;left:0;top:0;opacity:.66;pointer-events:none;will-change:transform;line-height:1;filter:drop-shadow(0 6px 8px rgba(0,0,0,.14))}
+#float span.fx{opacity:1;filter:none}
 .hero{margin:auto 0;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;text-align:center}
 .logo{font-size:58px;line-height:1;animation:wob 3.2s ease-in-out infinite;transform-origin:50% 90%}
 @keyframes wob{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(10deg) translateY(-4px)}}
-.brand{font-family:var(--serif);font-size:46px;font-weight:700;letter-spacing:.5px;line-height:1.05;background:linear-gradient(90deg,var(--fg) 0%,#e0507a 30%,#4a7de0 60%,var(--fg) 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 7s linear infinite}
+.brand{font-family:var(--serif);font-size:46px;font-weight:700;letter-spacing:.5px;line-height:1.05;background:linear-gradient(90deg,var(--fg) 0%,var(--b1,#e0507a) 30%,var(--b2,#4a7de0) 60%,var(--fg) 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 7s linear infinite}
 @keyframes shine{to{background-position:-300% 0}}
 .scribble{width:190px;height:16px;overflow:visible}
-.scribble path{fill:none;stroke:#e0507a;stroke-width:4;stroke-linecap:round;stroke-dasharray:240;stroke-dashoffset:240;animation:drw 1.4s .5s ease-out forwards}
+.scribble path{fill:none;stroke:var(--b1,#e0507a);stroke-width:4;stroke-linecap:round;stroke-dasharray:240;stroke-dashoffset:240;animation:drw 1.4s .5s ease-out forwards}
 @keyframes drw{to{stroke-dashoffset:0}}
 #tag{height:22px;font-size:15px;color:var(--muted);transition:opacity .4s}
 .cta{margin-bottom:6px;animation:pulse 2.6s ease-out infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(224,80,122,.45)}70%,100%{box-shadow:0 0 0 18px rgba(224,80,122,0)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--b1,#e0507a) 45%,transparent)}70%,100%{box-shadow:0 0 0 18px color-mix(in srgb,var(--b1,#e0507a) 0%,transparent)}}
+.brand.f-sans{font-family:ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;font-weight:800}
+.brand.f-round{font-family:ui-rounded,"SF Pro Rounded","Trebuchet MS",sans-serif;font-weight:800}
+.brand.f-mono{font-family:ui-monospace,"SF Mono","Courier New",monospace;font-size:38px}
+.brand.f-hand{font-family:"Bradley Hand","Segoe Script","Comic Sans MS",cursive;font-size:52px}
+.brand.plain{background:none;-webkit-text-fill-color:var(--fg);color:var(--fg);animation:none}
+#pvClose{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);z-index:20;display:none;padding:10px 18px;border-radius:999px;background:var(--inv-bg);color:var(--inv-fg);font-size:14px;font-weight:600;box-shadow:0 8px 24px var(--sh)}
+body.preview #pvClose{display:block}
+#s-splash{justify-content:center;align-items:center}
+#s-splash .logo{margin:auto}
 .foot{margin-top:12px;text-align:center;font-size:12px;color:var(--muted)}
 
 /* ── код та імʼя ── */
@@ -100,7 +107,7 @@ h2{font-family:var(--serif);font-size:28px;font-weight:600;text-align:center}
 .gc .ch{color:var(--muted);font-size:24px;padding-right:4px}
 
 /* нижнє меню */
-#dock{display:none;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);width:auto;max-width:none;display:flex;gap:4px;padding:6px;border-radius:999px;background:var(--pill);border:1px solid var(--line);box-shadow:0 12px 32px var(--sh);z-index:6}
+#dock{display:none;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);width:auto;max-width:none;gap:4px;padding:6px;border-radius:999px;background:var(--pill);border:1px solid var(--line);box-shadow:0 12px 32px var(--sh);z-index:6}
 body.menu-on #dock{display:flex}
 .dk{display:flex;align-items:center;gap:7px;padding:12px 16px;border-radius:999px;font-size:14px;font-weight:600;color:var(--muted);transition:background .25s,color .25s}
 .dk svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -146,6 +153,14 @@ body.menu-on #dock{display:flex}
 .sw.on{background:var(--ok)}
 .sw.on::after{transform:translateX(19px)}
 .dng{color:var(--bad)}
+.adl{padding:12px 16px;border-top:1px solid var(--line)}
+.adl:first-child{border-top:0}
+.ai{width:100%;margin-top:6px;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font-size:15px;outline:none;background:var(--bg);user-select:text;-webkit-user-select:text;resize:vertical}
+.ai:focus{border-color:var(--fg)}
+.adb{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line)}
+.adb .blk{flex:1;min-width:120px}
+.adb .wht{flex:1;min-width:120px;padding:12px 16px;font-size:15px}
+.adm-note{font-size:12px;color:var(--muted);line-height:1.45;padding:12px 16px}
 .ver{text-align:center;font-size:12px;color:var(--muted);margin-top:10px}
 
 /* статистика */
@@ -207,22 +222,30 @@ body.menu-on #dock{display:flex}
 .row.win{border-color:var(--fg)}
 .row b{font:700 26px var(--serif)}
 .wd{font:700 30px var(--serif);letter-spacing:3px}
+/* ── оформлення до свят ── */
+:root[data-skin="halloween"]{--bg:#150f1f;--fg:#f3ead9;--muted:#9a8aa8;--line:#33284a;--pill:#1e1630;--soft:#261c3b;--inv-bg:#ff8a1f;--inv-fg:#1a1024;--ok:#47c98b;--bad:#ff5d73;--sh:rgba(0,0,0,.5);--okbg:#173a31;--b1:#ff8a1f;--b2:#a259ff}
+:root[data-skin="winter"]{--bg:#eef5ff;--fg:#1c2b45;--muted:#6f84a6;--line:#d3e1f5;--pill:#fff;--soft:#e3eefc;--inv-bg:#2563c9;--inv-fg:#fff;--sh:rgba(40,80,140,.12);--okbg:#dcf3ea;--b1:#2563c9;--b2:#38b6ff}
+[data-skin="halloween"] .hello::after{content:" 🎃"}
+[data-skin="winter"] .hello::after{content:" ❄️"}
 </style>
 </head>
 <body>
 
 <div class="s on" id="s-welcome">
-<div class="aura"><i></i><i></i><i></i></div>
+<div class="aura" id="aura"><i></i><i></i><i></i></div>
 <div id="float"></div>
 <div class="hero">
-<div class="logo">🎨</div>
-<div class="brand">draw &amp; more</div>
+<div class="logo" id="wLogo">🎨</div>
+<div class="brand" id="wBrand">draw &amp; more</div>
 <svg class="scribble" viewBox="0 0 200 16"><path d="M4 9 C 38 1, 62 15, 100 8 S 170 3, 196 9"/></svg>
 <div id="tag"></div>
 </div>
 <button class="blk cta" id="toAuth">авторизуватись</button>
-<div class="foot">ігри для двох · малюй, вгадуй, перемагай</div>
+<div class="foot" id="wFoot"></div>
 </div>
+<button id="pvClose">✕ закрити перегляд</button>
+
+<div class="s" id="s-splash"><div class="logo">🎨</div></div>
 
 <div class="s" id="s-code">
 <button class="back" id="cback">‹</button>
@@ -298,6 +321,7 @@ function go(id) {
   document.querySelectorAll(".s").forEach(s => s.classList.toggle("on", s.id === id));
   document.body.classList.toggle("menu-on", id === "s-menu");
   if (id !== "s-menu") document.body.classList.remove("sh-open");
+  if (id === "s-welcome" && typeof startWelcome === "function") startWelcome();
 }
 const cur = () => document.querySelector(".s.on").id;
 
@@ -321,24 +345,132 @@ let user = null;
 try { user = JSON.parse(ls.get("dm_user")); } catch (e) {}
 const meHtml = u => `<b>${u.emoji}</b><span>${esc(u.name)}</span>`;
 
-/* ───── живий привітальний екран ───── */
-(() => {
-  const em = ["🎨", "✏️", "🖍️", "🔤", "❓", "🧩", "🖌️", "💡", "🎲", "✨", "🖼️", "🕵️", "🔄", "📝", "🐊", "🚢"];
-  em.forEach((e, i) => {
-    const s = document.createElement("span");
-    s.textContent = e;
-    s.style.cssText = `left:${(i * 37 + 6) % 88}%;top:${(i * 23 + 4) % 86}%;font-size:${30 + (i * 13) % 34}px;--d:${4 + (i * 7) % 5}s;animation-delay:-${(i * 1.3) % 6}s`;
-    s.onclick = () => { s.classList.remove("pop"); void s.offsetWidth; s.classList.add("pop"); vib(8); };
-    $("float").appendChild(s);
-  });
-  const tags = ["малюй · вгадуй · перемагай", "наживо, для двох", "один екран — двоє гравців", "час трохи пограти ✨"];
-  let k = 0; $("tag").textContent = tags[0];
-  setInterval(() => {
+/* ───── налаштування головного екрана (зберігаються для всіх) ───── */
+const DEF_SITE = {
+  brand: "draw & more", logo: "🎨", cta: "авторизуватись", foot: "ігри для двох · малюй, вгадуй, перемагай",
+  tagline: ["малюй · вгадуй · перемагай", "наживо, для двох", "один екран — двоє гравців", "час трохи пограти ✨"],
+  emojis: ["🎨", "✏️", "🖍️", "🔤", "❓", "🧩", "🖌️", "💡", "🎲", "✨", "🖼️", "🕵️", "🔄", "📝", "🐊", "🚢"],
+  count: 16, size: "m", motion: "float", touch: "repel", tapfx: "pop", bg: "candy", font: "serif", brandFx: "gradient", skin: "none"
+};
+const PRESETS = {
+  def: DEF_SITE,
+  halloween: { skin: "halloween", bg: "night", logo: "🎃", brand: "draw & more", cta: "увійти, якщо насмілишся", foot: "ігри для двох · лише для сміливців",
+    tagline: ["цукерка чи капость? 🎃", "бу! злякався? 👻", "малюй, вгадуй, не бійся 🕷️", "у цю ніч грається краще 🦇"],
+    emojis: ["🎃", "👻", "🦇", "🕷️", "🕸️", "💀", "🍬", "🧙", "🌙", "🪦", "🔮", "🍭"], count: 18, size: "m", motion: "float", touch: "attract", tapfx: "burst", font: "round", brandFx: "gradient" },
+  winter: { skin: "winter", bg: "ocean", logo: "🎄", brand: "draw & more", cta: "увійти", foot: "ігри для двох · тепло та затишно",
+    tagline: ["малюй, поки падає сніг ❄️", "гарячий чай і гра для двох ☕", "новорічний настрій 🎁"],
+    emojis: ["❄️", "⛄", "🎄", "⭐", "🎁", "🧦", "🦌", "☃️", "✨", "🔔"], count: 24, size: "m", motion: "rain", touch: "repel", tapfx: "burst", font: "serif", brandFx: "gradient" }
+};
+const BGS = { candy: ["#ffbcd0", "#b8d2ff", "#ffe4a0"], night: ["#7a3cff", "#ff7a1a", "#3a1f7a"], mint: ["#b9f0d8", "#bde6ff", "#fff2b8"], ocean: ["#7cc7ff", "#9fb8ff", "#c6f0ff"], sunset: ["#ff9a76", "#ffd36b", "#ff6fa0"] };
+let site = { ...DEF_SITE };
+try { site = { ...DEF_SITE, ...JSON.parse(ls.get("dm_site")) }; } catch (e) {}
+
+function effSkin() { const p = ls.get("dm_skin") || "auto"; return p === "auto" ? (site.skin || "none") : p; }
+function applySkin() {
+  const k = effSkin(), r = document.documentElement;
+  if (k === "none") r.removeAttribute("data-skin"); else r.setAttribute("data-skin", k);
+  ls.set("dm_skin_eff", k); applyTheme();
+}
+
+/* ───── живий привітальний екран: рух, дотик, тап ───── */
+const WE = { items: [], running: false, last: 0, w: 0, h: 0, f: { x: 0, y: 0, on: false }, cfg: site, dirty: true, tagTimer: 0 };
+const rr = (a, b) => a + Math.random() * (b - a);
+function welcomeApply(cfg) {
+  WE.cfg = cfg; WE.dirty = true;
+  $("wLogo").textContent = cfg.logo || "🎨"; $("wBrand").textContent = cfg.brand || "draw & more";
+  $("wBrand").className = "brand f-" + cfg.font + (cfg.brandFx === "plain" ? " plain" : "");
+  $("toAuth").textContent = cfg.cta || "авторизуватись"; $("wFoot").textContent = cfg.foot || "";
+  const c = BGS[cfg.bg] || BGS.candy, au = $("aura"); au.style.setProperty("--a1", c[0]); au.style.setProperty("--a2", c[1]); au.style.setProperty("--a3", c[2]);
+  const tags = (cfg.tagline && cfg.tagline.length ? cfg.tagline : [""]); let k = 0; $("tag").textContent = tags[0]; $("tag").style.opacity = 1;
+  clearInterval(WE.tagTimer);
+  if (tags.length > 1) WE.tagTimer = setInterval(() => {
     if (cur() !== "s-welcome") return;
     $("tag").style.opacity = 0;
     setTimeout(() => { k = (k + 1) % tags.length; $("tag").textContent = tags[k]; $("tag").style.opacity = 1; }, 400);
   }, 3200);
+  if (cur() === "s-welcome") buildItems();
+}
+function buildItems() {
+  const box = $("float"), r = box.getBoundingClientRect(), cfg = WE.cfg;
+  WE.w = r.width || innerWidth; WE.h = r.height || innerHeight; WE.dirty = false;
+  box.innerHTML = ""; WE.items = [];
+  const em = (cfg.emojis || []).filter(Boolean); if (!em.length) em.push("🎨");
+  const base = { s: 24, m: 34, l: 50 }[cfg.size] || 34, n = Math.max(1, Math.min(40, +cfg.count || 16));
+  for (let i = 0; i < n; i++) {
+    const size = base * (.75 + ((i * 53) % 50) / 100), el = document.createElement("span");
+    el.textContent = em[i % em.length]; el.style.fontSize = size + "px"; box.appendChild(el);
+    const it = { el, size, ph: i * 1.7, hx: ((i * .61803) % 1) * WE.w, hy: ((i * .38197 + .13) % 1) * WE.h, x: rr(0, WE.w), y: rr(0, WE.h),
+      vx: rr(-45, 45), vy: rr(-45, 45), fall: rr(35, 95), rad: rr(.12, .48), dir: i % 2 ? 1 : -1, ox: 0, oy: 0, popT: -9, gone: false };
+    WE.items.push(it);
+  }
+}
+function frame(ts) {
+  if (cur() !== "s-welcome") { WE.running = false; return; }
+  if (WE.dirty) buildItems();
+  const dt = Math.min(.05, (ts - WE.last) / 1000 || .016); WE.last = ts; const t = ts / 1000, { w, h, cfg, f, items } = WE, m = cfg.motion;
+  if (m === "bounce") {
+    items.forEach(it => { it.x += it.vx * dt; it.y += it.vy * dt; const r = it.size / 2;
+      if (it.x < r) { it.x = r; it.vx = Math.abs(it.vx); } if (it.x > w - r) { it.x = w - r; it.vx = -Math.abs(it.vx); }
+      if (it.y < r) { it.y = r; it.vy = Math.abs(it.vy); } if (it.y > h - r) { it.y = h - r; it.vy = -Math.abs(it.vy); } });
+    for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {   // зіткнення між собою
+      const a = items[i], b = items[j], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy), min = (a.size + b.size) * .4;
+      if (d > 0 && d < min) { const nx = dx / d, ny = dy / d, p = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
+        if (p > 0) { a.vx -= p * nx; a.vy -= p * ny; b.vx += p * nx; b.vy += p * ny; }
+        const o = (min - d) / 2; a.x -= nx * o; a.y -= ny * o; b.x += nx * o; b.y += ny * o; } }
+  }
+  const R = Math.min(w, h) * .28;
+  items.forEach(it => {
+    let bx, by, rot = 0;
+    if (m === "rain") { it.y += it.fall * dt; if (it.y > h + it.size) { it.y = -it.size; it.hx = rr(0, w); } bx = it.hx + Math.sin(t * .8 + it.ph) * 18; by = it.y; rot = Math.sin(t + it.ph) * 14; }
+    else if (m === "bounce") { bx = it.x; by = it.y; rot = (it.vx + it.vy) * .2; }
+    else if (m === "swirl") { const a = it.ph + t * .35 * it.dir; bx = w / 2 + Math.cos(a) * it.rad * w * 1.1; by = h / 2 + Math.sin(a) * it.rad * h * .9; rot = Math.sin(a) * 20; }
+    else { bx = it.hx + Math.sin(t * .6 + it.ph) * 14; by = it.hy + Math.cos(t * .5 + it.ph * 1.3) * 20; rot = Math.sin(t * .7 + it.ph) * 8; }
+    if (f.on && cfg.touch !== "none" && !it.gone) {
+      const dx = bx + it.ox - f.x, dy = by + it.oy - f.y, d = Math.hypot(dx, dy);
+      if (cfg.touch === "repel" && d < R && d > .1) { const p = (1 - d / R) * 900 * dt; it.ox += dx / d * p; it.oy += dy / d * p; }
+      else if (cfg.touch === "attract" && d < R * 1.8) { const k = 4 * dt * (1 - d / (R * 1.8)); it.ox += (f.x - bx - it.ox) * k; it.oy += (f.y - by - it.oy) * k; }
+    }
+    const dec = 1 / (1 + dt * (f.on ? 1.2 : 2.2)); it.ox *= dec; it.oy *= dec;
+    const pa = (t - it.popT) < .5 ? 1 + Math.sin((t - it.popT) / .5 * Math.PI) * .9 : 1;
+    it.el.style.transform = `translate3d(${bx + it.ox - it.size / 2}px,${by + it.oy - it.size / 2}px,0) rotate(${rot}deg) scale(${it.gone ? .2 : pa})`;
+  });
+  requestAnimationFrame(frame);
+}
+function startWelcome() { if (WE.running) return; WE.running = true; WE.last = performance.now(); if (WE.dirty || !WE.items.length) buildItems(); requestAnimationFrame(frame); }
+addEventListener("resize", () => { WE.dirty = true; });
+
+function burst(x, y, emoji, n) {
+  const box = $("float");
+  for (let i = 0; i < n; i++) {
+    const e = document.createElement("span"); e.className = "fx"; e.textContent = emoji || WE.items[i % Math.max(1, WE.items.length)]?.el.textContent || "✨";
+    e.style.fontSize = rr(16, 28) + "px"; box.appendChild(e);
+    const a = rr(0, 6.28), d = rr(50, 130);
+    e.animate([{ transform: `translate3d(${x}px,${y}px,0) scale(1)`, opacity: 1 }, { transform: `translate3d(${x + Math.cos(a) * d}px,${y + Math.sin(a) * d + 30}px,0) scale(.3) rotate(${rr(-90, 90)}deg)`, opacity: 0 }], { duration: rr(550, 900), easing: "cubic-bezier(.2,.7,.3,1)" }).onfinish = () => e.remove();
+  }
+}
+(() => {
+  const sc = $("s-welcome");
+  const pos = e => { const r = $("float").getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  sc.addEventListener("pointerdown", e => {
+    const [x, y] = pos(e); WE.f.x = x; WE.f.y = y; WE.f.on = true;
+    const fx = WE.cfg.tapfx, now = performance.now() / 1000;
+    let hit = null, best = 1e9;
+    WE.items.forEach(it => { const r = it.el.getBoundingClientRect(), b = $("float").getBoundingClientRect(), cx = r.left - b.left + r.width / 2, cy = r.top - b.top + r.height / 2, d = Math.hypot(cx - x, cy - y); if (d < it.size * .75 && d < best && !it.gone) { best = d; hit = [it, cx, cy]; } });
+    if (fx === "pop" && hit) { hit[0].popT = now; vib(8); }
+    else if (fx === "gone" && hit) { const it = hit[0]; burst(hit[1], hit[2], it.el.textContent, 8); it.gone = true; vib(10); setTimeout(() => { it.gone = false; it.x = rr(0, WE.w); it.y = rr(0, WE.h); it.hx = it.x; it.hy = it.y; it.popT = performance.now() / 1000; }, 1400); }
+    else if (fx === "burst") { burst(x, y, "", 9); vib(8); }
+  });
+  sc.addEventListener("pointermove", e => { if (e.pointerType === "mouse" || WE.f.on) { const [x, y] = pos(e); WE.f.x = x; WE.f.y = y; WE.f.on = true; } });
+  ["pointerup", "pointercancel"].forEach(ev => sc.addEventListener(ev, () => { WE.f.on = false; }));
+  sc.addEventListener("pointerleave", () => { WE.f.on = false; });
 })();
+welcomeApply(site);
+// свіжі налаштування з бази — видно всім ще до входу
+fetch(`${FB}/rooms/${ROOM}/site.json`).then(r => r.json()).then(d => {
+  if (!d) return; const n = { ...DEF_SITE, ...d };
+  if (JSON.stringify(n) !== JSON.stringify(site)) { site = n; ls.set("dm_site", JSON.stringify(n)); welcomeApply(site); applySkin(); }
+}).catch(() => {});
+applySkin();
 
 /* ───── екран коду ───── */
 let codeVal = "", codeCb = null, backTo = "s-welcome";
@@ -356,7 +488,7 @@ $("cgo").onclick = async () => {
 };
 
 /* ───── вхід ───── */
-$("toAuth").onclick = () => openCode("введи код", "увійти", "ваш код для входу — 0000", "s-welcome", code => {
+$("toAuth").onclick = () => document.body.classList.contains("preview") ? 0 : openCode("введи код", "увійти", "ваш код для входу — 0000", "s-welcome", code => {
   if (CODES[code]) return login({ ...CODES[code], uid: "u_" + CODES[code].pref });
   if (code === "0000") { $("nm").value = ""; go("s-name"); return; }
   return "невірний код";
@@ -588,6 +720,78 @@ ${comp ? `<div class="bar"><i class="sa" style="width:${W.a / comp * 100}%"></i>
 <div class="sec">останні ігри</div><div class="card2">${last}</div>`;
 }
 
+
+/* ───── редактор головного екрана (лише адміністратор) ───── */
+const isAdmin = () => !!user && user.pref === "v";
+let sdraft = null;
+const EMOJI_SETS = [["🎨 малювання", DEF_SITE.emojis], ["🎃 геловін", PRESETS.halloween.emojis], ["❄️ зима", PRESETS.winter.emojis],
+  ["🍕 їжа", ["🍕", "🍔", "🍩", "🍓", "🍉", "🍪", "🧁", "🍿", "🥑", "🍦"]], ["🚀 космос", ["🚀", "🪐", "🌙", "⭐", "👽", "🛸", "☄️", "🌍"]], ["🐾 тварини", ["🐶", "🐱", "🦊", "🐼", "🐸", "🦄", "🐙", "🦋", "🐧", "🐢"]]];
+function splitEmoji(str) {
+  try { if (window.Intl && Intl.Segmenter) return [...new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(str)].map(x => x.segment).filter(x => x.trim()); } catch (e) {}
+  return Array.from(str).filter(x => x.trim());
+}
+function buildAdmin() {
+  const box = $("admBox"); if (!box) return;
+  if (!sdraft) sdraft = JSON.parse(JSON.stringify(site));
+  const grp = (k, label, opts) => `<div class="adl"><div class="ol">${label}</div><div class="og" data-k="${k}">${opts.map(([v, l]) => `<button class="chip${String(sdraft[k]) === String(v) ? " on" : ""}" data-v="${v}">${l}</button>`).join("")}</div></div>`;
+  const txt = (k, label, ph) => `<div class="adl"><div class="ol">${label}</div><input class="ai" data-k="${k}" value="${esc(sdraft[k] || "")}" placeholder="${ph}" maxlength="60" autocomplete="off"></div>`;
+  box.innerHTML = `<div class="adm-note">Це бачать усі на екрані входу. Змінюй, дивись «переглянути», а коли сподобається — «зберегти для всіх».</div>
+<div class="adl"><div class="ol">готові набори</div><div class="og">${[["def", "звичайний"], ["halloween", "🎃 геловін"], ["winter", "❄️ зима"]].map(([v, l]) => `<button class="chip" data-pre="${v}">${l}</button>`).join("")}</div></div>
+${txt("brand", "назва", "draw & more")}${txt("logo", "емодзі над назвою", "🎨")}
+<div class="adl"><div class="ol">підписи під назвою (кожен з нового рядка, змінюються по колу)</div><textarea class="ai" data-k="tagline" rows="4">${esc((sdraft.tagline || []).join("\n"))}</textarea></div>
+${txt("cta", "текст кнопки", "авторизуватись")}${txt("foot", "нижній рядок", "")}
+<div class="adl"><div class="ol">емодзі на фоні (через пробіл)</div><input class="ai" data-k="emojis" value="${esc((sdraft.emojis || []).join(" "))}" autocomplete="off"><div class="og" style="margin-top:10px">${EMOJI_SETS.map(([l], i) => `<button class="chip" data-set="${i}">${l}</button>`).join("")}</div></div>
+${grp("count", "скільки емодзі", [[8, "8"], [16, "16"], [24, "24"], [32, "32"]])}
+${grp("size", "розмір емодзі", [["s", "малі"], ["m", "середні"], ["l", "великі"]])}
+${grp("motion", "як рухаються", [["float", "левітація"], ["rain", "дощ"], ["bounce", "відскок"], ["swirl", "вихор"]])}
+${grp("touch", "коли тримаєш палець", [["repel", "тікають"], ["attract", "липнуть"], ["none", "ніяк"]])}
+${grp("tapfx", "тап по екрану", [["pop", "підскок"], ["gone", "лопаються"], ["burst", "феєрверк"], ["none", "нічого"]])}
+${grp("bg", "фон", [["candy", "цукерки"], ["night", "ніч"], ["mint", "мʼята"], ["ocean", "океан"], ["sunset", "захід"]])}
+${grp("font", "шрифт назви", [["serif", "з засічками"], ["sans", "без засічок"], ["round", "округлий"], ["mono", "моно"], ["hand", "рукописний"]])}
+${grp("brandFx", "колір назви", [["gradient", "перелив"], ["plain", "звичайний"]])}
+${grp("skin", "свято на всьому сайті (для всіх)", [["none", "немає"], ["halloween", "🎃 геловін"], ["winter", "❄️ зима"]])}
+<div class="adb"><button class="wht" data-ad="preview">👀 переглянути</button><button class="blk sm" data-ad="save">💾 зберегти для всіх</button></div>
+<div class="adb" style="border-top:0;padding-top:0"><button class="wht" data-ad="reset">↩️ скинути до стандарту</button></div>
+<div class="adm-note" id="admMsg"></div>`;
+}
+(() => {
+  const root = $("p-set"), msg = t => { const m = $("admMsg"); if (m) m.textContent = t; };
+  root.addEventListener("click", e => {
+    const box = $("admBox"); if (!box || !box.contains(e.target)) return;
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.pre) { sdraft = { ...DEF_SITE, ...JSON.parse(JSON.stringify(PRESETS[b.dataset.pre])) }; buildAdmin(); msg("набір застосовано — натисни «переглянути»"); return; }
+    if (b.dataset.set !== undefined) { sdraft.emojis = [...EMOJI_SETS[+b.dataset.set][1]]; box.querySelector('input[data-k="emojis"]').value = sdraft.emojis.join(" "); return; }
+    if (b.dataset.ad === "preview") {
+      welcomeApply({ ...DEF_SITE, ...sdraft });
+      const k = sdraft.skin || "none"; if (k === "none") document.documentElement.removeAttribute("data-skin"); else document.documentElement.setAttribute("data-skin", k);
+      document.body.classList.add("preview"); go("s-welcome"); return;
+    }
+    if (b.dataset.ad === "save") {
+      site = { ...DEF_SITE, ...sdraft }; ls.set("dm_site", JSON.stringify(site));
+      fetch(`${FB}/rooms/${ROOM}/site.json`, { method: "PUT", body: JSON.stringify(site) }).then(r => msg(r.ok ? "збережено ✓ тепер це бачать усі" : "не вдалось зберегти")).catch(() => msg("нема звʼязку — не збережено"));
+      welcomeApply(site); applySkin(); vib(15); return;
+    }
+    if (b.dataset.ad === "reset") {
+      if (!confirm("повернути стандартний вигляд для всіх?")) return;
+      site = { ...DEF_SITE }; sdraft = JSON.parse(JSON.stringify(site)); ls.del("dm_site");
+      fetch(`${FB}/rooms/${ROOM}/site.json`, { method: "DELETE" }).catch(() => {});
+      welcomeApply(site); applySkin(); buildAdmin(); msg("скинуто до стандарту"); return;
+    }
+    const g = b.closest(".og"); if (g && g.dataset.k && b.dataset.v !== undefined) {
+      const k = g.dataset.k; sdraft[k] = k === "count" ? +b.dataset.v : b.dataset.v;
+      [...g.children].forEach(x => x.classList.toggle("on", x === b)); vib(6);
+    }
+  });
+  root.addEventListener("input", e => {
+    const t = e.target; if (!t.classList || !t.classList.contains("ai") || !sdraft) return;
+    const k = t.dataset.k;
+    if (k === "tagline") sdraft.tagline = t.value.split("\n").map(x => x.trim()).filter(Boolean);
+    else if (k === "emojis") sdraft.emojis = splitEmoji(t.value);
+    else sdraft[k] = t.value;
+  });
+  $("pvClose").onclick = () => { document.body.classList.remove("preview"); welcomeApply(site); applySkin(); go("s-menu"); setTab("set"); };
+})();
+
 /* ───── налаштування ───── */
 function renderSettings() {
   const duo = rc === DUO, th = ls.get("dm_theme") || "auto", vb = ls.get("dm_vib") !== "0", sn = ls.get("dm_snd") !== "0";
@@ -596,17 +800,21 @@ function renderSettings() {
 ${editName ? `<div class="ro"><input id="nmEdit" maxlength="12" value="${esc(user.name)}" autocomplete="off"><button class="lnk" data-s="saveName">зберегти</button></div>` : `<div class="ro"><span>імʼя</span><button class="lnk" data-s="name">змінити</button></div>`}
 <div class="ro col"><span>емодзі</span></div><div class="ems">${EMOJIS.map(e => `<button data-em="${e}"${e === user.emoji ? ' class="on"' : ""}>${e}</button>`).join("")}</div></div>
 <div class="sec">вигляд</div>
-<div class="card2"><div class="ro col"><span>тема</span><div class="seg">${[["auto", "авто"], ["light", "світла"], ["dark", "темна"]].map(([k, l]) => `<button data-th="${k}"${th === k ? ' class="on"' : ""}>${l}</button>`).join("")}</div></div></div>
+<div class="card2"><div class="ro col"><span>тема</span><div class="seg">${[["auto", "авто"], ["light", "світла"], ["dark", "темна"]].map(([k, l]) => `<button data-th="${k}"${th === k ? ' class="on"' : ""}>${l}</button>`).join("")}</div></div>
+<div class="ro col"><span>оформлення</span><div class="seg">${[["auto", "як на сайті"], ["none", "звичайне"], ["halloween", "🎃"], ["winter", "❄️"]].map(([k, l]) => `<button data-sk="${k}"${(ls.get("dm_skin") || "auto") === k ? ' class="on"' : ""}>${l}</button>`).join("")}</div></div></div>
 <div class="sec">відгук</div>
 <div class="card2"><div class="ro"><span>вібрація</span><button class="sw${vb ? " on" : ""}" data-s="vib" aria-label="вібрація"></button></div><div class="ro"><span>звуки в малюванні</span><button class="sw${sn ? " on" : ""}" data-s="snd" aria-label="звуки"></button></div></div>
 <div class="sec">дані</div>
 <div class="card2"><div class="ro"><span>скинути статистику</span><button class="lnk dng" data-s="reset">скинути</button></div>${duo ? "" : `<div class="ro"><span>кімната</span><button class="lnk" data-s="leave">вийти</button></div>`}</div>
 <div class="card2"><div class="ro"><span>акаунт</span><button class="lnk dng" data-s="out">вийти</button></div></div>
+${isAdmin() ? '<div class="sec">головний екран · тільки для тебе</div><div class="card2" id="admBox"></div>' : ""}
 <div class="ver">draw &amp; more · зроблено для двох 💛</div>`;
+  if (isAdmin()) buildAdmin();
 }
 $("p-set").onclick = e => {
   const b = e.target.closest("button"); if (!b) return;
   const th = b.dataset.th, s = b.dataset.s, em = b.dataset.em;
+  if (b.dataset.sk) { ls.set("dm_skin", b.dataset.sk); applySkin(); renderSettings(); vib(8); return; }
   if (th) { ls.set("dm_theme", th); applyTheme(); renderSettings(); }
   else if (em) { user.emoji = em; ls.set("dm_user", JSON.stringify(user)); put("players/" + mySlot, me()); renderSettings(); renderHeader(); vib(8); }
   else if (s === "vib") { ls.set("dm_vib", ls.get("dm_vib") === "0" ? "1" : "0"); renderSettings(); vib(20); }
@@ -799,6 +1007,7 @@ $("hgOv").onclick = e => {
 $("hgBack").onclick = toMenu;
 
 /* ───── старт ───── */
+if (user) go("s-splash"); else startWelcome();
 (async () => {
   if (!user) return;
   if (user.pref) { if (await joinDuo()) go("s-welcome"); return; }
