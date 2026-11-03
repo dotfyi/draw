@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#fbfbfa">
-<script>(function(){try{var t=localStorage.getItem("dm_theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()</script>
+<script>(function(){try{var t=localStorage.getItem("dm_theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);var k=localStorage.getItem("dm_skin_eff");if(k&&k!=="none")document.documentElement.setAttribute("data-skin",k)}catch(e){}})()</script>
 <link rel="apple-touch-icon" href="IMG_2010.jpeg">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔢</text></svg>">
 <title>знайди число · draw &amp; more</title>
@@ -58,6 +58,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-
 .muted{color:var(--muted);font-size:14px}
 .go{background:var(--inv-bg);color:var(--inv-fg);padding:15px 0;border-radius:999px;font-size:16px;font-weight:500}
 .ghost{border:1px solid var(--line);background:var(--pill);padding:14px 0;border-radius:999px;font-size:15px;font-weight:500}
+/* ── оформлення до свят ── */
+:root[data-skin="halloween"]{--bg:#150f1f;--fg:#f3ead9;--muted:#9a8aa8;--line:#33284a;--pill:#1e1630;--soft:#261c3b;--inv-bg:#ff8a1f;--inv-fg:#1a1024;--ok:#47c98b;--bad:#ff5d73;--sh:rgba(0,0,0,.5);--okbg:#173a31}
+:root[data-skin="winter"]{--bg:#eef5ff;--fg:#1c2b45;--muted:#6f84a6;--line:#d3e1f5;--pill:#fff;--soft:#e3eefc;--inv-bg:#2563c9;--inv-fg:#fff;--sh:rgba(40,80,140,.12);--okbg:#dcf3ea}
 </style>
 </head>
 <body>
