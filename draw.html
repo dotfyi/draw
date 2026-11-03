@@ -679,7 +679,7 @@ $("again").addEventListener("click", startMatch);
 $("tomenu").addEventListener("click", toMenu);
 
 /* ───── супер гра: естафета малюнків ───── */
-const RD = 30000, RG = 2500, RN = 5; // 30 с на раунд, пауза на обмін, 5 раундів
+const RD = 60000, RG = 2500, RN = 5; // 30 с на раунд, пауза на обмін, 5 раундів
 let relayOn = false, relayDone = false, relayId = "", relayR = -1, bgReady = true;
 const relayJoined = new Set();
 const rArt = (r, w) => { const x = db.relay; return (x && x.art && x.art["r" + r] && x.art["r" + r][w]) || null; };
