@@ -669,7 +669,7 @@ function renderHeader() {
   $("mAv").textContent = user.emoji;
   const o = otherOf(mySlot), p = db.players && db.players[o], pr = db.presence && db.presence[o];
   const on = p && pr && Date.now() - pr < 45000;
-  $("mSt").textContent = (rc === DUO ? "" : `🔑 ${rc} · `) + (p ? (on ? `🟢 ${p.name} онлайн` : `⚪ ${p.name} не в мережі`) : "чекаємо другого гравця…");
+  $("mSt").textContent = (rc === DUO ? "" : `🔑 ${rc} · `) + (p ? (on ? `❤️ ${p.name} онлайн` : `💔 ${p.name} не в мережі`) : "чекаємо другого гравця…");
 }
 function renderMenu() { renderHeader(); if (tab === "stats") renderStats(); }
 
