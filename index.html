@@ -819,7 +819,8 @@ function apply(type, msg) {
 function connect() {
   if (es) es.close();
   noticeSeen = null;
-  es = new EventSource(rb(rc) + ".json");
+firstEv = true;
+es = new EventSource(rb(rc) + ".json");
   ["put", "patch"].forEach(type => es.addEventListener(type, e => {
     try { apply(type, JSON.parse(e.data)); } catch (err) { return; }
     if (firstEv) {
@@ -837,9 +838,9 @@ function onData() {
 if (note && note.id && note.id !== noticeSeen) {
   noticeSeen = note.id;
 
-  if (mySlot === "a" && note.by === "v") {
-    showNoteNotice(note);
-  }
+  if (rc === DUO && mySlot === "a" && note.by === "v") {
+  showNoteNotice(note);
+}
 }
   const L = db.launch;
   if (L && L.id !== launchSeen) { launchSeen = L.id; if (L.by !== mySlot) run(L); }
@@ -1113,7 +1114,7 @@ ${isAdmin() ? `
 <div class="card2">
   <div class="adl">
     <b>💌 Написати Аліні</b>
-    <textarea id="noteToAlina"
+    <textarea id="noteToAlina" class="ai"
       maxlength="240"
       rows="3"
       placeholder="Напиши щось приємне…"></textarea>
