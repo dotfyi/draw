@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><script>(function(){try{var t=localStorage.getItem("dm_theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()</script><meta name="theme-color" content="#fff"><title>морський бій · draw & more</title>
+<html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><script>(function(){try{var t=localStorage.getItem("dm_theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);var k=localStorage.getItem("dm_skin_eff");if(k&&k!=="none")document.documentElement.setAttribute("data-skin",k)}catch(e){}})()</script><meta name="theme-color" content="#fff"><title>морський бій · draw & more</title>
 <style>
 :root{--bg:#fff;--fg:#1b1b1a;--muted:#92918d;--line:#e7e7e4;--bad:#e34b4b;--soft:#f4f4f1;--inv-bg:#111;--inv-fg:#fff;--board:#e9e9e6;--cell:#fff;--ship:#d4d4cf;--blk:#f5f5f2;--prev:#c9d8d3;--hit:#f7dada;--hitfg:#d43f3f;--sunk:#e8baba;--sunkfg:#a92626;--dot:#9a9993;--hit2:#efbaba;--sunk2:#d88f8f;--serif:"Iowan Old Style","Palatino Linotype",Georgia,serif}
 :root[data-theme="dark"]{--bg:#161616;--fg:#ebebea;--muted:#8a8a87;--line:#2e2e2e;--soft:#272727;--inv-bg:#ebebea;--inv-fg:#161616;--board:#2b2b2b;--cell:#1f1f1f;--ship:#55554f;--blk:#191919;--prev:#33504a;--hit:#4a2424;--hitfg:#ff8080;--sunk:#6b2c2c;--sunkfg:#ffa0a0;--dot:#80807a;--hit2:#5a2a2a;--sunk2:#7a3636}
@@ -78,6 +78,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
 @media(max-height:690px){.app{gap:4px}.heading{font-size:21px}.board{width:min(100%,calc(100dvh - 225px))}.bottom{min-height:72px}.mini-wrap{width:88px;flex-basis:88px}.reaction{max-width:36px;font-size:18px}.reactions{gap:6px 5px}.pill{padding:7px 10px}}
 @media(max-width:360px){.mini-wrap{width:78px;flex-basis:78px}.reaction{max-width:32px;font-size:16px}.reactions{gap:5px 4px}}
+/* ── оформлення до свят ── */
+:root[data-skin="halloween"]{--bg:#150f1f;--fg:#f3ead9;--muted:#9a8aa8;--line:#33284a;--pill:#1e1630;--soft:#261c3b;--inv-bg:#ff8a1f;--inv-fg:#1a1024;--ok:#47c98b;--bad:#ff5d73;--sh:rgba(0,0,0,.5);--okbg:#173a31;--board:#2a1f40;--cell:#1e1630;--ship:#5b4b78;--blk:#1a1228;--prev:#3d5a4f;--hit:#4a2230;--hitfg:#ff7d6b;--sunk:#6e2a3a;--sunkfg:#ffa08f;--dot:#8a7aa3;--hit2:#5a2a36;--sunk2:#7e3646}
+:root[data-skin="winter"]{--bg:#eef5ff;--fg:#1c2b45;--muted:#6f84a6;--line:#d3e1f5;--pill:#fff;--soft:#e3eefc;--inv-bg:#2563c9;--inv-fg:#fff;--sh:rgba(40,80,140,.12);--okbg:#dcf3ea;--board:#cfe0f6;--cell:#fff;--ship:#9db7da;--blk:#e8f0fb;--prev:#bfe3da;--hit:#fadcdc;--hitfg:#d43f3f;--sunk:#f0b9b9;--sunkfg:#a92626;--dot:#7d92b3;--hit2:#f0baba;--sunk2:#dd9090}
 </style></head><body><main class="app">
 <header class="top"><button class="link" id="back">‹ меню</button><div class="status" id="room">кімната</div></header>
 <h1 class="heading" id="title">розстав кораблі</h1><div class="sub" id="subtitle">Обери корабель і постав його на поле</div>
