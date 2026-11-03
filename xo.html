@@ -1,1 +1,291 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#fbfbfa">
+<script>(function(){try{var t=localStorage.getItem("dm_theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);var k=localStorage.getItem("dm_skin_eff");if(k&&k!=="none")document.documentElement.setAttribute("data-skin",k)}catch(e){}})()</script>
+<link rel="apple-touch-icon" href="IMG_2010.jpeg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❌</text></svg>">
+<title>хрестики-нулики · draw &amp; more</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#37352f;--muted:#9b9a97;--line:#e4e4e1;--pill:#fff;--soft:#f1f1ee;--inv-bg:#37352f;--inv-fg:#fff;--ok:#0f7b6c;--bad:#e03e3e;--sh:rgba(30,30,20,.09);--x:#ff5a73;--o:#4d8dff;--serif:"Iowan Old Style","Palatino Linotype",Georgia,"Times New Roman",serif}
+:root[data-theme="dark"]{--bg:#191919;--fg:#ebebea;--muted:#8a8a87;--line:#303030;--pill:#202020;--soft:#262626;--inv-bg:#ebebea;--inv-fg:#191919;--sh:rgba(0,0,0,.45)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#191919;--fg:#ebebea;--muted:#8a8a87;--line:#303030;--pill:#202020;--soft:#262626;--inv-bg:#ebebea;--inv-fg:#191919;--sh:rgba(0,0,0,.45)}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{touch-action:manipulation}
+html,body{height:100%;overflow:hidden}
+body{height:100dvh;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
+#app{height:100dvh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 8px) 14px calc(env(safe-area-inset-bottom,0px) + 12px)}
+#top{display:flex;align-items:center;justify-content:space-between;min-height:30px}
+#back{color:var(--muted);font-size:14px;padding:6px 8px 6px 0}
+#gl{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
 
+/* гравці */
+#pls{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.pl{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:20px;background:var(--pill);border:1.5px solid var(--line);box-shadow:0 6px 16px var(--sh);transition:border-color .25s,transform .25s,box-shadow .25s;min-width:0}
+.pl.r{flex-direction:row-reverse;text-align:right}
+.pl .av{font-size:28px;line-height:1}
+.pl .nm{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl .mk{display:block;width:16px;height:16px;margin-top:3px}
+.pl .tx{min-width:0}
+.pl.me .nm::after{content:" · ти";font-weight:500;color:var(--muted)}
+.pl.act{border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 22%,transparent),0 8px 22px var(--sh);transform:translateY(-1px)}
+.pl.x{--c:var(--x)}.pl.o{--c:var(--o)}
+#vs{font:700 22px var(--serif);color:var(--muted);text-align:center;font-variant-numeric:tabular-nums;min-width:62px}
+#vs small{display:block;font:500 10px ui-sans-serif,-apple-system,sans-serif;letter-spacing:.8px;text-transform:uppercase;margin-top:2px}
+#turn{text-align:center;font-size:14px;font-weight:600;height:20px}
+
+/* поле */
+#bw{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+#board{position:relative;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:10px;aspect-ratio:1;width:min(100%,calc(100dvh - 360px));max-width:470px;min-width:210px}
+.c{position:relative;border-radius:24px;background:var(--pill);border:1px solid var(--line);box-shadow:0 8px 20px var(--sh),inset 0 1px 0 rgba(255,255,255,.4);display:grid;place-items:center;transition:transform .15s,background .2s,opacity .35s}
+.c:not(.f):not(.lock):active{transform:scale(.95)}
+.c.can{background:linear-gradient(180deg,var(--pill),var(--soft))}
+.c svg{width:62%;height:62%;overflow:visible}
+.c .mx path,.c .mo circle{fill:none;stroke-width:15;stroke-linecap:round}
+.c .mx path{stroke:var(--x);stroke-dasharray:90;stroke-dashoffset:90;animation:dr .35s ease-out forwards}
+.c .mx path+path{animation-delay:.15s}
+.c .mo circle{stroke:var(--o);stroke-dasharray:240;stroke-dashoffset:240;animation:dr .5s ease-out forwards;transform:rotate(-90deg);transform-origin:50% 50%}
+.c .mx{filter:drop-shadow(0 4px 10px color-mix(in srgb,var(--x) 55%,transparent))}
+.c .mo{filter:drop-shadow(0 4px 10px color-mix(in srgb,var(--o) 55%,transparent))}
+@keyframes dr{to{stroke-dashoffset:0}}
+.c.dim{opacity:.32}
+.c.win{border-color:var(--wc);box-shadow:0 0 0 2px var(--wc),0 0 30px color-mix(in srgb,var(--wc) 50%,transparent)}
+#wl{position:absolute;inset:0;pointer-events:none;overflow:visible}
+#wl line{stroke-width:7;stroke-linecap:round;stroke-dasharray:400;stroke-dashoffset:400;animation:dr .5s .1s ease-out forwards;filter:drop-shadow(0 0 8px currentColor)}
+
+/* статистика */
+#stats{display:flex;flex-direction:column;gap:8px}
+.card{background:var(--pill);border:1px solid var(--line);border-radius:22px;box-shadow:0 6px 16px var(--sh);padding:12px 14px}
+.row1{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sc{display:flex;align-items:center;gap:8px;font:700 30px var(--serif);font-variant-numeric:tabular-nums}
+.sc em{font-style:normal;font-size:20px}
+.sc.o{flex-direction:row-reverse}
+.mid{text-align:center;font-size:12px;color:var(--muted);line-height:1.5}
+.mid b{display:block;font-size:13px;color:var(--fg)}
+.bar{height:7px;border-radius:99px;background:var(--soft);overflow:hidden;display:flex;margin-top:9px}
+.bar i{display:block;height:100%;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.bar .bx{background:var(--x)}.bar .bo{background:var(--o)}
+.all{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center}
+.all div{font-size:11px;color:var(--muted)}
+.all b{display:block;font:700 17px var(--serif);color:var(--fg);margin-bottom:2px;font-variant-numeric:tabular-nums}
+.ttl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+
+/* накладки */
+.ov{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;z-index:6}
+.ov.on{display:flex}
+.ov>*{width:100%;max-width:340px}
+.ov .big{font-size:60px;line-height:1}
+.ov h2{font:600 28px var(--serif);text-wrap:balance}
+.rw{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border:1.5px solid var(--line);border-radius:18px;font-weight:600;background:var(--pill)}
+.rw.win{border-color:var(--fg)}
+.rw b{font:700 28px var(--serif)}
+.muted{color:var(--muted);font-size:14px}
+.go{background:var(--inv-bg);color:var(--inv-fg);padding:15px 0;border-radius:999px;font-size:16px;font-weight:500}
+.ghost{border:1px solid var(--line);background:var(--pill);padding:14px 0;border-radius:999px;font-size:15px;font-weight:500}
+#banner{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 60px);transform:translate(-50%,-10px);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;background:var(--inv-bg);color:var(--inv-fg);padding:10px 18px;border-radius:999px;font-size:15px;font-weight:600;white-space:nowrap;z-index:5}
+#banner.on{opacity:1;transform:translate(-50%,0)}
+@media(max-height:700px){#board{width:min(100%,calc(100dvh - 330px))}.pl{padding:7px 10px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top"><button id="back">‹ меню</button><div id="gl"></div></div>
+  <section id="pls"><div class="pl" id="p1"></div><div id="vs"></div><div class="pl r" id="p2"></div></section>
+  <div id="turn"></div>
+  <main id="bw"><div id="board"></div></main>
+  <section id="stats"></section>
+</div>
+<div id="banner"></div>
+<div class="ov" id="ov"></div>
+
+<script>
+const FB = "https://draw-8cb08-default-rtdb.europe-west1.firebasedatabase.app", ROOM = "k7Qm2xVp9Lr4Tz8n";
+const $ = id => document.getElementById(id);
+const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } } };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rnd = () => Math.random().toString(36).slice(2, 8);
+const vib = p => { try { if (ls.get("dm_vib") === "0") return; } catch (e) {} navigator.vibrate && navigator.vibrate(p); };
+const other = s => s === "v" ? "a" : "v";
+
+const room = ls.get("dm_room"), me = ls.get("dm_slot");
+let L = null; try { L = JSON.parse(ls.get("dm_launch")); } catch (e) {}
+if (!room || (me !== "v" && me !== "a") || !L || !L.id) location.replace("index.html");
+const fb = `${FB}/rooms/${ROOM}/dm/${room}/xo`, logUrl = `${FB}/rooms/${ROOM}/dm/${room}/stats/log`;
+function logStat(id, rec) {
+  if (!room || !id) return;
+  rec.t = rec.t || Date.now();
+  fetch(`${logUrl}/${id}.json`, { method: "PUT", body: JSON.stringify(rec), keepalive: true }).catch(() => {});
+}
+const PEOPLE = { a: { name: "аліна", emoji: "🦊" }, v: { name: "вадим", emoji: "👻" } };
+fetch(`${FB}/rooms/${ROOM}/dm/${room}/players.json`).then(r => r.json()).then(p => {
+  if (p) for (const s of ["v", "a"]) if (p[s] && p[s].name) PEOPLE[s] = { name: p[s].name, emoji: p[s].emoji || PEOPLE[s].emoji };
+  tick(true);
+}).catch(() => {});
+
+/* ───── дані ───── */
+let db = {}, es;
+function apply(type, msg) {
+  const parts = (msg.path || "/").split("/").filter(Boolean);
+  if (!parts.length) { db = type === "put" ? (msg.data || {}) : Object.assign(db, msg.data || {}); return; }
+  let o = db;
+  for (let i = 0; i < parts.length - 1; i++) o = o[parts[i]] = o[parts[i]] || {};
+  const k = parts[parts.length - 1];
+  if (type === "put") { if (msg.data === null) delete o[k]; else o[k] = msg.data; } else o[k] = Object.assign(o[k] || {}, msg.data);
+}
+function connect() {
+  if (es) es.close();
+  es = new EventSource(fb + ".json");
+  ["put", "patch"].forEach(t => es.addEventListener(t, e => { try { apply(t, JSON.parse(e.data)); } catch (err) { return; } tick(); }));
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) connect(); });
+function put(path, val) { apply("put", { path: "/" + path, data: val }); return fetch(`${fb}/${path}.json`, { method: "PUT", body: JSON.stringify(val), keepalive: true }).catch(() => {}); }
+const game = () => { const g = db.g; return g && g.launch === L.id ? g : null; };
+function newGame(first) { return put("g", { id: rnd(), launch: L.id, target: +(L.cfg && L.cfg.xoN) || 3, first }); }
+async function ensureGame() { try { const g = await (await fetch(fb + "/g.json")).json(); if (g && g.launch === L.id) return; } catch (e) {} newGame(L.by); }
+
+/* ───── логіка серії: усе виводиться з журналу ходів ───── */
+const LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+function derive(g) {
+  const mv = (db.mv && db.mv[g.id]) || {}, sym = { [g.first]: "X", [other(g.first)]: "O" };
+  const firstOf = i => i % 2 === 0 ? g.first : other(g.first);
+  let board = Array(9).fill(""), gi = 0, turn = firstOf(0), n = 0, done = null;
+  const games = [], wins = { v: 0, a: 0 }; let draws = 0;
+  for (; ; n++) {
+    const m = mv["m" + n]; if (!m) break;
+    if (typeof m.c !== "number" || m.c < 0 || m.c > 8 || board[m.c] || m.p !== turn) continue;
+    board[m.c] = sym[m.p];
+    const line = LINES.find(l => l.every(i => board[i] === sym[m.p]));
+    if (line) {
+      games.push({ res: m.p, line, board: [...board] }); wins[m.p]++;
+      if (wins[m.p] >= g.target) { done = m.p; n++; break; }
+      board = Array(9).fill(""); gi++; turn = firstOf(gi);
+    } else if (board.every(Boolean)) {
+      games.push({ res: "draw", line: null, board: [...board] }); draws++;
+      board = Array(9).fill(""); gi++; turn = firstOf(gi);
+    } else turn = other(turn);
+  }
+  // наступний вільний ключ
+  let next = 0; while (mv["m" + next]) next++;
+  return { board, turn, games, wins, draws, gi, next, done, sym };
+}
+
+/* ───── загальна статистика зі всіх серій ───── */
+let all = { series: { v: 0, a: 0 }, games: { v: 0, a: 0 }, draws: 0, n: 0 };
+async function loadAll() {
+  try {
+    const d = await (await fetch(logUrl + ".json")).json(), a = { series: { v: 0, a: 0 }, games: { v: 0, a: 0 }, draws: 0, n: 0 };
+    Object.values(d || {}).forEach(x => { if (x && x.g === "xo") { a.n++; if (x.w === "v" || x.w === "a") a.series[x.w]++; if (x.s) { a.games.v += x.s.v || 0; a.games.a += x.s.a || 0; } a.draws += x.n || 0; } });
+    all = a; renderStats();
+  } catch (e) {}
+}
+
+/* ───── екран ───── */
+const MX = `<svg class="mx" viewBox="0 0 100 100"><path d="M24 24 L76 76"/><path d="M76 24 L24 76"/></svg>`;
+const MO = `<svg class="mo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="28"/></svg>`;
+const mini = s => s === "X" ? `<svg class="mk" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="var(--x)" stroke-width="2.6" stroke-linecap="round"/></svg>` : `<svg class="mk" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="none" stroke="var(--o)" stroke-width="2.6"/></svg>`;
+let curGid = "", shownG = 0, hold = null, lastKey = "", finalDone = false, view = null;
+
+function buildBoard() {
+  const b = $("board"); b.innerHTML = "";
+  for (let i = 0; i < 9; i++) { const c = document.createElement("button"); c.className = "c"; c.dataset.i = i; b.appendChild(c); }
+  const ns = "http://www.w3.org/2000/svg", s = document.createElementNS(ns, "svg"); s.id = "wl"; s.setAttribute("viewBox", "0 0 300 300"); s.setAttribute("preserveAspectRatio", "none"); b.appendChild(s);
+}
+function paintBoard(d, g, finished) {
+  const cells = $("board").querySelectorAll(".c"), bd = finished ? finished.board : d.board, canMove = !finished && !d.done && d.turn === me;
+  cells.forEach((c, i) => {
+    const v = bd[i], key = v + (finished ? "f" : "");
+    if (c._k !== key) { c._k = key; c.innerHTML = v === "X" ? MX : v === "O" ? MO : ""; }
+    c.classList.toggle("f", !!v); c.classList.toggle("can", canMove && !v); c.classList.toggle("lock", !canMove);
+    c.classList.toggle("win", !!(finished && finished.line && finished.line.includes(i)));
+    c.classList.toggle("dim", !!(finished && finished.line && !finished.line.includes(i)));
+    if (finished && finished.line && finished.line.includes(i)) c.style.setProperty("--wc", finished.res === g.first ? "var(--x)" : "var(--o)");
+  });
+  const wl = $("wl"); wl.innerHTML = "";
+  if (finished && finished.line) {
+    const p = i => [(i % 3) * 100 + 50, Math.floor(i / 3) * 100 + 50], a = p(finished.line[0]), z = p(finished.line[2]), col = finished.res === g.first ? "var(--x)" : "var(--o)";
+    wl.innerHTML = `<line x1="${a[0]}" y1="${a[1]}" x2="${z[0]}" y2="${z[1]}" stroke="${col}" style="color:${col}"/>`;
+  }
+}
+function renderTop(g, d) {
+  const pl = (s, rev) => `<span class="av">${esc(PEOPLE[s].emoji)}</span><span class="tx"><span class="nm">${esc(PEOPLE[s].name)}</span>${mini(d.sym[s])}</span>`;
+  const first = d.sym.v === "X" ? "v" : "a";   // зліва завжди хрестики
+  const L1 = d.sym.v === "X" ? "v" : "a", L2 = other(L1);
+  const p1 = $("p1"), p2 = $("p2");
+  p1.className = "pl x" + (L1 === me ? " me" : ""); p2.className = "pl r o" + (L2 === me ? " me" : "");
+  p1.innerHTML = pl(L1); p2.innerHTML = pl(L2);
+  $("vs").innerHTML = `${d.wins[L1]} : ${d.wins[L2]}<small>до ${g.target}</small>`;
+  const act = hold || d.done ? null : d.turn;
+  p1.classList.toggle("act", act === L1); p2.classList.toggle("act", act === L2);
+  $("gl").textContent = `партія ${Math.min(d.gi + 1 + (hold ? 0 : 0), 99)}`;
+  const t = $("turn"); t.style.color = "";
+  if (hold) t.textContent = hold.g.res === "draw" ? "нічия 🤝" : hold.g.res === me ? "ти виграв(ла) партію! 🎉" : `${PEOPLE[hold.g.res].name} виграє партію`;
+  else if (d.done) t.textContent = "";
+  else if (d.turn === me) { t.textContent = "твій хід"; t.style.color = d.sym[me] === "X" ? "var(--x)" : "var(--o)"; }
+  else t.textContent = `хід: ${PEOPLE[d.turn].name}…`;
+}
+function renderStats() {
+  const g = game(); if (!g) return;
+  const d = derive(g), L1 = d.sym.v === "X" ? "v" : "a", L2 = other(L1), tot = d.wins.v + d.wins.a;
+  $("stats").innerHTML = `<div class="card"><div class="ttl">ця серія</div><div class="row1">
+<div class="sc">${esc(PEOPLE[L1].emoji)}<span>${d.wins[L1]}</span></div>
+<div class="mid"><b>до ${g.target} перемог</b>нічиїх: ${d.draws}</div>
+<div class="sc o">${esc(PEOPLE[L2].emoji)}<span>${d.wins[L2]}</span></div></div>
+<div class="bar"><i class="bx" style="width:${tot ? d.wins[L1] / tot * 100 : 50}%"></i><i class="bo" style="width:${tot ? d.wins[L2] / tot * 100 : 50}%"></i></div></div>
+<div class="card"><div class="ttl">за весь час</div><div class="all">
+<div><b>${esc(PEOPLE.a.emoji)} ${all.series.a} · ${esc(PEOPLE.v.emoji)} ${all.series.v}</b>виграні серії</div>
+<div><b>${esc(PEOPLE.a.emoji)} ${all.games.a} · ${esc(PEOPLE.v.emoji)} ${all.games.v}</b>виграні партії</div>
+<div><b>${all.draws}</b>нічиїх</div></div></div>`;
+}
+function showBanner(t) { const b = $("banner"); b.textContent = t; b.classList.add("on"); clearTimeout(showBanner.t); showBanner.t = setTimeout(() => b.classList.remove("on"), 1500); }
+
+function tick() {
+  const g = game();
+  if (!g) { $("turn").textContent = "чекаємо, поки гру запустить другий гравець…"; return; }
+  const d = derive(g);
+  if (curGid !== g.id) { curGid = g.id; buildBoard(); shownG = d.games.length; hold = null; finalDone = false; $("ov").classList.remove("on"); $("ov").dataset.k = ""; lastKey = ""; if (d.done) shownG = d.games.length; }
+  // партія щойно завершилась — коротко показуємо її
+  if (!hold && d.games.length > shownG) {
+    hold = { g: d.games[shownG], until: Date.now() + 1500 }; vib(hold.g.res === me ? [20, 40, 20] : hold.g.res === "draw" ? 20 : 40);
+  }
+  if (hold && Date.now() >= hold.until) { hold = null; shownG++; if (shownG < d.games.length) { hold = { g: d.games[shownG], until: Date.now() + 1200 }; } }
+  const key = JSON.stringify([d.board, d.turn, d.wins, d.draws, hold && hold.g.res + shownG, d.done, all.n, PEOPLE.a.name, PEOPLE.v.name]);
+  if (key !== lastKey) {
+    lastKey = key; renderTop(g, d); paintBoard(d, g, hold ? hold.g : null); renderStats();
+  }
+  if (d.done && !hold && shownG >= d.games.length) showFinal(g, d);
+}
+setInterval(() => tick(), 150);
+
+$("board").addEventListener("pointerdown", e => {
+  const c = e.target.closest(".c"), g = game(); if (!c || !g || hold) return;
+  const d = derive(g); if (d.done || d.turn !== me) return;
+  const i = +c.dataset.i; if (d.board[i]) return;
+  vib(12); put(`mv/${g.id}/m${d.next}`, { c: i, p: me });
+  tick();
+});
+
+function showFinal(g, d) {
+  const ov = $("ov"); if (ov.dataset.k === g.id) return; ov.dataset.k = g.id;
+  const L1 = d.sym.v === "X" ? "v" : "a", L2 = other(L1), win = d.done;
+  ov.innerHTML = `<div class="big">🏆</div><h2>перемагає ${esc(PEOPLE[win].emoji)} ${esc(PEOPLE[win].name)}</h2><div class="muted">серія до ${g.target} перемог · нічиїх: ${d.draws}</div>` +
+    [L1, L2].map(s => `<div class="rw${s === win ? " win" : ""}"><span>${esc(PEOPLE[s].emoji)} ${esc(PEOPLE[s].name)}</span><b>${d.wins[s]}</b></div>`).join("") +
+    `<button class="go" data-a="again">ще раз</button><button class="ghost" data-a="menu">в меню</button>`;
+  ov.classList.add("on"); vib([30, 50, 30, 50, 90]);
+  logStat(g.id, { g: "xo", w: win, s: { v: d.wins.v, a: d.wins.a }, n: d.draws, tg: g.target });
+  setTimeout(loadAll, 900);
+}
+$("ov").addEventListener("click", e => {
+  const a = e.target.closest("button")?.dataset.a, g = game();
+  if (a === "menu") location.href = "index.html"; else if (a === "again" && g) newGame(other(g.first));
+});
+$("back").addEventListener("click", () => { location.href = "index.html"; });
+
+connect();
+loadAll();
+if (L && L.by === me) ensureGame();
+</script>
+</body>
+</html>
