@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#06080d">
+<link rel="apple-touch-icon" href="IMG_2010.jpeg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💣</text></svg>">
+<title>розмінуй бомбу · draw &amp; more</title>
+<style>
+:root{--ink:#e9edf7;--mut:#8d97ae;--line:rgba(255,255,255,.09);--red:#ff4d5e;--amb:#ffb020;--grn:#2ee59d;--blu:#4d8dff;--yel:#ffd23f;--vio:#9b7bff;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{touch-action:manipulation}
+html,body{height:100%;overflow:hidden;background:#06080d}
+body{height:100dvh;color:var(--ink);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+background:radial-gradient(900px 520px at 50% -10%,#1d2a4d 0%,rgba(10,14,24,0) 62%),radial-gradient(700px 500px at 105% 112%,rgba(255,77,94,.13),transparent 60%),radial-gradient(600px 400px at -10% 90%,rgba(77,141,255,.10),transparent 60%),#06080d}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
+#app{height:100dvh;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 6px) 12px calc(env(safe-area-inset-bottom,0px) + 8px);gap:8px}
+#app.shake{animation:shk .5s}
+@keyframes shk{10%,50%,90%{transform:translateX(-7px)}30%,70%{transform:translateX(7px)}}
+
+/* ── верхня панель ── */
+#hud{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.hl{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+#back{color:var(--mut);font-size:13px;padding:2px 6px 2px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:12px;font-weight:700;letter-spacing:.4px}
+.tbox{padding:7px 18px 8px;border-radius:20px;background:linear-gradient(180deg,#080b12,#111826);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 3px 14px rgba(0,0,0,.75),0 10px 28px rgba(0,0,0,.45),0 0 0 1px rgba(0,0,0,.6)}
+#timer{font:800 clamp(38px,12.5vw,54px)/1 var(--mono);letter-spacing:2px;color:#ff6a5c;text-shadow:0 0 20px rgba(255,80,60,.55),0 0 2px #ffb0a6;font-variant-numeric:tabular-nums}
+#timer.warn{animation:blink 1s steps(2) infinite}
+#timer.crit{animation:blink .5s steps(2) infinite;color:#ff3b3b}
+@keyframes blink{50%{opacity:.55}}
+.hr{display:flex;justify-content:flex-end;gap:7px}
+.pip{width:26px;height:26px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--line);display:grid;place-items:center;color:rgba(255,255,255,.18);font-size:15px;font-weight:900;transition:all .3s}
+.pip.on{background:rgba(255,77,94,.18);border-color:rgba(255,77,94,.7);color:var(--red);box-shadow:0 0 18px rgba(255,77,94,.55)}
+#role{text-align:center;font-size:12px;color:var(--mut);letter-spacing:.3px}
+#role b{color:var(--ink)}
+
+/* ── сцена ── */
+#stage{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}
+.plate{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:18px;position:relative;overflow:hidden;background:linear-gradient(180deg,#2b3449,#1a2133);border:1px solid rgba(255,255,255,.1);box-shadow:0 12px 30px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.1)}
+.plate::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:repeating-linear-gradient(135deg,#ffc400 0 8px,#12151d 8px 16px);opacity:.75}
+.sn small,.pl small{display:block;font-size:9px;letter-spacing:1.4px;color:var(--mut);margin-bottom:3px}
+.sn b{font:800 19px var(--mono);letter-spacing:3px;color:#dfe6f7;text-shadow:0 1px 0 rgba(0,0,0,.6)}
+.bats{display:flex;gap:5px;min-height:20px;align-items:center}
+.bat{width:13px;height:20px;border-radius:4px;background:linear-gradient(180deg,#ffd23f,#e09a00);border:1px solid rgba(0,0,0,.4);position:relative;box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.bat::before{content:"";position:absolute;left:3px;right:3px;top:-4px;height:3px;border-radius:2px 2px 0 0;background:#9aa3b8}
+.nobat{font-size:12px;color:var(--mut)}
+.leds{display:flex;gap:12px}
+.led{display:flex;align-items:center;gap:6px;font:700 11px var(--mono);letter-spacing:1px;color:var(--mut)}
+.led i{width:12px;height:12px;border-radius:50%;background:#2a3040;border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}
+.led.on{color:var(--ink)}
+.led.on i{background:radial-gradient(circle at 35% 30%,#b8ffe0,#2ee59d 55%,#0a9a63);box-shadow:0 0 14px rgba(46,229,157,.9)}
+
+.car{flex:1;min-height:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -12px;padding:0 12px}
+.car::-webkit-scrollbar{display:none}
+.mod{flex:0 0 100%;scroll-snap-align:center;min-height:0;display:flex}
+.card{flex:1;position:relative;display:flex;flex-direction:column;padding:16px 16px 18px;border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));border:1px solid var(--line);box-shadow:0 24px 50px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1);overflow:hidden}
+.card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(360px 160px at 50% -30px,rgba(255,255,255,.08),transparent 70%)}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ch b{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mut)}
+.lamp{width:12px;height:12px;border-radius:50%;background:#3a2228;box-shadow:inset 0 1px 3px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.1);transition:all .35s}
+.lamp.ok{background:radial-gradient(circle at 35% 30%,#b8ffe0,#2ee59d 55%,#0a9a63);box-shadow:0 0 16px rgba(46,229,157,.95)}
+.lamp.bad{background:#ff4d5e;box-shadow:0 0 16px rgba(255,77,94,.95)}
+.cb{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.cap{text-align:center;font-size:12px;color:var(--mut);margin-top:14px;min-height:16px}
+.done{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(6,40,28,.72);z-index:3;border-radius:inherit}
+.done.on{display:flex;animation:fadeIn .4s both}
+.done svg{width:96px;height:96px;filter:drop-shadow(0 0 24px rgba(46,229,157,.8))}
+.done path{fill:none;stroke:var(--grn);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:90;stroke-dashoffset:90;animation:draw .6s .15s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.card.flash{animation:cf .5s}
+@keyframes cf{0%,100%{box-shadow:0 24px 50px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1)}30%{box-shadow:0 0 0 2px var(--red),0 0 46px rgba(255,77,94,.6),inset 0 0 40px rgba(255,77,94,.25)}}
+
+#dots{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;min-height:34px}
+.dt{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--mut);transition:all .25s}
+.dt i{width:8px;height:8px;border-radius:50%;background:#3a4256}
+.dt.cur{color:var(--ink);border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1)}
+.dt.ok i{background:var(--grn);box-shadow:0 0 10px var(--grn)}
+
+/* ── дроти ── */
+.wires{display:flex;flex-direction:column;gap:6px}
+.wire{display:block;width:100%;height:50px;position:relative}
+.wire svg{width:100%;height:100%;overflow:visible}
+.wire .wl,.wire .wr{transition:transform .38s cubic-bezier(.2,.8,.2,1)}
+.wire.cut .wl{transform:translate(-16px,6px)}
+.wire.cut .wr{transform:translate(16px,-4px)}
+.wire .sp{opacity:0;font-size:20px}
+.wire.cut .sp{animation:spark .7s ease-out}
+@keyframes spark{0%{opacity:0;transform:scale(.4)}30%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(1)}}
+.wire:active:not(.cut) svg{transform:scale(1.01)}
+
+/* ── кнопка ── */
+.btw{display:flex;align-items:center;justify-content:center;gap:22px}
+.ring{width:min(60vw,236px);aspect-ratio:1;border-radius:50%;padding:12px;background:conic-gradient(from 210deg,#5a6480,#1b2132,#6a7592,#1b2132,#5a6480);box-shadow:0 22px 46px rgba(0,0,0,.55),inset 0 0 0 2px rgba(0,0,0,.5)}
+.bigbtn{width:100%;height:100%;border-radius:50%;position:relative;display:grid;place-items:center;touch-action:none;transition:transform .12s,box-shadow .12s;
+background:radial-gradient(circle at 34% 26%,var(--c1),var(--c2) 56%,var(--c3));box-shadow:0 10px 0 var(--c3),0 22px 34px rgba(0,0,0,.5),inset 0 -8px 16px rgba(0,0,0,.28),inset 0 8px 16px rgba(255,255,255,.4)}
+.bigbtn.dn{transform:translateY(8px);box-shadow:0 2px 0 var(--c3),0 8px 16px rgba(0,0,0,.5),inset 0 -8px 16px rgba(0,0,0,.28),inset 0 8px 16px rgba(255,255,255,.3)}
+.bigbtn span{font:800 clamp(18px,6vw,24px)/1 var(--mono);letter-spacing:2px;color:var(--tx);text-shadow:0 1px 0 rgba(255,255,255,.25)}
+.c-red{--c1:#ff8a94;--c2:#e8283f;--c3:#8f1224;--tx:#4a0510}
+.c-blue{--c1:#8ab6ff;--c2:#2f6fe8;--c3:#173e91;--tx:#06204f}
+.c-yellow{--c1:#ffe98a;--c2:#f5b800;--c3:#a77a00;--tx:#4a3500}
+.c-white{--c1:#ffffff;--c2:#d3d9e8;--c3:#8790a6;--tx:#2a3042}
+.strip{width:22px;height:min(46vw,176px);border-radius:12px;background:#0c1019;border:1px solid var(--line);box-shadow:inset 0 2px 8px rgba(0,0,0,.8);position:relative;overflow:hidden}
+.strip i{position:absolute;inset:3px;border-radius:9px;background:var(--sc,#333);opacity:0;transition:opacity .15s;box-shadow:0 0 18px var(--sc,#333)}
+.strip.lit i{opacity:1}
+
+/* ── символи ── */
+.symg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sym{aspect-ratio:1;border-radius:24px;font-size:clamp(40px,14vw,62px);display:grid;place-items:center;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:1px solid var(--line);box-shadow:0 10px 20px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12);transition:transform .15s,box-shadow .25s}
+.sym:active{transform:scale(.96)}
+.sym.ok{border-color:var(--grn);box-shadow:0 0 0 1px var(--grn),0 0 34px rgba(46,229,157,.45);pointer-events:none}
+.sym.no{animation:nope .4s;border-color:var(--red)}
+@keyframes nope{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ── кольори (simon) ── */
+.pads{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(100%,330px);aspect-ratio:1;margin:0 auto}
+.pad{border-radius:28px;background:var(--pc);filter:brightness(.42) saturate(.9);transition:filter .12s,box-shadow .12s,transform .12s;box-shadow:inset 0 -8px 16px rgba(0,0,0,.3),inset 0 6px 14px rgba(255,255,255,.2)}
+.pad.lit{filter:brightness(1.45) saturate(1.1);transform:scale(1.03);box-shadow:0 0 46px var(--pc),inset 0 6px 14px rgba(255,255,255,.4)}
+.pad:active{filter:brightness(1.15)}
+.stg{display:flex;justify-content:center;gap:8px;margin-bottom:14px}
+.stg i{width:30px;height:6px;border-radius:9px;background:rgba(255,255,255,.12);transition:background .3s}
+.stg i.on{background:var(--grn);box-shadow:0 0 10px rgba(46,229,157,.7)}
+.rep{align-self:center;margin-top:14px;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--mut)}
+
+/* ── інструкція (штаб) ── */
+.man{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}
+.tabs{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;padding:9px 15px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--mut);white-space:nowrap;transition:all .2s}
+.tab.on{background:var(--ink);color:#0b0f18;border-color:var(--ink)}
+.tab.ok::after{content:" ✓";color:var(--grn)}
+.tab.on.ok::after{color:#0a9a63}
+.mp{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;border-radius:26px;padding:16px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));border:1px solid var(--line);box-shadow:0 20px 44px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.09);display:flex;flex-direction:column;gap:11px}
+.mp h3{font-size:19px;font-weight:800;letter-spacing:.2px}
+.mp p{font-size:14px;line-height:1.5;color:#c4cce0}
+.mp .lead{font-size:13px;color:var(--mut)}
+.rule{display:flex;gap:12px;padding:12px 13px;border-radius:16px;background:rgba(255,255,255,.045);border:1px solid var(--line)}
+.rule .n{flex:none;width:26px;height:26px;border-radius:9px;background:rgba(255,255,255,.09);display:grid;place-items:center;font:800 12px var(--mono);color:var(--mut)}
+.rule .t{font-size:14px;line-height:1.5}
+.rule .t .a{display:block;margin-top:3px;color:var(--amb);font-weight:700}
+.rule.def{border-style:dashed}
+.cw{display:inline-flex;align-items:center;gap:5px;font-weight:700;white-space:nowrap}
+.cw i{width:12px;height:12px;border-radius:50%;box-shadow:0 0 0 1px rgba(255,255,255,.35)}
+.seg{display:flex;background:rgba(255,255,255,.06);border-radius:999px;padding:3px}
+.seg button{flex:1;padding:9px 0;border-radius:999px;font-size:13px;font-weight:700;color:var(--mut)}
+.seg button.on{background:var(--ink);color:#0b0f18}
+.cols{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.col{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid var(--line);font-size:clamp(17px,5.4vw,23px)}
+.mapg{display:flex;flex-direction:column;gap:7px}
+.maprow{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 11px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid var(--line);font-size:12px;color:var(--mut)}
+.maprow b{font-size:12px;color:var(--ink);min-width:62px}
+.mp1{display:flex;align-items:center;gap:3px;font-size:11px}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 1px rgba(255,255,255,.3)}
+.q{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45}
+.q em{font-style:normal;font-size:20px}
+.digit{font:800 17px var(--mono);color:var(--amb)}
+
+/* ── накладки ── */
+#cover,#end{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:26px;z-index:20}
+#cover{background:rgba(6,8,13,.9)}
+#cover.on,#end.on{display:flex}
+#cover b.cnt{font:800 110px/1 var(--mono);color:#fff;text-shadow:0 0 40px rgba(255,255,255,.35);animation:cn .9s ease-out infinite}
+@keyframes cn{0%{transform:scale(1.4);opacity:0}30%{opacity:1}100%{transform:scale(1)}}
+#cover h2,#end h2{font-size:26px;font-weight:800;text-wrap:balance}
+#cover p,#end p{font-size:15px;color:var(--mut);line-height:1.5;max-width:300px}
+.rb{font-size:54px}
+#end{background:radial-gradient(500px 400px at 50% 30%,var(--glow),transparent 70%),rgba(6,8,13,.94)}
+#end .big{font:900 72px/1 ui-sans-serif,-apple-system,sans-serif;letter-spacing:-1px}
+#end .num{font:800 62px/1 var(--mono)}
+.btn{width:min(320px,100%);padding:16px 0;border-radius:999px;font-size:16px;font-weight:700}
+.btn.p{background:var(--ink);color:#0b0f18}
+.btn.g{background:rgba(255,255,255,.08);border:1px solid var(--line)}
+.brow{display:flex;flex-direction:column;gap:10px;width:100%;align-items:center;margin-top:8px}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:30}
+.vig{position:fixed;inset:0;pointer-events:none;z-index:25;opacity:0;background:radial-gradient(ellipse at center,transparent 35%,rgba(255,40,60,.6) 100%)}
+.vig.on{animation:vg .6s ease-out}
+@keyframes vg{0%{opacity:1}100%{opacity:0}}
+.flash{position:fixed;inset:0;pointer-events:none;z-index:40;background:#fff;opacity:0}
+.flash.on{animation:fl 1.1s ease-out}
+@keyframes fl{0%{opacity:1;background:#fff}25%{opacity:.9;background:#ffb347}100%{opacity:0;background:#ff3b1f}}
+.p{position:fixed;pointer-events:none;z-index:31;font-size:26px}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header id="hud">
+    <div class="hl"><button id="back">‹ меню</button><span class="chip" id="bn">💣 1</span></div>
+    <div class="tbox"><div id="timer">00:00</div></div>
+    <div class="hr" id="strikes"><div class="pip">✕</div><div class="pip">✕</div><div class="pip">✕</div></div>
+  </header>
+  <div id="role"></div>
+  <main id="stage"></main>
+  <nav id="dots"></nav>
+</div>
+<div id="cover"></div>
+<div id="end"></div>
+<div class="vig" id="vig"></div>
+<div class="flash" id="flash"></div>
+<div id="fx"></div>
+
+<script>
+const FB = "https://draw-8cb08-default-rtdb.europe-west1.firebasedatabase.app", ROOM = "k7Qm2xVp9Lr4Tz8n";
+const $ = id => document.getElementById(id);
+const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } } };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rnd = () => Math.random().toString(36).slice(2, 8);
+const vib = p => { try { if (ls.get("dm_vib") === "0") return; } catch (e) {} navigator.vibrate && navigator.vibrate(p); };
+const other = s => s === "v" ? "a" : "v";
+
+const room = ls.get("dm_room"), me = ls.get("dm_slot");
+let L = null; try { L = JSON.parse(ls.get("dm_launch")); } catch (e) {}
+if (!room || (me !== "v" && me !== "a") || !L || !L.id) location.replace("index.html");
+const fb = `${FB}/rooms/${ROOM}/dm/${room}/bomb`;
+function logStat(id, rec) {
+  if (!room || !id) return;
+  rec.t = rec.t || Date.now();
+  fetch(`${FB}/rooms/${ROOM}/dm/${room}/stats/log/${id}.json`, { method: "PUT", body: JSON.stringify(rec), keepalive: true }).catch(() => {});
+}
+const PEOPLE = { a: { name: "аліна", emoji: "🦊" }, v: { name: "вадим", emoji: "👻" } };
+fetch(`${FB}/rooms/${ROOM}/dm/${room}/players.json`).then(r => r.json()).then(p => {
+  if (p) for (const s of ["v", "a"]) if (p[s] && p[s].name) PEOPLE[s] = { name: p[s].name, emoji: p[s].emoji || PEOPLE[s].emoji };
+}).catch(() => {});
+
+/* ───── звук ───── */
+let ac;
+function audio() { if (ls.get("dm_snd") === "0") return null; if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (ac && ac.state === "suspended") ac.resume(); return ac; }
+function tone(f, d = .1, type = "sine", v = .05, t0 = 0) {
+  const a = audio(); if (!a) return;
+  const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + t0;
+  o.type = type; o.frequency.setValueAtTime(f, t); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + d + .02);
+}
+const sfx = {
+  tick: hi => tone(hi ? 1200 : 900, .05, "square", hi ? .035 : .02),
+  cut: () => { tone(220, .09, "sawtooth", .05); tone(660, .12, "triangle", .04, .05); },
+  ok: () => { tone(660, .12, "sine", .06); tone(880, .16, "sine", .06, .09); tone(1320, .2, "sine", .05, .2); },
+  bad: () => { tone(150, .35, "sawtooth", .09); tone(110, .4, "square", .06, .05); },
+  boom: () => { const a = audio(); if (!a) return; const n = a.sampleRate * 1.4, b = a.createBuffer(1, n, a.sampleRate), d = b.getChannelData(0); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2.2); const s = a.createBufferSource(), g = a.createGain(), f = a.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 700; g.gain.value = .55; s.buffer = b; s.connect(f); f.connect(g); g.connect(a.destination); s.start(); tone(60, .8, "sine", .2); },
+  win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, .25, "triangle", .06, i * .11)),
+  press: () => tone(400, .05, "triangle", .04)
+};
+addEventListener("pointerdown", () => audio(), { once: true });
+
+/* ───── генератор бомби (однаковий на обох телефонах за seed) ───── */
+function hash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const WC = ["red", "blue", "yellow", "white", "black"];
+const CN = { red: "червоний", blue: "синій", yellow: "жовтий", white: "білий", black: "чорний" };
+const CNp = { red: "червоних", blue: "синіх", yellow: "жовтих", white: "білих", black: "чорних" };
+const CNg = { red: "червоного", blue: "синього", yellow: "жовтого", white: "білого", black: "чорного" };
+const CNf = { red: "червона", blue: "синя", yellow: "жовта", white: "біла", black: "чорна" };
+const HEX = { red: "#ff4d5e", blue: "#4d8dff", yellow: "#ffd23f", white: "#eef2fb", black: "#394056", green: "#2ee59d" };
+const POS = { first: "перший", second: "другий", third: "третій", last: "останній" };
+const LABELS = ["ДЕРЖИ", "СТОП", "ПУСК", "ВИБУХ"];
+const SYMS = ["🌙", "🔥", "💧", "⚡", "🌿", "🍄", "🔑", "🔔", "🧲", "🪐", "⭐", "🎲", "🪓", "🦋", "🐚", "🍒", "🎈", "🧿", "🔮", "🪁"];
+const SC = ["red", "blue", "green", "yellow"];
+const SCN = { red: "червоний", blue: "синій", green: "зелений", yellow: "жовтий" };
+const SHEX = { red: "#ff4d5e", blue: "#4d8dff", green: "#2ee59d", yellow: "#ffd23f" };
+const MODS = ["wires", "button", "symbols", "simon"];
+const MNAME = { wires: "Дроти", button: "Кнопка", symbols: "Символи", simon: "Кольори" };
+const TOTAL = { 1: 150, 2: 210, 3: 270 }, PENALTY = 20, COUNT = 3600, HOLD = 600;
+
+function genBomb(seed, lvl) {
+  const R = mulberry(hash(seed)), rint = (a, b) => a + Math.floor(R() * (b - a + 1)), pick = a => a[Math.floor(R() * a.length)];
+  const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const LET = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  let ser = ""; for (let i = 0; i < 5; i++) ser += R() < .55 ? pick(LET.split("")) : String(rint(0, 9));
+  ser += String(rint(0, 9)); if (!/[A-Z]/.test(ser)) ser = pick(LET.split("")) + ser.slice(1); if (!/\d/.test(ser.slice(0, 5))) ser = ser.slice(0, 4) + rint(0, 9) + ser.slice(5);
+  const B = { serial: ser, odd: +ser[5] % 2 === 1, vowel: /[AEIOU]/.test(ser), bat: rint(0, 4), ind: { FRK: R() < .5, CLR: R() < .5 }, lvl };
+  B.mods = shuffle(MODS).slice(0, Math.min(4, lvl + 1)).sort((a, b) => MODS.indexOf(a) - MODS.indexOf(b));
+  const bt = (r, B) => r.res;
+
+  // дроти
+  const WK = ["none", "one", "many", "lastIs", "firstIs", "odd", "bat", "frk", "clr"];
+  const genRules = () => {
+    const rules = shuffle(WK).slice(0, 3).map(k => {
+      const r = { k, X: pick(WC), N: rint(1, 3) };
+      r.act = k === "one" ? { t: "that" } : k === "many" ? { t: "lastX" } : { t: "pos", p: pick(["first", "second", "third", "last"]) };
+      return r;
+    });
+    return { rules, def: { t: "pos", p: pick(["first", "second", "third", "last"]) } };
+  };
+  const n = rint(3, 6); let W = Array.from({ length: n }, () => pick(WC)); if (new Set(W).size === 1) W[rint(0, n - 1)] = pick(WC.filter(c => c !== W[0]));
+  B.wires = { W, tables: { 3: genRules(), 4: genRules(), 5: genRules(), 6: genRules() } };
+
+  // кнопка
+  const BC = ["red", "blue", "yellow", "white"], BK = ["color", "label", "bat", "clr", "frk", "odd", "cl"];
+  const rules = shuffle(BK).slice(0, 3).map(k => ({ k, X: pick(BC), Y: pick(LABELS), N: rint(1, 3), res: R() < .5 ? "tap" : "hold" }));
+  const digs = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 4), dmap = {}; BC.forEach((c, i) => dmap[c] = digs[i]);
+  B.button = { color: pick(BC), label: pick(LABELS), strip: pick(BC), rules, def: R() < .5 ? "tap" : "hold", dmap };
+
+  // символи
+  const cols = Array.from({ length: 6 }, () => shuffle(SYMS).slice(0, 7)), tc = rint(0, 5), shown = shuffle(cols[tc]).slice(0, 4);
+  for (let i = 0; i < 6; i++) if (i !== tc) { let g = 0; while (shown.every(s => cols[i].includes(s)) && g++ < 50) cols[i] = shuffle(SYMS).slice(0, 7); if (shown.every(s => cols[i].includes(s))) cols[i][0] = SYMS.find(s => !shown.includes(s) && !cols[i].includes(s)) || cols[i][0], cols[i] = cols[i].filter((x, j, a) => a.indexOf(x) === j); }
+  B.symbols = { cols, tc, shown: shuffle(shown), order: [...shown].sort((a, b) => cols[tc].indexOf(a) - cols[tc].indexOf(b)) };
+
+  // кольори
+  const seq = Array.from({ length: 3 }, () => pick(SC)), map = { y: [], n: [] };
+  for (const v of ["y", "n"]) for (let s = 0; s < 3; s++) { const p = shuffle(SC), m = {}; SC.forEach((c, i) => m[c] = p[i]); map[v].push(m); }
+  B.simon = { seq, map };
+  return B;
+}
+// відповіді (єдине місце логіки — і для перевірки, і для інструкції)
+function wTest(r, W, B) { switch (r.k) { case "none": return !W.includes(r.X); case "one": return W.filter(c => c === r.X).length === 1; case "many": return W.filter(c => c === r.X).length > 1; case "lastIs": return W[W.length - 1] === r.X; case "firstIs": return W[0] === r.X; case "odd": return B.odd; case "bat": return B.bat >= r.N; case "frk": return B.ind.FRK; case "clr": return B.ind.CLR; } }
+function wIdx(a, W, X) { if (a.t === "that") return W.indexOf(X); if (a.t === "lastX") return W.lastIndexOf(X); return a.p === "last" ? W.length - 1 : { first: 0, second: 1, third: 2 }[a.p]; }
+function solveWires(B) { const W = B.wires.W, t = B.wires.tables[W.length]; for (const r of t.rules) if (wTest(r, W, B)) return wIdx(r.act, W, r.X); return wIdx(t.def, W); }
+function bTest(r, b, B) { switch (r.k) { case "color": return b.color === r.X; case "label": return b.label === r.Y; case "bat": return B.bat >= r.N; case "clr": return B.ind.CLR; case "frk": return B.ind.FRK; case "odd": return B.odd; case "cl": return b.color === r.X && b.label === r.Y; } }
+function solveButton(B) { const b = B.button; for (const r of b.rules) if (bTest(r, b, B)) return r.res; return b.def; }
+
+/* ───── дані та синхронізація ───── */
+let db = {}, es;
+function apply(type, msg) {
+  const parts = (msg.path || "/").split("/").filter(Boolean);
+  if (!parts.length) { db = type === "put" ? (msg.data || {}) : Object.assign(db, msg.data || {}); return; }
+  let o = db;
+  for (let i = 0; i < parts.length - 1; i++) o = o[parts[i]] = o[parts[i]] || {};
+  const k = parts[parts.length - 1];
+  if (type === "put") { if (msg.data === null) delete o[k]; else o[k] = msg.data; } else o[k] = Object.assign(o[k] || {}, msg.data);
+}
+function connect() {
+  if (es) es.close();
+  es = new EventSource(fb + ".json");
+  ["put", "patch"].forEach(t => es.addEventListener(t, e => { try { apply(t, JSON.parse(e.data)); } catch (err) { return; } tick(); }));
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) connect(); });
+function put(path, val, local = true) {
+  if (local) apply("put", { path: "/" + path, data: val });
+  return fetch(`${fb}/${path}.json`, { method: "PUT", body: JSON.stringify(val), keepalive: true }).catch(() => {});
+}
+const game = () => { const g = db.g; return g && g.launch === L.id ? g : null; };
+const stOf = (g, k) => (db.st && db.st[g.id] && db.st[g.id]["b" + k]) || {};
+const defOf = (g, k) => k % 2 === 0 ? g.first : other(g.first);
+function newGame(first) { return put("g", { id: rnd(), launch: L.id, lvl: +(L.cfg && L.cfg.bombLvl) || 2, seed: Math.floor(Math.random() * 2 ** 31), first }); }
+async function ensureGame() { try { const g = await (await fetch(fb + "/g.json")).json(); if (g && g.launch === L.id) return; } catch (e) {} newGame(L.by); }
+
+let offset = 0, calibrated = false;
+async function calibrate() {
+  let best = null;
+  for (let i = 0; i < 3; i++) {
+    try {
+      const t0 = Date.now();
+      await fetch(`${fb}/off/${me}.json`, { method: "PUT", body: JSON.stringify({ ".sv": "timestamp" }) });
+      const t1 = Date.now(), ts = await (await fetch(`${fb}/off/${me}.json`)).json(), rtt = t1 - t0;
+      if (typeof ts === "number" && (!best || rtt < best.rtt)) best = { rtt, off: ts - (t0 + rtt / 2) };
+    } catch (e) {}
+  }
+  if (best) offset = best.off; calibrated = true;
+}
+const srv = () => Date.now() + offset;
+
+function runState(g) {
+  let k = 0, won = 0;
+  for (; ; k++) { const s = stOf(g, k); if (s.status === "won") { won++; continue; } if (s.status === "boom") return { k, won, over: true }; break; }
+  return { k, won, over: false };
+}
+
+/* ───── розмітка інструкції ───── */
+const cw = c => `<span class="cw"><i style="background:${HEX[c]}"></i>${CN[c]}</span>`;
+const cwG = c => `<span class="cw"><i style="background:${HEX[c]}"></i>${CNg[c]}</span>`;
+const cwP = c => `<span class="cw"><i style="background:${HEX[c]}"></i>${CNp[c]}</span>`;
+const cwF = c => `<span class="cw"><i style="background:${HEX[c]}"></i>${CNf[c]}</span>`;
+function wCond(r) { switch (r.k) { case "none": return `немає жодного ${cwG(r.X)} дроту`; case "one": return `є рівно один ${cw(r.X)} дріт`; case "many": return `${cwP(r.X)} дротів більше одного`; case "lastIs": return `останній дріт ${cw(r.X)}`; case "firstIs": return `перший дріт ${cw(r.X)}`; case "odd": return "серійний номер закінчується на <b>непарну</b> цифру"; case "bat": return `батарей щонайменше <b>${r.N}</b>`; case "frk": return "лампочка <b>FRK</b> світиться"; case "clr": return "лампочка <b>CLR</b> світиться"; } }
+function wAct(a, X) { if (a.t === "that") return "переріж цей дріт"; if (a.t === "lastX") return `переріж останній ${cw(X)} дріт`; return `переріж <b>${POS[a.p]}</b> дріт (рахуючи зверху)`; }
+function bCond(r) { switch (r.k) { case "color": return `кнопка ${cwF(r.X)}`; case "label": return `на кнопці напис «<b>${r.Y}</b>»`; case "bat": return `батарей щонайменше <b>${r.N}</b>`; case "clr": return "лампочка <b>CLR</b> світиться"; case "frk": return "лампочка <b>FRK</b> світиться"; case "odd": return "серійний номер закінчується на <b>непарну</b> цифру"; case "cl": return `кнопка ${cwF(r.X)} з написом «<b>${r.Y}</b>»`; } }
+const bRes = r => r === "tap" ? "торкнись і <b>одразу відпусти</b>" : "<b>тримай</b> кнопку й дивись на смужку збоку";
+const rule = (i, cond, act, def) => `<div class="rule${def ? " def" : ""}"><div class="n">${def ? "•" : i}</div><div class="t">${cond}<span class="a">→ ${act}</span></div></div>`;
+const dotC = c => `<span class="dot" style="background:${SHEX[c] || HEX[c]}"></span>`;
+
+function manualPages(B) {
+  const P = {};
+  P.info = `<h3>Як це працює</h3>
+<p>Сапер бачить бомбу, а ти — інструкцію. <b>Питай</b> його, що на модулі, і шукай відповідь тут. Правила цієї бомби унікальні: пам'ятати нічого не треба, лише уважно читати.</p>
+<div class="rule"><div class="n">1</div><div class="t"><b>Спершу запитай про бомбу:</b> який серійний номер, скільки батарей, які лампочки світяться.</div></div>
+<div class="rule"><div class="n">2</div><div class="t"><b>Серійний номер.</b> Дивись на останній символ: цифра непарна (1, 3, 5, 7, 9) чи парна. Голосні літери: A, E, I, O, U.</div></div>
+<div class="rule"><div class="n">3</div><div class="t"><b>Помилки.</b> Кожна забирає <b>${PENALTY} секунд</b>. Третя помилка — вибух.</div></div>
+<div class="rule"><div class="n">4</div><div class="t"><b>Модулі на цій бомбі:</b> ${B.mods.map(m => MNAME[m]).join(", ")}. Розмінувати треба всі.</div></div>
+<div class="q"><em>💬</em><span>Говоріть чітко й по черзі: «дротів п'ять: червоний, синій…». Це половина успіху.</span></div>`;
+  const wt = n => { const t = B.wires.tables[n]; return t.rules.map((r, i) => rule(i + 1, "Якщо " + wCond(r), wAct(r.act, r.X))).join("") + rule(0, "В усіх інших випадках", wAct(t.def), true); };
+  P.wires = `<h3>Дроти</h3><p class="lead">Запитай, скільки всього дротів і якого кольору кожен (зверху вниз). Бери перше правило, яке підходить.</p>
+<div class="seg" id="wseg">${[3, 4, 5, 6].map(n => `<button data-n="${n}"${n === B.wires.W.length ? "" : ""}>${n} дроти</button>`).join("")}</div><div id="wrules">${wt(3)}</div>`;
+  const b = B.button;
+  P.button = `<h3>Кнопка</h3><p class="lead">Крок 1. Дізнайся колір і напис на кнопці та візьми перше правило, яке підходить.</p>
+${b.rules.map((r, i) => rule(i + 1, "Якщо " + bCond(r), bRes(r.res))).join("")}${rule(0, "В усіх інших випадках", bRes(b.def), true)}
+<h3 style="margin-top:6px">Якщо тримаєш</h3><p class="lead">Крок 2. Коли сапер тримає кнопку, збоку загориться смужка. Запитай її колір і скажи, <b>коли відпустити</b>: у таймері <b>на будь-якій позиції</b> має бути потрібна цифра.</p>
+${["red", "blue", "yellow", "white"].map(c => `<div class="maprow"><span class="cw"><i style="background:${HEX[c]}"></i>${CNf[c]} смужка</span><span>відпусти, коли є цифра <span class="digit">${b.dmap[c]}</span></span></div>`).join("")}`;
+  P.symbols = `<h3>Символи</h3><p class="lead">Сапер називає 4 символи. Знайди <b>єдину колонку</b>, де є всі чотири. Нехай натискає їх у порядку <b>зверху вниз</b> по цій колонці.</p>
+<div class="cols">${B.symbols.cols.map(c => `<div class="col">${c.map(s => `<span>${s}</span>`).join("")}</div>`).join("")}</div>`;
+  const mp = (v, title) => `<h3 style="margin-top:4px">${title}</h3>` + B.simon.map[v].map((m, s) => `<div class="maprow"><b>${s === 0 ? "без помилок" : s === 1 ? "1 помилка" : "2 помилки"}</b><span style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">${SC.map(c => `<span class="mp1">${dotC(c)}→${dotC(m[c])}</span>`).join("")}</span></div>`).join("");
+  P.simon = `<h3>Кольори</h3><p class="lead">Сапер бачить спалахи кольорів і має натискати <b>інші</b> кольори. Спалах → що натискати, залежить від серійного номера (є голосна чи ні) та кількості помилок.</p>
+<p class="lead">Стрілка: «спалахнув → натисни». Повторювати треба <b>всю послідовність від початку</b>, а на кожному етапі вона довшає.</p>${mp("y", "Серійний номер має голосну")}${mp("n", "Серійний номер без голосної")}`;
+  return P;
+}
+
+/* ───── стан бомби в UI ───── */
+let curGid = "", bombKey = "", bombIdx = -1, B = null, role = "def", G = null, K = 0;
+let inter = null, overShown = false, startWriting = false, lastSec = -1, tabNow = "info", solvedLocal = {}, strikesLocal = 0, ended = false;
+
+const fmt = s => { s = Math.max(0, Math.ceil(s)); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
+function cover(html) { const c = $("cover"); if (c.dataset.h !== html) { c.dataset.h = html; c.innerHTML = html; } c.classList.add("on"); }
+function uncover() { $("cover").classList.remove("on"); $("cover").dataset.h = ""; }
+function pips(n) { [...$("strikes").children].forEach((p, i) => p.classList.toggle("on", i < n)); }
+
+function setupBomb(g, k) {
+  G = g; K = k; bombIdx = k; bombKey = g.id + ":" + k; ended = false; startWriting = false; lastSec = -1; solvedLocal = {}; strikesLocal = 0; tabNow = "info";
+  B = genBomb(`${g.seed}:${k}`, g.lvl); role = defOf(g, k) === me ? "def" : "man";
+  $("bn").textContent = "💣 " + (k + 1); pips(0); $("timer").className = ""; $("timer").textContent = fmt(TOTAL[g.lvl]);
+  $("role").innerHTML = role === "def" ? "🔧 <b>ти сапер</b> · описуй усе, що бачиш" : "📖 <b>ти штаб</b> · шукай у інструкції";
+  $("stage").innerHTML = ""; $("dots").innerHTML = "";
+  role === "def" ? buildDefuser() : buildManual();
+  put(`ready/${g.id}/b${k}/${me}`, true);
+}
+
+/* ───── сапер ───── */
+const MOD_HDR = m => `<div class="ch"><b>${MNAME[m]}</b><i class="lamp" id="l-${m}"></i></div>`;
+function buildDefuser() {
+  const st = $("stage");
+  const bats = B.bat ? Array.from({ length: B.bat }, () => '<i class="bat"></i>').join("") : '<span class="nobat">немає</span>';
+  st.innerHTML = `<div class="plate"><div class="sn"><small>СЕРІЙНИЙ НОМЕР</small><b>${B.serial}</b></div><div class="pl"><small>БАТАРЕЇ</small><div class="bats">${bats}</div></div><div class="pl"><small>ЛАМПОЧКИ</small><div class="leds"><span class="led${B.ind.FRK ? " on" : ""}"><i></i>FRK</span><span class="led${B.ind.CLR ? " on" : ""}"><i></i>CLR</span></div></div></div><div class="car" id="car"></div>`;
+  const car = $("car");
+  car.innerHTML = B.mods.map(m => `<section class="mod" data-m="${m}"><div class="card" id="c-${m}">${MOD_HDR(m)}<div class="cb" id="b-${m}"></div><div class="done" id="d-${m}"><svg viewBox="0 0 64 64"><path d="M14 34 L27 46 L51 18"/></svg></div></div></section>`).join("");
+  B.mods.forEach(m => ({ wires: mkWires, button: mkButton, symbols: mkSymbols, simon: mkSimon })[m]());
+  $("dots").innerHTML = B.mods.map(m => `<button class="dt" id="t-${m}" data-m="${m}"><i></i>${MNAME[m]}</button>`).join("");
+  $("dots").onclick = e => { const b = e.target.closest(".dt"); if (b) document.querySelector(`.mod[data-m="${b.dataset.m}"]`).scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }); };
+  car.onscroll = () => { const i = Math.round(car.scrollLeft / car.clientWidth); B.mods.forEach((m, j) => $("t-" + m).classList.toggle("cur", i === j)); };
+  car.onscroll();
+}
+function strike(m, why) {
+  if (ended) return;
+  strikesLocal++; sfx.bad(); vib([60, 40, 90]);
+  const c = $("c-" + m); if (c) { c.classList.remove("flash"); void c.offsetWidth; c.classList.add("flash"); }
+  const vg = $("vig"); vg.classList.remove("on"); void vg.offsetWidth; vg.classList.add("on");
+  $("app").classList.remove("shake"); void $("app").offsetWidth; $("app").classList.add("shake");
+  pips(strikesLocal); put(`st/${G.id}/b${K}/strikes`, strikesLocal);
+  if (strikesLocal >= 3) endBomb("boom");
+}
+function solved(m) {
+  if (solvedLocal[m]) return; solvedLocal[m] = true; sfx.ok(); vib([20, 40, 20]);
+  $("d-" + m).classList.add("on"); $("l-" + m).classList.add("ok"); $("t-" + m).classList.add("ok");
+  put(`st/${G.id}/b${K}/solved/${m}`, true);
+  if (B.mods.every(x => solvedLocal[x])) endBomb("won");
+}
+function endBomb(status) {
+  if (ended) return; ended = true;
+  const left = Math.max(0, TOTAL[G.lvl] - (srv() - (stOf(G, K).start + COUNT)) / 1000 - PENALTY * strikesLocal);
+  put(`st/${G.id}/b${K}/left`, Math.round(left)); put(`st/${G.id}/b${K}/status`, status);
+}
+
+/* дроти */
+function wireSvg(c, i) {
+  const a = 5 + (i * 7) % 9, d = `M16 22 C 70 ${22 - a}, 110 ${22 + a}, 150 22 S 230 ${22 - a}, 284 22`, col = HEX[c], hi = c === "black" ? "#7a84a0" : "#fff";
+  const shape = `<path d="${d}" stroke="#000" stroke-opacity=".4" stroke-width="15" fill="none" stroke-linecap="round" transform="translate(0,3)"/><path d="${d}" stroke="${col}" stroke-width="12" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${hi}" stroke-opacity="${c === "white" ? ".0" : ".38"}" stroke-width="3" fill="none" stroke-linecap="round" transform="translate(0,-3)"/>`;
+  return `<svg viewBox="0 0 300 44" preserveAspectRatio="none"><defs><clipPath id="L${i}"><rect x="0" y="-10" width="150" height="64"/></clipPath><clipPath id="R${i}"><rect x="150" y="-10" width="150" height="64"/></clipPath><radialGradient id="m${i}" cx="35%" cy="30%"><stop offset="0" stop-color="#d7deee"/><stop offset="1" stop-color="#3b4458"/></radialGradient></defs>
+<g class="wl" clip-path="url(#L${i})">${shape}</g><g class="wr" clip-path="url(#R${i})">${shape}</g>
+<circle cx="10" cy="22" r="9" fill="url(#m${i})" stroke="#0008"/><circle cx="290" cy="22" r="9" fill="url(#m${i})" stroke="#0008"/><text class="sp" x="150" y="30" text-anchor="middle">✨</text></svg>`;
+}
+function mkWires() {
+  const body = $("b-wires"), W = B.wires.W, right = solveWires(B), cut = new Set();
+  body.innerHTML = `<div class="wires">${W.map((c, i) => `<button class="wire" data-i="${i}" aria-label="дріт ${i + 1}">${wireSvg(c, i)}</button>`).join("")}</div><div class="cap">торкнись дроту, щоб перерізати</div>`;
+  body.onpointerdown = e => {
+    const w = e.target.closest(".wire"); if (!w || solvedLocal.wires || ended) return;
+    const i = +w.dataset.i; if (cut.has(i)) return; cut.add(i); w.classList.add("cut"); sfx.cut(); vib(25);
+    if (i === right) solved("wires"); else strike("wires");
+  };
+}
+/* кнопка */
+function mkButton() {
+  const b = B.button, need = solveButton(B), body = $("b-button");
+  body.innerHTML = `<div class="btw"><div class="ring"><button class="bigbtn c-${b.color}" id="bb"><span>${b.label}</span></button></div><div class="strip" id="strip" style="--sc:${HEX[b.strip]}"><i></i></div></div><div class="cap" id="bcap">торкнись або тримай</div>`;
+  const bb = $("bb"), strip = $("strip"); let tm = 0, holding = false, down = false;
+  bb.addEventListener("pointerdown", e => {
+    if (solvedLocal.button || ended) return; bb.setPointerCapture(e.pointerId); down = true; holding = false; bb.classList.add("dn"); sfx.press(); vib(10);
+    tm = setTimeout(() => { holding = true; strip.classList.add("lit"); $("bcap").textContent = "тримаєш… дивись на смужку"; vib(15); }, HOLD);
+  });
+  const rel = () => {
+    if (!down) return; down = false; clearTimeout(tm); bb.classList.remove("dn"); strip.classList.remove("lit"); $("bcap").textContent = "торкнись або тримай";
+    if (solvedLocal.button || ended) return;
+    if (!holding) { need === "tap" ? solved("button") : strike("button"); return; }
+    const g = G, ps = stOf(g, K).start + COUNT, left = TOTAL[g.lvl] - (srv() - ps) / 1000 - PENALTY * strikesLocal, s = fmt(left).replace(":", "");
+    (need === "hold" && s.includes(String(b.dmap[b.strip]))) ? solved("button") : strike("button");
+  };
+  bb.addEventListener("pointerup", rel); bb.addEventListener("pointercancel", rel);
+}
+/* символи */
+function mkSymbols() {
+  const S = B.symbols, body = $("b-symbols"); let idx = 0;
+  body.innerHTML = `<div class="symg">${S.shown.map(s => `<button class="sym" data-s="${s}">${s}</button>`).join("")}</div><div class="cap">натискай у правильному порядку</div>`;
+  body.onpointerdown = e => {
+    const t = e.target.closest(".sym"); if (!t || solvedLocal.symbols || ended || t.classList.contains("ok")) return;
+    if (t.dataset.s === S.order[idx]) { t.classList.add("ok"); sfx.press(); vib(12); idx++; if (idx === 4) solved("symbols"); }
+    else { t.classList.remove("no"); void t.offsetWidth; t.classList.add("no"); idx = 0; body.querySelectorAll(".sym.ok").forEach(x => x.classList.remove("ok")); strike("symbols"); }
+  };
+}
+/* кольори */
+const SF = { red: 262, blue: 330, green: 392, yellow: 523 };
+function mkSimon() {
+  const body = $("b-simon"), sq = B.simon.seq; let stage = 1, idx = 0, timer = 0, busy = false;
+  body.innerHTML = `<div class="stg"><i class="on"></i><i></i><i></i></div><div class="pads">${SC.map(c => `<button class="pad" data-c="${c}" style="--pc:${SHEX[c]}"></button>`).join("")}</div><button class="rep" id="rep">↻ показати ще раз</button>`;
+  const pad = c => body.querySelector(`.pad[data-c="${c}"]`);
+  const flash = (c, ms = 380) => { const p = pad(c); p.classList.add("lit"); tone(SF[c], ms / 1000, "sine", .07); setTimeout(() => p.classList.remove("lit"), ms); };
+  const play = () => { clearTimeout(timer); if (solvedLocal.simon || ended) return; busy = true; idx = 0; let i = 0; const step = () => { if (i < stage) { flash(sq[i]); i++; timer = setTimeout(step, 700); } else { busy = false; timer = setTimeout(play, 5200); } }; timer = setTimeout(step, 450); };
+  const stg = () => body.querySelectorAll(".stg i").forEach((x, i) => x.classList.toggle("on", i < stage));
+  body.onpointerdown = e => {
+    if (e.target.id === "rep") { play(); return; }
+    const p = e.target.closest(".pad"); if (!p || solvedLocal.simon || ended) return;
+    const c = p.dataset.c; flash(c, 220); clearTimeout(timer);
+    const m = B.simon.map[B.vowel ? "y" : "n"][Math.min(2, strikesLocal)], want = m[sq[idx]];
+    if (c === want) { idx++; if (idx === stage) { stage++; idx = 0; if (stage > 3) { stage = 3; solved("simon"); clearTimeout(timer); return; } stg(); timer = setTimeout(play, 900); } else timer = setTimeout(play, 5200); }
+    else { strike("simon"); idx = 0; timer = setTimeout(play, 1200); }
+  };
+  play();
+}
+
+/* ───── штаб ───── */
+function buildManual() {
+  const P = manualPages(B), tabs = ["info", ...B.mods];
+  $("stage").innerHTML = `<div class="man"><div class="tabs" id="tabs">${tabs.map(t => `<button class="tab${t === "info" ? " on" : ""}" data-t="${t}">${t === "info" ? "Огляд" : MNAME[t]}</button>`).join("")}</div><div class="mp" id="mp"></div></div>`;
+  const show = t => {
+    tabNow = t; $("mp").innerHTML = P[t]; $("mp").scrollTop = 0;
+    [...$("tabs").children].forEach(b => b.classList.toggle("on", b.dataset.t === t));
+    const seg = $("wseg"); if (seg) { const set = n => { [...seg.children].forEach(b => b.classList.toggle("on", +b.dataset.n === n)); const t2 = B.wires.tables[n]; $("wrules").innerHTML = t2.rules.map((r, i) => rule(i + 1, "Якщо " + wCond(r), wAct(r.act, r.X))).join("") + rule(0, "В усіх інших випадках", wAct(t2.def), true); }; seg.onclick = e => { const b = e.target.closest("button"); if (b) set(+b.dataset.n); }; set(3); }
+  };
+  $("tabs").onclick = e => { const b = e.target.closest(".tab"); if (b) show(b.dataset.t); };
+  show("info");
+  $("dots").innerHTML = B.mods.map(m => `<span class="dt" id="t-${m}"><i></i>${MNAME[m]}</span>`).join("");
+}
+
+/* ───── ефекти ───── */
+function burst(emoji, n, x = innerWidth / 2, y = innerHeight / 2, spread = 220) {
+  for (let i = 0; i < n; i++) {
+    const e = document.createElement("div"); e.className = "p"; e.textContent = Array.isArray(emoji) ? emoji[i % emoji.length] : emoji; e.style.fontSize = (18 + Math.random() * 22) + "px"; $("fx").appendChild(e);
+    const a = Math.random() * 6.28, d = 60 + Math.random() * spread;
+    e.animate([{ transform: `translate(${x}px,${y}px) scale(.4)`, opacity: 1 }, { transform: `translate(${x + Math.cos(a) * d}px,${y + Math.sin(a) * d + 60}px) scale(1.1) rotate(${Math.random() * 360}deg)`, opacity: 0 }], { duration: 900 + Math.random() * 700, easing: "cubic-bezier(.2,.7,.3,1)" }).onfinish = () => e.remove();
+  }
+}
+function showWin(g, k) {
+  const s = stOf(g, k); sfx.win(); vib([30, 60, 30, 60, 120]); burst(["🎉", "✨", "🟢", "⭐"], 26);
+  $("end").style.setProperty("--glow", "rgba(46,229,157,.28)");
+  $("end").innerHTML = `<div class="rb">✅</div><div class="big" style="color:var(--grn)">Розміновано!</div><p>бомба №${k + 1} · залишилось <b style="color:#fff">${fmt(s.left || 0)}</b></p><p>тепер міняєтесь ролями</p>`;
+  $("end").classList.add("on"); uncover();
+}
+function explode() {
+  sfx.boom(); vib([200, 60, 300]);
+  const f = $("flash"); f.classList.remove("on"); void f.offsetWidth; f.classList.add("on");
+  $("app").classList.remove("shake"); void $("app").offsetWidth; $("app").classList.add("shake");
+  burst(["💥", "🔥", "💨", "🧨"], 34, innerWidth / 2, innerHeight / 2, 320); uncover();
+}
+function showFinal(g, rs) {
+  const e = $("end"); if (e.dataset.k === g.id) return; e.dataset.k = g.id;
+  $("end").style.setProperty("--glow", "rgba(255,77,94,.3)");
+  const n = rs.won, msg = n === 0 ? "Не засмучуйтесь, спробуйте ще раз" : n < 3 ? "Непогано для початку" : n < 6 ? "Гарна команда!" : "Ви справжні сапери 🏆";
+  e.innerHTML = `<div class="rb">💥</div><div class="big" style="color:var(--red)">БУМ!</div><p>розмінувано бомб поспіль</p><div class="num">${n}</div><p>${msg}</p><div class="brow"><button class="btn p" data-a="again">ще раз</button><button class="btn g" data-a="menu">в меню</button></div>`;
+  e.classList.add("on");
+  logStat(g.id, { g: "bomb", w: "", n, lvl: g.lvl });
+}
+$("end").addEventListener("click", ev => {
+  const a = ev.target.closest("button")?.dataset.a, g = game();
+  if (a === "menu") location.href = "index.html"; else if (a === "again" && g) newGame(other(g.first));
+});
+$("back").addEventListener("click", () => { location.href = "index.html"; });
+
+/* ───── головний цикл ───── */
+function tick() {
+  const g = game();
+  if (!g) { cover(`<div class="rb">💣</div><h2>Готуємо бомбу…</h2><p>чекаємо, поки гру запустить другий гравець</p>`); return; }
+  if (curGid !== g.id) { curGid = g.id; bombKey = ""; bombIdx = -1; inter = null; overShown = false; $("end").classList.remove("on"); $("end").dataset.k = ""; $("fx").innerHTML = ""; }
+  const rs = runState(g);
+  if (rs.over) {
+    if (!overShown) { overShown = true; if (bombKey === g.id + ":" + rs.k) { explode(); setTimeout(() => showFinal(g, rs), 2400); } else showFinal(g, rs); }
+    return;
+  }
+  if (bombKey && bombIdx < rs.k) {
+    if (!inter) { inter = { until: Date.now() + 2800 }; showWin(g, bombIdx); }
+    if (Date.now() < inter.until) return;
+    inter = null; $("end").classList.remove("on"); bombKey = "";
+  }
+  if (!bombKey) setupBomb(g, rs.k);
+  if (!calibrated) { cover(`<div class="rb">⏱️</div><h2>Синхронізуємо годинник…</h2>`); return; }
+  const s = stOf(g, K), rd = (db.ready && db.ready[g.id] && db.ready[g.id]["b" + K]) || {}, o = PEOPLE[other(me)];
+  if (!(rd.v && rd.a)) { cover(`<div class="rb">${o.emoji}</div><h2>Чекаємо ${esc(o.name)}…</h2><p>бомба почне тікати, щойно обоє будуть готові</p>`); return; }
+  if (typeof s.start !== "number") {
+    if (role === "def" && !startWriting) { startWriting = true; put(`st/${g.id}/b${K}/start`, { ".sv": "timestamp" }, false); }
+    cover(`<div class="rb">💣</div><h2>Активуємо бомбу…</h2>`); return;
+  }
+  const ps = s.start + COUNT, now = srv();
+  if (now < ps) {
+    const n = Math.ceil((ps - now) / 1000);
+    cover(`<div class="rb">${role === "def" ? "🔧" : "📖"}</div><h2>${role === "def" ? "Ти сапер" : "Ти штаб"}</h2><p>${role === "def" ? "Ти бачиш бомбу. Описуй усе вголос: що на модулях, які номери й лампочки." : "У тебе інструкція. Став запитання сапера й читай йому правила."}</p><b class="cnt" key="${n}">${n}</b>`);
+    return;
+  }
+  uncover();
+  const strikes = Math.max(s.strikes || 0, strikesLocal), left = TOTAL[g.lvl] - (now - ps) / 1000 - PENALTY * strikes, sec = Math.ceil(left);
+  $("timer").textContent = fmt(left); $("timer").className = left <= 10 ? "crit" : left <= 30 ? "warn" : "";
+  pips(strikes);
+  if (role === "man") B.mods.forEach(m => { const solvedNow = s.solved && s.solved[m], t = $("t-" + m); if (t) t.classList.toggle("ok", !!solvedNow); const tb = document.querySelector(`.tab[data-t="${m}"]`); if (tb) tb.classList.toggle("ok", !!solvedNow); });
+  if (sec !== lastSec && left > 0 && left <= 45) { sfx.tick(left <= 10); }
+  lastSec = sec;
+  if (s.status || ended) return;
+  if (left <= 0 && role === "def") endBomb("boom");
+  else if ((left < -2 || strikes >= 3) && role === "man") { ended = true; put(`st/${g.id}/b${K}/status`, "boom"); }
+}
+setInterval(tick, 100);
+
+calibrate();
+connect();
+if (L && L.by === me) ensureGame();
+</script>
+</body>
+</html>
