@@ -635,7 +635,7 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 /* ── Свіжий вигляд головного екрана ── */
 #s-welcome .foot{max-width:310px;margin-top:10px;font-size:12px;line-height:1.5;text-align:center;text-wrap:balance;color:var(--muted)}
 #s-welcome .hero{z-index:1;margin-top:0;margin-bottom:2px;flex:none}
-#s-welcome #toAuth{flex:none;width:min(100%,300px)}
+#s-welcome #toAuth,#s-welcome #toGuest{flex:none;width:min(100%,300px);min-width:0;padding-left:0;padding-right:0;box-sizing:border-box}
 #s-welcome #wFoot{flex:none;margin-top:0;max-width:320px}
 #s-welcome .hero{background:linear-gradient(145deg,color-mix(in srgb,var(--bg) 82%,transparent),color-mix(in srgb,var(--bg) 62%,transparent));border-color:color-mix(in srgb,var(--fg) 13%,transparent);box-shadow:0 18px 55px rgba(30,30,20,.10),inset 0 1px 0 rgba(255,255,255,.55)}
 #s-welcome #toAuth,#s-welcome #wFoot{position:relative;z-index:1}
@@ -662,7 +662,7 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 <div id="tag"></div>
 </div>
 <button class="blk cta" id="toAuth">авторизуватись</button>
-<button class="wht cta-secondary" id="toGuest">грати як гість</button>
+<button class="wht cta-secondary" id="toGuest">увійти як гість</button>
 <div class="foot" id="wFoot"></div>
 </div>
 <button id="pvClose">✕ закрити перегляд</button>
@@ -685,6 +685,7 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 </div>
 
 <div class="s" id="s-name">
+<button class="back" id="nback">‹</button>
 <h2>як тебе звати?</h2>
 <input id="nm" maxlength="12" placeholder="імʼя" autocomplete="off">
 <button class="blk" id="nmGo">далі</button>
@@ -1000,16 +1001,15 @@ $("cgo").onclick = async () => {
 };
 
 /* ───── вхід ───── */
-$("toAuth").onclick = () => document.body.classList.contains("preview") ? 0 : openCode("введи код", "увійти", "ваш код для входу — 0000", "s-welcome", code => {
+$("toAuth").onclick = () => document.body.classList.contains("preview") ? 0 : openCode("введи код", "увійти", "", "s-welcome", code => {
   if (CODES[code]) return login({ ...CODES[code], uid: "u_" + CODES[code].pref });
-  if (code === "0000") { $("nm").value = ""; go("s-name"); return; }
   return "невірний код";
-  $("toGuest").onclick = () => {
-  if (document.body.classList.contains("preview")) return;
-  $("nm").value = "";
-  go("s-name");
-};
 });
+$("toGuest").onclick = () => {
+  if (document.body.classList.contains("preview")) return;
+  $("nm").value = ""; go("s-name");
+};
+$("nback").onclick = () => go("s-welcome");
 $("nmGo").onclick = () => {
   const name = $("nm").value.trim(); if (!name) return;
   login({ name, emoji: GUEST_EMOJI[Math.floor(Math.random() * GUEST_EMOJI.length)], pref: null, uid: "g_" + rnd() + rnd() });
@@ -1022,6 +1022,8 @@ async function login(u) {
 function showHome() { $("hMe").innerHTML = meHtml(user); go("s-home"); }
 function logout() { if (es) es.close(); rc = null; user = null; ls.del("dm_user"); ls.del("dm_room"); go("s-welcome"); }
 $("hOut").onclick = logout;
+
+document.addEventListener("visibilitychange", () => { if (!document.hidden && typeof rc !== "undefined" && rc) { try { connect(); beat(); } catch (e) {} } });
 
 /* ───── кімнати ───── */
 const rb = c => `${FB}/rooms/${ROOM}/dm/${c}`;
@@ -1427,7 +1429,7 @@ ${editName ? `<div class="ro"><input id="nmEdit" maxlength="12" value="${esc(use
 <div class="ro col"><span>емодзі</span></div><div class="ems">${EMOJIS.map(e => `<button data-em="${e}"${e === user.emoji ? ' class="on"' : ""}>${e}</button>`).join("")}</div></div>
 <div class="sec">вигляд</div>
 <div class="card2"><div class="ro col"><span>тема</span><div class="seg">${[["auto", "авто"], ["light", "світла"], ["dark", "темна"]].map(([k, l]) => `<button data-th="${k}"${th === k ? ' class="on"' : ""}>${l}</button>`).join("")}</div></div>
-<div class="ro col"><span>оформлення</span><div class="seg">${[["auto", "як на сайті"], ["none", "звичайне"], ["halloween", "🎃"], ["winter", "❄️"]].map(([k, l]) => `<button data-sk="${k}"${(ls.get("dm_skin") || "auto") === k ? ' class="on"' : ""}>${l}</button>`).join("")}</div></div></div>
+<div class="ro col"><span>оформлення</span><div class="seg">${[["none", "звичайне"], ["halloween", "🎃"], ["winter", "❄️"]].map(([k, l]) => `<button data-sk="${k}"${((ls.get("dm_skin") && ls.get("dm_skin") !== "auto") ? ls.get("dm_skin") : (site.skin || "none")) === k ? ' class="on"' : ""}>${l}</button>`).join("")}</div></div></div>
 <div class="sec">відгук</div>
 <div class="card2"><div class="ro"><span>вібрація</span><button class="sw${vb ? " on" : ""}" data-s="vib" aria-label="вібрація"></button></div><div class="ro"><span>звуки в малюванні</span><button class="sw${sn ? " on" : ""}" data-s="snd" aria-label="звуки"></button></div></div>
 <div class="sec">дані</div>
@@ -1680,8 +1682,15 @@ function botPick(g) {
 function botCheck(g) {
   if (!g || !g.bot || g.done || g.res || g.turn !== g.bot || g.bot === mySlot || botT) return;
   const key = g.id + ":" + g.r + ":" + (g.tried || "");
-  botT = setTimeout(() => { botT = 0; const cg = db.game; if (!cg || cg.res || cg.done || cg.turn !== cg.bot) return; if (cg.id + ":" + cg.r + ":" + (cg.tried || "") !== key) return; hangMove(botPick(cg), cg.bot); }, 1100 + Math.random() * 900);
+  botT = setTimeout(() => {
+    botT = 0; const cg = db.game;
+    if (!cg || cg.res || cg.done || cg.turn !== cg.bot) return;
+    if (cg.id + ":" + cg.r + ":" + (cg.tried || "") !== key) { botCheck(cg); return; }   // стан змінився — плануємо наново
+    try { hangMove(botPick(cg), cg.bot); } catch (e) { setTimeout(() => botCheck(db.game), 1200); }
+  }, 1100 + Math.random() * 900);
 }
+// сторож: якщо подію загубили, бот усе одно ходить
+setInterval(() => { if (cur() === "s-hang" && db.game) botCheck(db.game); }, 1500);
 $("hgKb").onclick = e => { const b = e.target.closest("button"); if (!b || b.disabled) return; if (gmode) { draft.push(b.dataset.k); renderHang(); } else hangMove(b.dataset.k); };
 $("hgAct").onclick = e => {
   const b = e.target.closest("button"); if (!b || b.disabled) return; const a = b.dataset.a;
