@@ -343,89 +343,143 @@ body.preview #pvClose{display:block}
 
 
 
-/* Нижнє компактне меню */
+/* ===== LIQUID GLASS BOTTOM DOCK ===== */
+
 #dock {
   display: none;
   position: fixed;
   left: 50%;
   bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
   transform: translateX(-50%);
+
   width: max-content;
   max-width: calc(100vw - 24px);
+
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: var(--pill);
-  border: 1px solid var(--line);
-  box-shadow: 0 8px 28px var(--sh);
+  gap: 5px;
+
+  padding: 7px;
+
+  background: rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 24px;
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.10),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8);
+
   z-index: 6;
 }
 
-/* Показуємо меню */
 body.menu-on #dock {
   display: flex;
 }
 
-/* Кнопки меню */
+/* Пункти меню */
 .dk {
   position: relative;
+
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex: 0 0 44px;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
+
+  flex: 0 0 62px;
+  width: 62px;
+  height: 58px;
+
+  gap: 3px;
+  padding: 5px 2px;
+
+  border: 1px solid transparent;
+  border-radius: 17px;
+
   background: transparent;
   color: var(--muted);
-  font-size: 14px;
-  font-weight: 600;
-  transition: color .2s, transform .2s;
+
+  cursor: pointer;
+
+  transition:
+    background .25s ease,
+    border .25s ease,
+    transform .2s ease,
+    color .2s ease;
 }
 
-/* Іконки */
+/* Емодзі замість SVG */
 .dk svg {
-  display: block;
-  width: 21px;
-  height: 21px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  display: none;
 }
 
-/* Ховаємо назви пунктів */
+/* Текст */
 .dk span {
-  display: none !important;
+  display: block !important;
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: .2px;
+  text-transform: lowercase;
+}
+
+/* Емодзі перед текстом */
+.dk::before {
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+/* Іконки кожного пункту */
+.dk[data-tab="games"]::before {
+  content: "🎮";
+}
+
+.dk[data-tab="stats"]::before {
+  content: "🏆";
+}
+
+.dk[data-tab="set"]::before {
+  content: "⚙️";
+}
+
+.dk[data-tab="studio"]::before {
+  content: "🚧";
 }
 
 /* Активний пункт */
 .dk.on {
-  color: #000;
-  background: transparent;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(255, 255, 255, 0.8);
+
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.07),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 
-/* Чорне підкреслення активного пункту */
-.dk.on::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 1px;
-  transform: translateX(-50%);
-  width: 18px;
-  height: 3px;
-  border-radius: 3px;
-  background: #000;
-}
-
-/* Ефект натискання */
+/* Натискання */
 .dk:active {
-  transform: scale(.94);
+  transform: scale(.92);
+}
+
+/* Темна тема */
+@media (prefers-color-scheme: dark) {
+  #dock {
+    background: rgba(35, 35, 38, 0.62);
+    border-color: rgba(255, 255, 255, 0.14);
+
+    box-shadow:
+      0 8px 30px rgba(0, 0, 0, 0.3),
+      inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  }
+
+  .dk.on {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
 }
 
 
