@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<script>(function(){try{var t=localStorage.getItem("dm_theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()</script>
+<link rel="apple-touch-icon" href="IMG_2010.jpeg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
+<title>draw &amp; more</title>
+<style>
+:root{--bg:#fff;--fg:#1b1b1a;--muted:#8d8c88;--line:#e7e7e4;--pill:#fff;--soft:#f4f4f1;--inv-bg:#111;--inv-fg:#fff;--ok:#0f7b6c;--bad:#e03e3e;--sh:rgba(30,30,20,.08);--okbg:#e3f4ef;--serif:"Iowan Old Style","Palatino Linotype",Georgia,serif}
+:root[data-theme="dark"]{--bg:#161616;--fg:#ebebea;--muted:#8a8a87;--line:#2e2e2e;--pill:#202020;--soft:#272727;--inv-bg:#ebebea;--inv-fg:#161616;--sh:rgba(0,0,0,.45);--okbg:#12332d}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161616;--fg:#ebebea;--muted:#8a8a87;--line:#2e2e2e;--pill:#202020;--soft:#272727;--inv-bg:#ebebea;--inv-fg:#161616;--sh:rgba(0,0,0,.45);--okbg:#12332d}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{touch-action:manipulation}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{height:100dvh;position:relative;color:var(--fg);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
+input{font:inherit;color:inherit}
+.s{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 18px) 22px calc(env(safe-area-inset-bottom,0px) + 22px);overflow-y:auto;overscroll-behavior:contain}
+.s.on{display:flex}
+.s>*{width:100%;max-width:400px;position:relative;z-index:1}
+.blk{background:var(--inv-bg);color:var(--inv-fg);border-radius:999px;padding:16px 28px;font-size:16px;font-weight:500;text-align:center;transition:transform .15s,opacity .2s}
+.blk:active{transform:scale(.97)}
+.blk:disabled{opacity:.3;cursor:default}
+.blk.sm{padding:12px 18px;font-size:15px}
+.wht{background:var(--pill);border:1px solid var(--line);border-radius:999px;padding:16px 28px;font-size:16px;font-weight:500;text-align:center}
+.wht:active{transform:scale(.97)}
+.lnk{color:var(--muted);font-size:14px;padding:8px}
+.muted{color:var(--muted);font-size:14px}
+h2{font-family:var(--serif);font-size:28px;font-weight:600;text-align:center}
+.err{min-height:20px;color:var(--bad);font-size:14px;text-align:center}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ── привітальний екран ── */
+#s-welcome{justify-content:center;align-items:center;overflow:hidden;gap:14px;padding-top:calc(env(safe-area-inset-top,0px) + 24px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px)}
+#float,.aura{position:absolute;inset:0;overflow:hidden;pointer-events:none;max-width:none!important;width:auto!important;z-index:0!important}
+.aura i{position:absolute;width:64vmax;height:64vmax;border-radius:50%;filter:blur(58px);opacity:.6;animation:drift 16s ease-in-out infinite alternate}
+.aura i:nth-child(1){background:radial-gradient(circle,var(--a1,#ffbcd0),transparent 66%);left:-26vmax;top:-22vmax}
+.aura i:nth-child(2){background:radial-gradient(circle,var(--a2,#b8d2ff),transparent 66%);right:-30vmax;top:16%;animation-delay:-6s}
+.aura i:nth-child(3){background:radial-gradient(circle,var(--a3,#ffe4a0),transparent 66%);left:-12vmax;bottom:-32vmax;animation-delay:-11s}
+:root[data-theme="dark"] .aura i{opacity:.3}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .aura i{opacity:.3}}
+@keyframes drift{to{transform:translate(9vmax,-7vmax) scale(1.18)}}
+#float span{position:absolute;left:0;top:0;opacity:.34;pointer-events:none;will-change:transform;line-height:1;filter:blur(1.5px) drop-shadow(0 6px 8px rgba(0,0,0,.10))}
+#float span.fx{opacity:.75;filter:blur(.4px)}
+.hero{width:min(100%,400px);margin:0 auto 2px;padding:28px 22px 22px;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;text-align:center;border:1px solid color-mix(in srgb,var(--fg) 9%,transparent);border-radius:28px;background:color-mix(in srgb,var(--bg) 58%,transparent);-webkit-backdrop-filter:blur(18px) saturate(145%);backdrop-filter:blur(18px) saturate(145%);box-shadow:0 12px 38px rgba(30,30,20,.06),inset 0 1px 0 rgba(255,255,255,.38)}
+.logo{font-size:58px;line-height:1;animation:wob 3.2s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes wob{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(10deg) translateY(-4px)}}
+.brand{font-family:var(--serif);font-size:46px;font-weight:700;letter-spacing:.5px;line-height:1.05;background:linear-gradient(90deg,var(--fg) 0%,var(--b1,#e0507a) 30%,var(--b2,#4a7de0) 60%,var(--fg) 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 7s linear infinite}
+@keyframes shine{to{background-position:-300% 0}}
+.scribble{width:190px;height:16px;overflow:visible}
+.scribble path{fill:none;stroke:var(--b1,#e0507a);stroke-width:4;stroke-linecap:round;stroke-dasharray:240;stroke-dashoffset:240;animation:drw 1.4s .5s ease-out forwards}
+@keyframes drw{to{stroke-dashoffset:0}}
+#tag{min-height:22px;height:auto;max-width:100%;font-size:15px;line-height:1.45;font-weight:550;letter-spacing:.1px;color:var(--fg);text-wrap:balance;transition:opacity .4s}
+.cta{min-width:min(250px,100%);margin:2px 0 0;padding:15px 30px;animation:pulse 2.6s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--b1,#e0507a) 45%,transparent)}70%,100%{box-shadow:0 0 0 18px color-mix(in srgb,var(--b1,#e0507a) 0%,transparent)}}
+.brand.f-sans{font-family:ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;font-weight:800}
+.brand.f-round{font-family:ui-rounded,"SF Pro Rounded","Trebuchet MS",sans-serif;font-weight:800}
+.brand.f-mono{font-family:ui-monospace,"SF Mono","Courier New",monospace;font-size:38px}
+.brand.f-hand{font-family:"Bradley Hand","Segoe Script","Comic Sans MS",cursive;font-size:52px}
+.brand.plain{background:none;-webkit-text-fill-color:var(--fg);color:var(--fg);animation:none}
+#pvClose{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);z-index:20;display:none;padding:10px 18px;border-radius:999px;background:var(--inv-bg);color:var(--inv-fg);font-size:14px;font-weight:600;box-shadow:0 8px 24px var(--sh)}
+body.preview #pvClose{display:block}
+#s-splash {
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+}
+
+#s-splash .logo {
+  margin: 0 0 12px;
+  text-align: center;
+  flex: none;
+}
+
+#s-splash .skel {
+  width: 100%;
+  height: 76px;
+  flex: none;
+  border-radius: 22px;
+}
+.foot{margin-top:12px;text-align:center;font-size:12px;color:var(--muted)}
+
+/* ── код та імʼя ── */
+#s-code,#s-name{gap:16px}
+.back{align-self:flex-start;font-size:28px;color:var(--muted);width:auto;padding:0 8px;line-height:1}
+#cells{display:flex;gap:12px;justify-content:center;margin-top:8px}
+#cells i{width:58px;height:68px;border:1.5px solid var(--line);border-radius:16px;display:grid;place-items:center;font:600 30px var(--serif);font-style:normal;transition:border-color .2s;background:var(--pill)}
+#cells i.f{border-color:var(--fg)}
+#cells.shake{animation:sh .35s}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+#pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:auto}
+#pad button{height:54px;border:1px solid var(--line);border-radius:16px;font-size:22px;font-weight:500;background:var(--pill)}
+#pad button:active{background:var(--soft)}
+.hint{text-align:center;color:var(--muted);font-size:13px}
+#nm{border:1.5px solid var(--line);border-radius:16px;padding:16px;font-size:18px;text-align:center;outline:none;user-select:text;-webkit-user-select:text;background:var(--pill)}
+#nm:focus{border-color:var(--fg)}
+
+/* ── вхід гостя ── */
+.me{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:600}
+.me b{font-size:26px;font-weight:400}
+.mid{margin:auto 0;display:flex;flex-direction:column;gap:12px}
+
+/* ── меню ── */
+#s-menu{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 104px)}
+.pane{display:none;flex-direction:column;gap:12px}
+.pane.on{display:flex;animation:fi .35s both}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0 4px}
+.hello{font:600 27px var(--serif);line-height:1.1}
+.st{font-size:13px;color:var(--muted);margin-top:5px}
+.av{width:46px;height:46px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:26px;border:1px solid var(--line);flex:none}
+.av.big{width:58px;height:58px;font-size:32px}
+.pt{font:600 27px var(--serif);margin:6px 0 2px}
+.sec{font-size:12px;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin:12px 4px 0}
+.gc{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:var(--r1,22px);background:var(--pill);border:1px solid var(--line);text-align:left;box-shadow:0 4px 14px var(--sh);transition:transform .15s}
+.gc:active{transform:scale(.98)}
+.gt{width:54px;height:54px;border-radius:17px;display:grid;place-items:center;font-size:29px;background:rgba(var(--c),.17);flex:none}
+.gx{flex:1;min-width:0}
+.gx b{display:block;font-size:16px}
+.gx small{font-size:13px;color:var(--muted)}
+.gc .ch{color:var(--muted);font-size:24px;padding-right:4px}
+
+
+/* Toast-повідомлення */
+#toast {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 20px);
+  right: 20px;
+  left: auto;
+  bottom: auto;
+  transform: translateY(-12px);
+  z-index: 99999;
+  width: max-content;
+  max-width: calc(100vw - 40px);
+  padding: 12px 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--pill);
+  color: var(--fg);
+  box-shadow: 0 10px 32px var(--sh);
+  font-size: 14px;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .22s, transform .22s, visibility .22s;
+  pointer-events: none;
+}
+
+#toast.on {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+#toast.bad {
+  border-color: color-mix(in srgb, var(--bad) 45%, var(--line));
+}
+
+
+#noteNotice {
+  position: fixed;
+  left: 50%;
+  top: calc(env(safe-area-inset-top, 0px) + 18px);
+  transform: translate(-50%, -14px);
+  z-index: 50;
+  width: min(360px, calc(100vw - 32px));
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--pill);
+  color: var(--fg);
+  box-shadow: 0 12px 36px var(--sh);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .22s, transform .22s, visibility .22s;
+}
+
+#noteNotice.on {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+#noteNotice .nn-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 7px;
+}
+
+#noteNotice .nn-emoji {
+  font-size: 25px;
+  line-height: 1;
+}
+
+#noteNotice .nn-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+#noteNotice .nn-text {
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #noteNotice { transition: none; }
+}
+
+/* Власне підтвердження замість системного confirm */
+#confirmLayer{
+  position:fixed;inset:0;z-index:35;
+  display:none;align-items:center;justify-content:center;
+  padding:24px;background:rgba(0,0,0,.38)
+}
+#confirmLayer.on{display:flex}
+#confirmBox{
+  width:100%;max-width:340px;padding:22px;
+  border:1px solid var(--line);border-radius:24px;
+  background:var(--bg);box-shadow:0 18px 60px rgba(0,0,0,.2);
+  display:flex;flex-direction:column;gap:16px;text-align:center
+}
+#confirmBox p{font:600 20px var(--serif);line-height:1.35}
+#confirmBox .actions{display:flex;gap:8px}
+#confirmBox .actions>*{flex:1;padding:12px 14px;font-size:14px}
+
+/* Ніжний градієнт заголовків */
+.hello,.pt,#hgQ{
+  background:linear-gradient(105deg,var(--fg) 0%,#d47b9b 28%,#8b83d8 52%,#63a9bd 72%,var(--fg) 100%);
+  background-size:240% 100%;
+  background-position:100% 50%;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:heading-flow 11s ease-in-out infinite alternate
+}
+@keyframes heading-flow{to{background-position:0% 50%}}
+
+/* Скелетон */
+.skel {
+  position: relative;
+  overflow: hidden;
+  height: 76px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: linear-gradient(
+    100deg,
+    var(--pill) 25%,
+    var(--soft) 45%,
+    var(--pill) 65%
+  );
+  background-size: 220% 100%;
+  animation: sk-shimmer 1.5s ease-in-out infinite;
+}
+
+.skel::before,
+.skel::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  height: 9px;
+  border-radius: 10px;
+  background: var(--line);
+  opacity: .7;
+}
+
+.skel::before {
+  top: 22px;
+  width: 42%;
+}
+
+.skel::after {
+  top: 40px;
+  width: 65%;
+  opacity: .4;
+}
+
+.skel:nth-of-type(3) {
+  opacity: .75;
+}
+
+.skel:nth-of-type(4) {
+  opacity: .5;
+}
+
+@keyframes sk-shimmer {
+  to {
+    background-position-x: -220%;
+  }
+}
+
+/* Переливання навколо емодзі в головному меню */
+#mAv {
+  position: relative;
+  isolation: isolate;
+  border: 0;
+  background: transparent;
+}
+
+#mAv::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #ff6b9d,
+    #a78bfa,
+    #60a5fa,
+    #5eead4,
+    #fde68a,
+    #ff6b9d
+  );
+  z-index: -2;
+  animation: avatarSpin 4s linear infinite;
+  filter: drop-shadow(0 0 4px rgba(167, 139, 250, .4));
+}
+
+#mAv::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: var(--soft);
+  z-index: -1;
+}
+
+@keyframes avatarSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #mAv::before {
+    animation: none;
+  }
+}
+
+
+
+/* ===== COMPACT LIQUID GLASS DOCK ===== */
+
+#dock {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  transform: translateX(-50%);
+
+  width: min(280px, calc(100vw - 48px));
+  box-sizing: border-box;
+
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+
+  padding: 5px;
+
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 999px;
+
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9);
+
+  z-index: 6;
+}
+
+body.menu-on #dock {
+  display: flex;
+}
+
+/* Кнопки */
+.dk {
+  position: relative;
+
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 52px;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 999px;
+
+  background: transparent;
+  color: #383838;
+
+  cursor: pointer;
+
+  transition:
+    background .25s ease,
+    transform .2s ease;
+}
+
+/* Приховуємо SVG та текст */
+.dk svg,
+.dk span {
+  display: none !important;
+}
+
+/* Емодзі */
+.dk::before {
+  display: block;
+  font-size: 25px;
+  line-height: 1;
+}
+
+.dk[data-tab="games"]::before {
+  content: "🎮";
+}
+
+.dk[data-tab="stats"]::before {
+  content: "🏆";
+}
+
+.dk[data-tab="set"]::before {
+  content: "⚙️";
+}
+
+.dk[data-tab="studio"]::before {
+  content: "🚧";
+}
+
+/* Активний пункт */
+.dk.on {
+  background: rgba(0, 0, 0, 0.075);
+  color: #000;
+}
+
+/* Натискання */
+.dk:active {
+  transform: scale(0.90);
+}
+
+/* Прихована студія */
+.dk[hidden] {
+  display: none !important;
+}
+
+/* Темна тема */
+@media (prefers-color-scheme: dark) {
+  #dock {
+    background: rgba(35, 35, 38, 0.78);
+    border-color: rgba(255, 255, 255, 0.16);
+
+    box-shadow:
+      0 8px 25px rgba(0, 0, 0, 0.25),
+      inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  }
+
+  .dk {
+    color: #dedede;
+  }
+
+  .dk.on {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+  }
+}
+
+
+/* картка гри (шторка) */
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.38);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s,visibility 0s .3s;z-index:8}
+#sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:480px;transform:translate(-50%,100%);visibility:hidden;transition:transform .42s cubic-bezier(.2,.8,.2,1),visibility 0s .42s;background:var(--bg);border-radius:calc(var(--r1,22px) + 6px) calc(var(--r1,22px) + 6px) 0 0;padding:10px 22px calc(env(safe-area-inset-bottom,0px) + 22px);z-index:9;display:flex;flex-direction:column;gap:14px;max-height:90dvh;overflow-y:auto;box-shadow:0 -12px 44px rgba(0,0,0,.22)}
+.sh-open #scrim{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .3s}
+.sh-open #sheet{transform:translate(-50%,0);visibility:visible;transition:transform .42s cubic-bezier(.2,.8,.2,1)}
+.grab{width:42px;height:5px;border-radius:9px;background:var(--line);align-self:center}
+.shh{display:flex;align-items:center;gap:14px}
+.shh .gt{width:62px;height:62px;font-size:34px;border-radius:20px}
+.shh b{font:600 24px var(--serif)}
+#dDesc{font-size:15px;line-height:1.5;color:var(--muted)}
+.og{display:flex;gap:8px;justify-content:flex-start;flex-wrap:wrap;margin-top:6px}
+.ol{font-size:12px;color:var(--muted)}
+.chip{padding:8px 16px;border:1px solid var(--line);border-radius:999px;font-size:14px;color:var(--muted)}
+.chip.on{border-color:var(--fg);color:var(--fg);font-weight:600}
+#dSet{display:flex;flex-direction:column;gap:12px}
+
+/* налаштування */
+.card2{background:var(--pill);border:1px solid var(--line);border-radius:var(--r1,22px);overflow:hidden;box-shadow:0 4px 14px var(--sh)}
+.ro{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;font-size:15px}
+.ro+.ro,.prof+.ro{border-top:1px solid var(--line)}
+.ro.col{flex-direction:column;align-items:stretch}
+.ro .lnk{padding:4px 0}
+.prof{display:flex;align-items:center;gap:14px;padding:16px}
+.prof b{display:block;font-size:18px}
+.prof small{font-size:13px;color:var(--muted)}
+.ems{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:2px 12px 12px;justify-items:center}
+#nmEdit{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;font-size:15px;outline:none;background:var(--bg);user-select:text;-webkit-user-select:text}
+#nmEdit:focus{border-color:var(--fg)}
+.ems button{font-size:24px;padding:6px 8px;border-radius:12px}
+.ems button.on{background:var(--soft);box-shadow:inset 0 0 0 1.5px var(--fg)}
+.seg{display:flex;background:var(--soft);border-radius:999px;padding:3px}
+.seg button{flex:1;padding:9px 0;border-radius:999px;font-size:13px;color:var(--muted)}
+.seg button.on{background:var(--pill);color:var(--fg);font-weight:600;box-shadow:0 1px 5px var(--sh)}
+.sw{width:48px;height:29px;border-radius:999px;background:var(--line);position:relative;transition:background .2s;flex:none}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:23px;height:23px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.sw.on{background:var(--ok)}
+.sw.on::after{transform:translateX(19px)}
+.dng{color:var(--bad)}
+.adl{padding:12px 16px;border-top:1px solid var(--line)}
+.adl:first-child{border-top:0}
+.ai{width:100%;margin-top:6px;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font-size:15px;outline:none;background:var(--bg);user-select:text;-webkit-user-select:text;resize:vertical}
+.ai:focus{border-color:var(--fg)}
+.adb{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line)}
+.adb .blk{flex:1;min-width:120px}
+.adb .wht{flex:1;min-width:120px;padding:12px 16px;font-size:15px}
+.adm-note{font-size:12px;color:var(--muted);line-height:1.45;padding:12px 16px}
+.ver{text-align:center;font-size:12px;color:var(--muted);margin-top:10px}
+
+/* статистика */
+.hero-n{text-align:center;padding:6px 0 2px}
+.hero-n b{display:block;font:700 62px var(--serif);line-height:1}
+.hero-n span{font-size:14px;color:var(--muted)}
+.duel{display:flex;gap:10px}
+.dp{flex:1;text-align:center;padding:16px 8px;border:1.5px solid var(--line);border-radius:var(--r1,22px);background:var(--pill)}
+.dp.lead{border-color:var(--fg)}
+.dp em{display:block;font-style:normal;font-size:30px;margin-bottom:2px}
+.dp b{display:block;font:700 36px var(--serif);line-height:1.1}
+.dp span{font-size:13px;color:var(--muted)}
+.bar{height:9px;border-radius:99px;background:var(--soft);overflow:hidden;display:flex}
+.bar i{display:block;height:100%;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.sa{background:#e26a8a}.sv{background:#4a7de0}
+.gr{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.gr+.gr,.fr+.fr,.lr+.lr{border-top:1px solid var(--line)}
+.gr .ge{font-size:26px;width:36px;text-align:center}
+.gr .gx b{font-size:15px}
+.gw{font-size:13px;color:var(--muted);text-align:right;white-space:nowrap}
+.fr{display:flex;justify-content:space-between;gap:12px;padding:13px 16px;font-size:14px}
+.fr span:first-child{color:var(--muted)}
+.fr b{font-weight:600;text-align:right}
+.lr{display:flex;align-items:center;gap:12px;padding:12px 16px;font-size:14px}
+.lr .ge{font-size:22px}
+.lr .gx small{font-size:12px}
+.lr .gw b{color:var(--fg);font-weight:600}
+.empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:15px;line-height:1.5}
+.empty b{display:block;font-size:50px;margin-bottom:10px}
+
+/* вгадай слово */
+.hbar{display:flex;align-items:center;justify-content:space-between}
+#hgInfo{font-size:14px;color:var(--muted)}
+#hgPl{display:flex;gap:10px;margin-top:6px}
+.pc{flex:1;display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1.5px solid var(--line);border-radius:16px;font-size:14px;font-weight:600;transition:border-color .2s;background:var(--pill)}
+.pc.turn{border-color:var(--fg)}
+.pc b{font:700 22px var(--serif)}
+#hgQ{font-family:var(--serif);font-size:22px;font-weight:600;text-align:center;margin:18px 0 16px;text-wrap:balance}
+#hgBox{display:flex;gap:6px;justify-content:center;margin-bottom:12px}
+#hgBox i{flex:1 1 0;min-width:0;max-width:40px;aspect-ratio:1;border:2px solid var(--fg);border-radius:10px;display:grid;place-items:center;font:700 20px var(--serif);font-style:normal}
+#hgBox i.o{background:var(--soft)}
+#hgBox i.d{border-style:dashed;color:var(--muted)}
+#hgBox i.m{color:var(--bad);border-color:var(--line)}
+#hgSt{min-height:44px;text-align:center;font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+#hgKb{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.k{width:calc((100% - 40px)/9);height:42px;border:1px solid var(--line);border-radius:10px;font-weight:600;background:var(--pill)}
+.k.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+.k.bad{opacity:.25;text-decoration:line-through}
+.k:disabled{opacity:.4;cursor:default}
+.k.ok:disabled{opacity:1}
+.k.bad:disabled{opacity:.25}
+#hgAct{display:flex;gap:8px;justify-content:center;margin-top:12px;min-height:50px}
+#hgAct .wht,#hgAct .blk{padding:12px 18px;font-size:15px}
+.ov{position:absolute;inset:0;max-width:none!important;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;z-index:5!important}
+.ov.on{display:flex}
+.ov>*{width:100%;max-width:340px}
+.ov .big{font-size:56px;line-height:1}
+.row{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border:1.5px solid var(--line);border-radius:18px;font-weight:600;background:var(--pill)}
+.row.win{border-color:var(--fg)}
+.row b{font:700 26px var(--serif)}
+.wd{font:700 30px var(--serif);letter-spacing:3px}
+/* ── студія, боти, налаштування вигляду ── */
+.dk[hidden]{display:none}
+.gc.off{filter:grayscale(1);opacity:.42}
+.gc.off .gt{opacity:.7}
+#glist.grid{display:grid!important;grid-template-columns:1fr 1fr;gap:10px}
+#glist.grid .sec{grid-column:1/-1}
+#glist.grid .gc{flex-direction:column;text-align:center;padding:16px 10px;gap:10px}
+#glist.grid .ch{display:none}
+html[data-dn="compact"] .gc{padding:8px 12px}
+html[data-dn="compact"] .gt{width:44px;height:44px;font-size:24px;border-radius:14px}
+html[data-dn="airy"] .gc{padding:18px 16px}
+html[data-dn="airy"] #glist{gap:14px!important}
+html[data-tl="solid"] .gt{background:rgb(var(--c))}
+html[data-tl="outline"] .gt{background:transparent;box-shadow:inset 0 0 0 2px rgba(var(--c),.55)}
+html[data-btn="accent"] .blk,html[data-btn="accent"] .dk.on{background:var(--ac,var(--b1,#e0507a));color:#fff}
+html[data-uf="serif"] body{font-family:Georgia,"Times New Roman",serif}
+html[data-uf="round"] body{font-family:ui-rounded,"SF Pro Rounded","Trebuchet MS",sans-serif}
+html[data-uf="mono"] body{font-family:ui-monospace,"SF Mono","Courier New",monospace}
+html[data-mbg="aura"] #s-menu{background:radial-gradient(520px 420px at 0% 0%,color-mix(in srgb,var(--b1,#e0507a) 20%,transparent),transparent 70%),radial-gradient(520px 420px at 100% 100%,color-mix(in srgb,var(--b2,#4a7de0) 18%,transparent),transparent 70%)}
+html[data-mbg="dots"] #s-menu{background:radial-gradient(var(--line) 1.2px,transparent 1.3px) 0 0/20px 20px}
+html[data-anim="off"] *{animation:none!important;transition:none!important}
+.sbar{position:sticky;top:0;z-index:6;display:flex;gap:8px;padding:8px 0;background:var(--bg)}
+.sbar .blk,.sbar .wht{flex:1;padding:12px 10px;font-size:14px}
+.snote{font-size:12px;color:var(--muted);min-height:16px;padding:0 4px}
+.acc{overflow:hidden}
+.acc-h{width:100%;display:flex;align-items:center;justify-content:space-between;padding:15px 16px;font-size:15px;font-weight:700;text-align:left}
+.acc-h i{font-style:normal;color:var(--muted);font-size:20px;transition:transform .25s}
+.acc.open .acc-h i{transform:rotate(90deg)}
+.acc-b{display:none;border-top:1px solid var(--line)}
+.acc.open .acc-b{display:block}
+.swt{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.swt button{width:34px;height:34px;border-radius:50%;background:var(--sw);box-shadow:0 0 0 2px var(--bg),0 0 0 3px var(--line)}
+.swt button.on{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--fg)}
+.swt button.none{background:linear-gradient(135deg,var(--soft) 45%,var(--line) 50%,var(--soft) 55%)}
+.ro span small{display:block;font-size:12px;color:var(--muted);margin-top:2px;font-weight:400}
+.gmr{display:flex;align-items:center;gap:10px;padding:10px 16px}
+.gmr+.gmr{border-top:1px solid var(--line)}
+.gmr .ge{font-size:22px;width:30px;text-align:center}
+.gmr b{flex:1;font-size:14px}
+.gmr .mv{display:flex;gap:2px}
+.gmr .mv button{width:30px;height:30px;border-radius:9px;background:var(--soft);font-size:14px}
+.gmr.hid b{opacity:.4}
+/* ── оформлення до свят ── */
+:root[data-skin="halloween"]{--bg:#150f1f;--fg:#f3ead9;--muted:#9a8aa8;--line:#33284a;--pill:#1e1630;--soft:#261c3b;--inv-bg:#ff8a1f;--inv-fg:#1a1024;--ok:#47c98b;--bad:#ff5d73;--sh:rgba(0,0,0,.5);--okbg:#173a31;--b1:#ff8a1f;--b2:#a259ff}
+:root[data-skin="winter"]{--bg:#eef5ff;--fg:#1c2b45;--muted:#6f84a6;--line:#d3e1f5;--pill:#fff;--soft:#e3eefc;--inv-bg:#2563c9;--inv-fg:#fff;--sh:rgba(40,80,140,.12);--okbg:#dcf3ea;--b1:#2563c9;--b2:#38b6ff}
+[data-skin="halloween"] .hello::after{content:" 🎃"}
+[data-skin="winter"] .hello::after{content:" ❄️"}
+
+/* ── Свіжий вигляд головного екрана ── */
+#s-welcome .foot{max-width:310px;margin-top:10px;font-size:12px;line-height:1.5;text-align:center;text-wrap:balance;color:var(--muted)}
+#s-welcome .hero{z-index:1;margin-top:0;margin-bottom:2px;flex:none}
+#s-welcome #toAuth{flex:none;width:min(100%,300px)}
+#s-welcome #wFoot{flex:none;margin-top:0;max-width:320px}
+#s-welcome .hero{background:linear-gradient(145deg,color-mix(in srgb,var(--bg) 82%,transparent),color-mix(in srgb,var(--bg) 62%,transparent));border-color:color-mix(in srgb,var(--fg) 13%,transparent);box-shadow:0 18px 55px rgba(30,30,20,.10),inset 0 1px 0 rgba(255,255,255,.55)}
+#s-welcome #toAuth,#s-welcome #wFoot{position:relative;z-index:1}
+@media(max-width:380px){
+  #s-welcome .hero{padding:22px 16px 18px;gap:9px;margin-bottom:2px}
+  #s-welcome .brand{font-size:clamp(34px,11vw,42px)}
+  #s-welcome .logo{font-size:50px}
+  #s-welcome #tag{font-size:13px}
+}
+:root[data-theme="dark"] #s-welcome .hero{background:rgba(25,25,28,.50);border-color:rgba(255,255,255,.12)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) #s-welcome .hero{background:rgba(25,25,28,.50);border-color:rgba(255,255,255,.12)}}
+
+</style>
+</head>
+<body>
+
+<div class="s on" id="s-welcome">
+<div class="aura" id="aura"><i></i><i></i><i></i></div>
+<div id="float"></div>
+<div class="hero">
+<div class="logo" id="wLogo">🎨</div>
+<div class="brand" id="wBrand">draw &amp; more</div>
+<svg class="scribble" viewBox="0 0 200 16"><path d="M4 9 C 38 1, 62 15, 100 8 S 170 3, 196 9"/></svg>
+<div id="tag"></div>
+</div>
+<button class="blk cta" id="toAuth">авторизуватись</button>
+<div class="foot" id="wFoot"></div>
+</div>
+<button id="pvClose">✕ закрити перегляд</button>
+
+<div class="s" id="s-splash">
+  <div class="logo">🎨</div>
+  <div class="skel"></div>
+  <div class="skel"></div>
+  <div class="skel"></div>
+</div>
+
+<div class="s" id="s-code">
+<button class="back" id="cback">‹</button>
+<h2 id="ctitle"></h2>
+<div id="cells"><i></i><i></i><i></i><i></i></div>
+<div class="err" id="cerr"></div>
+<div id="pad"></div>
+<button class="blk" id="cgo" disabled>увійти</button>
+<div class="hint" id="chint"></div>
+</div>
+
+<div class="s" id="s-name">
+<h2>як тебе звати?</h2>
+<input id="nm" maxlength="12" placeholder="імʼя" autocomplete="off">
+<button class="blk" id="nmGo">далі</button>
+</div>
+
+<div class="s" id="s-home">
+<div class="me" id="hMe"></div>
+<div class="mid">
+<button class="blk" id="hCreate">створити гру</button>
+<button class="wht" id="hJoin">приєднатись</button>
+</div>
+<button class="lnk" id="hOut">вийти з акаунта</button>
+</div>
+
+<div class="s" id="s-menu">
+<section class="pane on" id="p-games">
+<div class="ph"><div><div class="hello" id="mHello"></div><div class="st" id="mSt"></div></div><div class="av" id="mAv"></div></div>
+<div id="glist" style="display:flex;flex-direction:column;gap:10px"></div>
+</section>
+<section class="pane" id="p-stats"></section>
+<section class="pane" id="p-set"></section>
+<section class="pane" id="p-studio"></section>
+
+</div>
+
+<nav id="dock">
+<button class="dk on" data-tab="games"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span>ігри</span></button>
+<button class="dk" data-tab="stats"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></svg><span>статистика</span></button>
+<button class="dk" data-tab="set"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span>меню</span></button>
+<button class="dk" data-tab="studio" hidden><svg viewBox="0 0 24 24"><path d="M4 20l9-9"/><path d="M14 4l1.2 2.6L18 8l-2.8 1.4L14 12l-1.2-2.6L10 8l2.8-1.4z"/><path d="M19 14l.7 1.5L21 16l-1.3.7L19 18l-.7-1.3L17 16l1.3-.5z"/></svg><span>студія</span></button>
+</nav>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="noteNotice" role="status" aria-live="polite">
+  <div class="nn-head">
+    <span class="nn-emoji"></span>
+    <span class="nn-name"></span>
+  </div>
+  <div class="nn-text"></div>
+</div>
+<div id="confirmLayer" role="presentation">
+  <div id="confirmBox" role="dialog" aria-modal="true" aria-labelledby="confirmText">
+    <p id="confirmText"></p>
+    <div class="actions">
+      <button class="wht" id="confirmNo">скасувати</button>
+      <button class="blk" id="confirmYes">підтвердити</button>
+    </div>
+  </div>
+</div>
+<div id="scrim"></div>
+<div id="sheet">
+<div class="grab"></div>
+<div class="shh"><div class="gt" id="shT"></div><b id="shN"></b></div>
+<div id="dDesc"></div>
+<div id="dSet"></div>
+<button class="blk" id="startBtn">почати гру</button>
+<button class="wht" id="botBtn" style="display:none">🤖 зіграти з ботом</button>
+<button class="lnk" id="shClose">закрити</button>
+</div>
+
+<div class="s" id="s-hang">
+<div class="hbar"><button class="lnk" id="hgBack" style="padding-left:0">‹ меню</button><div id="hgInfo"></div></div>
+<div id="hgPl"></div>
+<div id="hgQ"></div>
+<div id="hgBox"></div>
+<div id="hgSt"></div>
+<div id="hgKb"></div>
+<div id="hgAct"></div>
+<div class="ov" id="hgOv"></div>
+</div>
+
+<script>
+const FB = "https://draw-8cb08-default-rtdb.europe-west1.firebasedatabase.app", ROOM = "k7Qm2xVp9Lr4Tz8n";
+const $ = id => document.getElementById(id);
+let toastTimer = 0, confirmResolve = null, noteTimer = 0;
+
+function showNoteNotice(note) {
+  const el = $("noteNotice");
+  if (!el) return;
+
+  el.querySelector(".nn-emoji").textContent = note.emoji || "💌";
+  el.querySelector(".nn-name").textContent = note.name || "Вадим";
+  el.querySelector(".nn-text").textContent = note.text || "";
+
+  clearTimeout(noteTimer);
+  el.classList.add("on");
+
+  noteTimer = setTimeout(() => {
+    el.classList.remove("on");
+  }, 3000);
+}
+
+function toast(message, type = "ok") {
+  const el = $("toast");
+  if (!el) return;
+  clearTimeout(toastTimer);
+  el.textContent = message;
+  el.classList.toggle("bad", type === "bad");
+  el.classList.add("on");
+  toastTimer = setTimeout(() => el.classList.remove("on"), 2600);
+}
+
+function askConfirm(message, yes = "підтвердити") {
+  return new Promise(resolve => {
+    confirmResolve = resolve;
+    $("confirmText").textContent = message;
+    $("confirmYes").textContent = yes;
+    $("confirmLayer").classList.add("on");
+    $("confirmYes").focus();
+  });
+}
+
+function closeConfirm(value) {
+  if (!confirmResolve) return;
+  const done = confirmResolve;
+  confirmResolve = null;
+  $("confirmLayer").classList.remove("on");
+  done(value);
+}
+
+$("confirmNo").onclick = () => closeConfirm(false);
+$("confirmYes").onclick = () => closeConfirm(true);
+$("confirmLayer").addEventListener("click", e => {
+  if (e.target === $("confirmLayer")) closeConfirm(false);
+});
+addEventListener("keydown", e => {
+  if (e.key === "Escape" && confirmResolve) closeConfirm(false);
+});
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
+const otherOf = s => s === "v" ? "a" : "v";
+const rnd = () => Math.random().toString(36).slice(2, 8);
+const vib = p => { if (ls.get("dm_vib") === "0") return; navigator.vibrate && navigator.vibrate(p); };
+function go(id) {
+  document.querySelectorAll(".s").forEach(s => s.classList.toggle("on", s.id === id));
+  document.body.classList.toggle("menu-on", id === "s-menu");
+  if (id !== "s-menu") document.body.classList.remove("sh-open");
+  if (id === "s-welcome" && typeof startWelcome === "function") startWelcome();
+}
+const cur = () => document.querySelector(".s.on").id;
+
+/* ───── тема ───── */
+function applyTheme() {
+  const t = ls.get("dm_theme") || "auto", r = document.documentElement;
+  if (t === "auto") r.removeAttribute("data-theme"); else r.setAttribute("data-theme", t);
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.content = getComputedStyle(r).getPropertyValue("--bg").trim() || "#fff";
+}
+applyTheme();
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme); } catch (e) {}
+
+/* ───── акаунти ───── */
+const CODES = { "2512": { pref: "a", name: "аліна", emoji: "🦊" }, "1974": { pref: "v", name: "вадим", emoji: "👻" } };
+const GUEST_EMOJI = ["🐼", "🦉", "🐙", "🍀", "🌵", "🐸", "🦄", "🐻", "🦁", "🐧"];
+const EMOJIS = ["🦊", "👻", "🐼", "🦉", "🐙", "🍀", "🌵", "🐸", "🦄", "🐻", "🦁", "🐧", "🐯", "🐰", "🦋", "🐳", "🌸", "🍓"];
+let editName = false;
+const DUO = "duo";
+let user = null;
+try { user = JSON.parse(ls.get("dm_user")); } catch (e) {}
+const meHtml = u => `<b>${u.emoji}</b><span>${esc(u.name)}</span>`;
+
+/* ───── налаштування головного екрана (зберігаються для всіх) ───── */
+const DEF_SITE = {
+  brand: "draw & more", logo: "🎨", cta: "почати грати", foot: "увійди за кодом або створи гостьовий профіль · гра почнеться за мить",
+  tagline: ["Малюй. Вгадуй. Перемагай.", "Ігри для двох — наживо.", "Перевір, хто креативніший 🎨", "Трохи суперництва, багато сміху.", "Твій наступний рекорд починається тут."],
+  emojis: ["🎨", "✏️", "🖍️", "🔤", "❓", "🧩", "🖌️", "💡", "🎲", "✨", "🖼️", "🕵️", "🔄", "📝", "🐊", "🚢"],
+  count: 16, size: "m", motion: "float", touch: "repel", tapfx: "pop", bg: "candy", font: "serif", brandFx: "gradient", skin: "none", acc: "none", btn: "dark", radius: "normal", uiFont: "system", density: "normal", layout: "list", tiles: "tint", menuBg: "plain", anim: "on", greet: "", hidden: [], order: [], botOn: true, botLvl: 2, showStats: true, showPresence: true
+};
+const PRESETS = {
+  def: DEF_SITE,
+  halloween: { skin: "halloween", bg: "night", logo: "🎃", brand: "draw & more", cta: "увійти, якщо насмілишся", foot: "ігри для двох · лише для сміливців",
+    tagline: ["цукерка чи капость? 🎃", "бу! злякався? 👻", "малюй, вгадуй, не бійся 🕷️", "у цю ніч грається краще 🦇"],
+    emojis: ["🎃", "👻", "🦇", "🕷️", "🕸️", "💀", "🍬", "🧙", "🌙", "🪦", "🔮", "🍭"], count: 18, size: "m", motion: "float", touch: "attract", tapfx: "burst", font: "round", brandFx: "gradient" },
+  winter: { skin: "winter", bg: "ocean", logo: "🎄", brand: "draw & more", cta: "увійти", foot: "ігри для двох · тепло та затишно",
+    tagline: ["малюй, поки падає сніг ❄️", "гарячий чай і гра для двох ☕", "новорічний настрій 🎁"],
+    emojis: ["❄️", "⛄", "🎄", "⭐", "🎁", "🧦", "🦌", "☃️", "✨", "🔔"], count: 24, size: "m", motion: "rain", touch: "repel", tapfx: "burst", font: "serif", brandFx: "gradient" }
+};
+const BGS = { candy: ["#ffbcd0", "#b8d2ff", "#ffe4a0"], night: ["#7a3cff", "#ff7a1a", "#3a1f7a"], mint: ["#b9f0d8", "#bde6ff", "#fff2b8"], ocean: ["#7cc7ff", "#9fb8ff", "#c6f0ff"], sunset: ["#ff9a76", "#ffd36b", "#ff6fa0"] };
+let site = { ...DEF_SITE };
+try { site = { ...DEF_SITE, ...JSON.parse(ls.get("dm_site")) }; } catch (e) {}
+// Якщо раніше було ввімкнено Halloween-пресет, повертаємо нейтральний вигляд.
+function removeSeasonalWelcome(cfg) {
+  if (cfg && cfg.skin === "halloween") return {
+    ...cfg,
+    skin: "none", bg: DEF_SITE.bg, logo: DEF_SITE.logo, brand: DEF_SITE.brand,
+    cta: DEF_SITE.cta, foot: DEF_SITE.foot, tagline: [...DEF_SITE.tagline],
+    emojis: [...DEF_SITE.emojis], font: DEF_SITE.font, brandFx: DEF_SITE.brandFx
+  };
+  return cfg;
+}
+site = removeSeasonalWelcome(site);
+
+function effSkin() { const p = ls.get("dm_skin") || "auto"; return p === "auto" ? (site.skin || "none") : p; }
+function applySkin() {
+  const k = effSkin(), r = document.documentElement;
+  if (k === "none") r.removeAttribute("data-skin"); else r.setAttribute("data-skin", k);
+  ls.set("dm_skin_eff", k); applyDesign(); applyTheme();
+}
+
+/* ───── живий привітальний екран: рух, дотик, тап ───── */
+const WE = { items: [], running: false, last: 0, w: 0, h: 0, f: { x: 0, y: 0, on: false }, cfg: site, dirty: true, tagTimer: 0 };
+const rr = (a, b) => a + Math.random() * (b - a);
+function welcomeApply(cfg) {
+  WE.cfg = cfg; WE.dirty = true;
+  $("wLogo").textContent = cfg.logo || "🎨"; $("wBrand").textContent = cfg.brand || "draw & more";
+  $("wBrand").className = "brand f-" + cfg.font + (cfg.brandFx === "plain" ? " plain" : "");
+  $("toAuth").textContent = cfg.cta || "авторизуватись"; $("wFoot").textContent = cfg.foot || "";
+  const c = BGS[cfg.bg] || BGS.candy, au = $("aura"); au.style.setProperty("--a1", c[0]); au.style.setProperty("--a2", c[1]); au.style.setProperty("--a3", c[2]);
+  const tags = (cfg.tagline && cfg.tagline.length ? cfg.tagline : [""]); let k = 0; $("tag").textContent = tags[0]; $("tag").style.opacity = 1;
+  clearInterval(WE.tagTimer);
+  if (tags.length > 1) WE.tagTimer = setInterval(() => {
+    if (cur() !== "s-welcome") return;
+    $("tag").style.opacity = 0;
+    setTimeout(() => { k = (k + 1) % tags.length; $("tag").textContent = tags[k]; $("tag").style.opacity = 1; }, 400);
+  }, 3200);
+  if (cur() === "s-welcome") buildItems();
+}
+function buildItems() {
+  const box = $("float"), r = box.getBoundingClientRect(), cfg = WE.cfg;
+  WE.w = r.width || innerWidth; WE.h = r.height || innerHeight; WE.dirty = false;
+  box.innerHTML = ""; WE.items = [];
+  const em = (cfg.emojis || []).filter(Boolean); if (!em.length) em.push("🎨");
+  const base = { s: 24, m: 34, l: 50 }[cfg.size] || 34, n = Math.max(1, Math.min(40, +cfg.count || 16));
+  for (let i = 0; i < n; i++) {
+    const size = base * (.75 + ((i * 53) % 50) / 100), el = document.createElement("span");
+    el.textContent = em[i % em.length]; el.style.fontSize = size + "px"; box.appendChild(el);
+    const it = { el, size, ph: i * 1.7, hx: ((i * .61803) % 1) * WE.w, hy: ((i * .38197 + .13) % 1) * WE.h, x: rr(0, WE.w), y: rr(0, WE.h),
+      vx: rr(-45, 45), vy: rr(-45, 45), fall: rr(35, 95), rad: rr(.12, .48), dir: i % 2 ? 1 : -1, ox: 0, oy: 0, popT: -9, gone: false };
+    WE.items.push(it);
+  }
+}
+function frame(ts) {
+  if (cur() !== "s-welcome") { WE.running = false; return; }
+  if (WE.dirty) buildItems();
+  const dt = Math.min(.05, (ts - WE.last) / 1000 || .016); WE.last = ts; const t = ts / 1000, { w, h, cfg, f, items } = WE, m = cfg.motion;
+  if (m === "bounce") {
+    items.forEach(it => { it.x += it.vx * dt; it.y += it.vy * dt; const r = it.size / 2;
+      if (it.x < r) { it.x = r; it.vx = Math.abs(it.vx); } if (it.x > w - r) { it.x = w - r; it.vx = -Math.abs(it.vx); }
+      if (it.y < r) { it.y = r; it.vy = Math.abs(it.vy); } if (it.y > h - r) { it.y = h - r; it.vy = -Math.abs(it.vy); } });
+    for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {   // зіткнення між собою
+      const a = items[i], b = items[j], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy), min = (a.size + b.size) * .4;
+      if (d > 0 && d < min) { const nx = dx / d, ny = dy / d, p = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
+        if (p > 0) { a.vx -= p * nx; a.vy -= p * ny; b.vx += p * nx; b.vy += p * ny; }
+        const o = (min - d) / 2; a.x -= nx * o; a.y -= ny * o; b.x += nx * o; b.y += ny * o; } }
+  }
+  const R = Math.min(w, h) * .28;
+  items.forEach(it => {
+    let bx, by, rot = 0;
+    if (m === "rain") { it.y += it.fall * dt; if (it.y > h + it.size) { it.y = -it.size; it.hx = rr(0, w); } bx = it.hx + Math.sin(t * .8 + it.ph) * 18; by = it.y; rot = Math.sin(t + it.ph) * 14; }
+    else if (m === "bounce") { bx = it.x; by = it.y; rot = (it.vx + it.vy) * .2; }
+    else if (m === "swirl") { const a = it.ph + t * .35 * it.dir; bx = w / 2 + Math.cos(a) * it.rad * w * 1.1; by = h / 2 + Math.sin(a) * it.rad * h * .9; rot = Math.sin(a) * 20; }
+    else { bx = it.hx + Math.sin(t * .6 + it.ph) * 14; by = it.hy + Math.cos(t * .5 + it.ph * 1.3) * 20; rot = Math.sin(t * .7 + it.ph) * 8; }
+    if (f.on && cfg.touch !== "none" && !it.gone) {
+      const dx = bx + it.ox - f.x, dy = by + it.oy - f.y, d = Math.hypot(dx, dy);
+      if (cfg.touch === "repel" && d < R && d > .1) { const p = (1 - d / R) * 900 * dt; it.ox += dx / d * p; it.oy += dy / d * p; }
+      else if (cfg.touch === "attract" && d < R * 1.8) { const k = 4 * dt * (1 - d / (R * 1.8)); it.ox += (f.x - bx - it.ox) * k; it.oy += (f.y - by - it.oy) * k; }
+    }
+    const dec = 1 / (1 + dt * (f.on ? 1.2 : 2.2)); it.ox *= dec; it.oy *= dec;
+    const pa = (t - it.popT) < .5 ? 1 + Math.sin((t - it.popT) / .5 * Math.PI) * .9 : 1;
+    it.el.style.transform = `translate3d(${bx + it.ox - it.size / 2}px,${by + it.oy - it.size / 2}px,0) rotate(${rot}deg) scale(${it.gone ? .2 : pa})`;
+  });
+  requestAnimationFrame(frame);
+}
+function startWelcome() { if (WE.running) return; WE.running = true; WE.last = performance.now(); if (WE.dirty || !WE.items.length) buildItems(); requestAnimationFrame(frame); }
+addEventListener("resize", () => { WE.dirty = true; });
+
+function burst(x, y, emoji, n) {
+  const box = $("float");
+  for (let i = 0; i < n; i++) {
+    const e = document.createElement("span"); e.className = "fx"; e.textContent = emoji || WE.items[i % Math.max(1, WE.items.length)]?.el.textContent || "✨";
+    e.style.fontSize = rr(16, 28) + "px"; box.appendChild(e);
+    const a = rr(0, 6.28), d = rr(50, 130);
+    e.animate([{ transform: `translate3d(${x}px,${y}px,0) scale(1)`, opacity: 1 }, { transform: `translate3d(${x + Math.cos(a) * d}px,${y + Math.sin(a) * d + 30}px,0) scale(.3) rotate(${rr(-90, 90)}deg)`, opacity: 0 }], { duration: rr(550, 900), easing: "cubic-bezier(.2,.7,.3,1)" }).onfinish = () => e.remove();
+  }
+}
+(() => {
+  const sc = $("s-welcome");
+  const pos = e => { const r = $("float").getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  sc.addEventListener("pointerdown", e => {
+    const [x, y] = pos(e); WE.f.x = x; WE.f.y = y; WE.f.on = true;
+    const fx = WE.cfg.tapfx, now = performance.now() / 1000;
+    let hit = null, best = 1e9;
+    WE.items.forEach(it => { const r = it.el.getBoundingClientRect(), b = $("float").getBoundingClientRect(), cx = r.left - b.left + r.width / 2, cy = r.top - b.top + r.height / 2, d = Math.hypot(cx - x, cy - y); if (d < it.size * .75 && d < best && !it.gone) { best = d; hit = [it, cx, cy]; } });
+    if (fx === "pop" && hit) { hit[0].popT = now; vib(8); }
+    else if (fx === "gone" && hit) { const it = hit[0]; burst(hit[1], hit[2], it.el.textContent, 8); it.gone = true; vib(10); setTimeout(() => { it.gone = false; it.x = rr(0, WE.w); it.y = rr(0, WE.h); it.hx = it.x; it.hy = it.y; it.popT = performance.now() / 1000; }, 1400); }
+    else if (fx === "burst") { burst(x, y, "", 9); vib(8); }
+  });
+  sc.addEventListener("pointermove", e => { if (e.pointerType === "mouse" || WE.f.on) { const [x, y] = pos(e); WE.f.x = x; WE.f.y = y; WE.f.on = true; } });
+  ["pointerup", "pointercancel"].forEach(ev => sc.addEventListener(ev, () => { WE.f.on = false; }));
+  sc.addEventListener("pointerleave", () => { WE.f.on = false; });
+})();
+welcomeApply(site);
+// свіжі налаштування з бази — видно всім ще до входу
+fetch(`${FB}/rooms/${ROOM}/site.json`).then(r => r.json()).then(d => {
+  if (!d) return; const n = removeSeasonalWelcome({ ...DEF_SITE, ...d });
+  if (JSON.stringify(n) !== JSON.stringify(site)) { site = n; ls.set("dm_site", JSON.stringify(n)); welcomeApply(site); applySkin(); }
+}).catch(() => {});
+applySkin();
+
+/* ───── екран коду ───── */
+let codeVal = "", codeCb = null, backTo = "s-welcome";
+(() => { "123456789 0⌫".split("").forEach(k => { const b = document.createElement("button"); if (k === " ") { b.style.visibility = "hidden"; } else { b.textContent = k; b.dataset.k = k; } $("pad").appendChild(b); }); })();
+function paintCode() { [...$("cells").children].forEach((c, i) => { c.textContent = codeVal[i] || ""; c.classList.toggle("f", i === codeVal.length); }); $("cgo").disabled = codeVal.length < 4; }
+function openCode(title, btn, hint, back, cb) { codeVal = ""; codeCb = cb; backTo = back; $("ctitle").textContent = title; $("cgo").textContent = btn; $("chint").textContent = hint; $("cerr").textContent = ""; paintCode(); go("s-code"); }
+function keyIn(k) { if (k === "⌫") codeVal = codeVal.slice(0, -1); else if (codeVal.length < 4) codeVal += k; $("cerr").textContent = ""; paintCode(); }
+$("pad").onclick = e => { const b = e.target.closest("button[data-k]"); if (b) { vib(8); keyIn(b.dataset.k); } };
+addEventListener("keydown", e => { if (cur() !== "s-code") return; if (/^\d$/.test(e.key)) keyIn(e.key); else if (e.key === "Backspace") keyIn("⌫"); else if (e.key === "Enter" && codeVal.length === 4) $("cgo").click(); });
+$("cback").onclick = () => go(backTo);
+$("cgo").onclick = async () => {
+  $("cgo").disabled = true;
+  const err = await codeCb(codeVal);
+  if (err) { $("cerr").textContent = err; $("cells").classList.remove("shake"); void $("cells").offsetWidth; $("cells").classList.add("shake"); vib([20, 40, 20]); codeVal = ""; paintCode(); }
+};
+
+/* ───── вхід ───── */
+$("toAuth").onclick = () => document.body.classList.contains("preview") ? 0 : openCode("введи код", "увійти", "ваш код для входу — 0000", "s-welcome", code => {
+  if (CODES[code]) return login({ ...CODES[code], uid: "u_" + CODES[code].pref });
+  if (code === "0000") { $("nm").value = ""; go("s-name"); return; }
+  return "невірний код";
+});
+$("nmGo").onclick = () => {
+  const name = $("nm").value.trim(); if (!name) return;
+  login({ name, emoji: GUEST_EMOJI[Math.floor(Math.random() * GUEST_EMOJI.length)], pref: null, uid: "g_" + rnd() + rnd() });
+};
+async function login(u) {
+  user = u; ls.set("dm_user", JSON.stringify(u));
+  if (u.pref) return joinDuo();   // свої — одразу в спільну кімнату
+  showHome();
+}
+function showHome() { $("hMe").innerHTML = meHtml(user); go("s-home"); }
+function logout() { if (es) es.close(); rc = null; user = null; ls.del("dm_user"); ls.del("dm_room"); go("s-welcome"); }
+$("hOut").onclick = logout;
+
+/* ───── кімнати ───── */
+const rb = c => `${FB}/rooms/${ROOM}/dm/${c}`;
+let rc = null, mySlot = null, db = {}, es = null,
+    launchSeen = null, firstEv = true, noticeSeen = null;
+async function getRoom(c) { const r = await fetch(rb(c) + ".json"); return r.json(); }
+const me = () => ({ name: user.name, emoji: user.emoji, uid: user.uid });
+const pl = s => (cur() === "s-hang" && db.game && db.game.bot === s) ? { name: "бот", emoji: "🤖" } : ((db.players && db.players[s]) || { name: "…", emoji: "❔" });
+function slotFor(room) {
+  const p = room.players || {};
+  for (const s of ["v", "a"]) if (p[s] && p[s].uid === user.uid) return s;
+  const pref = user.pref || "v";
+  for (const s of [pref, otherOf(pref)]) if (!p[s]) return s;
+  return null;
+}
+async function joinDuo() {
+  try {
+    const room = await getRoom(DUO);
+    if (!room || !room.players) {
+      await fetch(rb(DUO) + ".json", { method: "PUT", body: JSON.stringify({ created: Date.now(), players: { [user.pref]: me() } }) });
+      enter(DUO, user.pref, true);
+    } else {
+      const p = room.players[user.pref];   // збережений профіль у кімнаті — головний
+      if (p && p.name) { user.name = p.name; user.emoji = p.emoji || user.emoji; ls.set("dm_user", JSON.stringify(user)); }
+      enter(DUO, user.pref);
+    }
+  } catch (e) { return "нема звʼязку"; }
+}
+$("hCreate").onclick = () => openCode("придумай код гри", "створити", "4 цифри · однаковий код = одна гра", "s-home", async code => {
+  try {
+    const room = await getRoom(code), t = Date.now();
+    if (room && room.presence && Object.entries(room.presence).some(([s, ts]) => room.players && room.players[s] && room.players[s].uid !== user.uid && t - ts < 45000)) return "цей код зараз зайнятий";
+    const slot = user.pref || "v";
+    await fetch(rb(code) + ".json", { method: "PUT", body: JSON.stringify({ created: t, players: { [slot]: me() } }) });
+    enter(code, slot, true);
+  } catch (e) { return "нема звʼязку"; }
+});
+$("hJoin").onclick = () => openCode("код гри", "приєднатись", "введи код, який придумав(ла) другий гравець", "s-home", async code => {
+  try {
+    const room = await getRoom(code);
+    if (!room || !room.players) return "гри з таким кодом нема";
+    const slot = slotFor(room);
+    if (!slot) return "кімната вже заповнена";
+    enter(code, slot);
+  } catch (e) { return "нема звʼязку"; }
+});
+function enter(code, slot, fresh) {
+  rc = code; mySlot = slot; db = {}; firstEv = true; ls.set("dm_room", code);
+  if (!fresh) fetch(`${rb(code)}/players/${slot}.json`, { method: "PUT", body: JSON.stringify(me()) }).catch(() => {});
+  connect(); beat(); closeSheet(true); applyDesign(); go("s-menu"); setTab("games");
+}
+function put(path, val) { apply("put", { path: "/" + path, data: val }); fetch(`${rb(rc)}/${path}.json`, { method: "PUT", body: JSON.stringify(val), keepalive: true }).catch(() => {}); }
+function beat() { if (rc) put("presence/" + mySlot, Date.now()); }
+setInterval(beat, 15000);
+function apply(type, msg) {
+  const parts = (msg.path || "/").split("/").filter(Boolean);
+  if (!parts.length) { db = type === "put" ? (msg.data || {}) : Object.assign(db, msg.data || {}); return; }
+  let o = db;
+  for (let i = 0; i < parts.length - 1; i++) o = o[parts[i]] = o[parts[i]] || {};
+  const k = parts[parts.length - 1];
+  if (type === "put") { if (msg.data === null) delete o[k]; else o[k] = msg.data; } else o[k] = Object.assign(o[k] || {}, msg.data);
+}
+function connect() {
+  if (es) es.close();
+  noticeSeen = null;
+firstEv = true;
+es = new EventSource(rb(rc) + ".json");
+  ["put", "patch"].forEach(type => es.addEventListener(type, e => {
+    try { apply(type, JSON.parse(e.data)); } catch (err) { return; }
+    if (firstEv) {
+  firstEv = false;
+  launchSeen = db.launch && db.launch.id;
+  noticeSeen = db.message && db.message.id;
+}
+onData();
+  }));
+}
+function onData() {
+  if (!rc) return;
+  const note = db.message;
+
+if (note && note.id && note.id !== noticeSeen) {
+  noticeSeen = note.id;
+
+  if (rc === DUO && mySlot === "a" && note.by === "v") {
+  showNoteNotice(note);
+}
+}
+  const L = db.launch;
+  if (L && L.id !== launchSeen) { launchSeen = L.id; if (L.by !== mySlot) run(L); }
+  const c = cur();
+  if (c === "s-menu") renderMenu(); else if (c === "s-hang") renderHang();
+}
+function leaveRoom() { rc = null; if (es) es.close(); ls.del("dm_room"); showHome(); }
+function toMenu() { go("s-menu"); renderMenu(); }
+setInterval(() => { if (rc && cur() === "s-menu") renderHeader(); }, 5000);
+
+/* ───── ігри ───── */
+const GAMES = [
+  { id: "same", e: "🖼️", n: "одна картинка", s: "малюєте одне слово й оцінюєте", c: "226,106,138", g: 0, d: "Обоє малюєте одне й те саме слово, а потім оцінюєте малюнки одне одного. Бали — за оцінку й за швидкість." },
+  { id: "guess", e: "🕵️", n: "вгадай малюнок", s: "ти малюєш — другий вгадує", c: "140,110,230", g: 0, d: "У кожного своє слово. Ти малюєш — другий вгадує, що це." },
+  { id: "relay", e: "🔄", n: "естафета", s: "малюнки міняються кожні 60 с", c: "40,170,150", g: 0, d: "60 секунд малюєш — і малюнки міняються місцями. 5 раундів, а в кінці побачите спільний шедевр." },
+  { id: "croc", e: "🐊", n: "крокодил", s: "малюй наживо, вгадуй вголос", c: "86,170,92", g: 0, d: "Один малює слово, другий бачить малюнок наживо й вгадує вголос. Малювальник тисне «вгадав» або «не вгадав» — і ви міняєтесь ролями." },
+  { id: "word", e: "🔤", n: "вгадай слово", s: "вікторина з квадратиками", c: "232,160,40", g: 1, d: "Питання зверху, відповідь — у квадратиках. Відкривайте літери по черзі, першим(ою) ходить {a}. Можна одразу вгадувати слово!" },
+  { id: "find", e: "🔢", n: "знайди число", s: "хто швидше знайде число", c: "235,105,70", g: 1, d: "На полі хаотично розкидані числа. Зверху зʼявляється число — хто першим його знайде й торкнеться, той отримує бал. Помилився — пауза 1,5 с. Грають до заданої кількості очок." },
+  { id: "xo", e: "❌", n: "хрестики-нулики", s: "серія до N перемог", c: "255,90,115", g: 1, d: "Класика на двох: поле 3×3, ходите по черзі, а хто ходить першим, чергується. Грайте серію до потрібної кількості перемог. Знизу видно статистику серії та за весь час." },
+  { id: "bomb", e: "💣", n: "розмінуй бомбу", s: "говоріть вголос — розмінуйте разом", c: "235,70,70", g: 1, d: "Один (сапер) бачить бомбу: дроти, кнопку, символи й кольори. Другий (штаб) має інструкцію, але нічого не бачить. Описуйте усе вголос і розмінуйте разом до того, як спливе час. Після кожної бомби ролі міняються, а гра триває до першого вибуху." },
+  { id: "erudit", e: "🔠", n: "ерудит", s: "складай слова на полі 15×15", c: "120,100,230", g: 1, d: "Класичний «Ерудит»: поле 15×15, по 7 фішок, бонусні клітинки на літеру й слово, порожні фішки та бонус за всі сім літер. Слова перевіряє ваша довіра: сумніваєшся — оскаржуй, а автор вирішує. Підказку з онлайн-словника видно біля кожного слова." },
+  { id: "ships", e: "🚢", n: "морський бій", s: "класичний флот 10×10", c: "60,130,220", g: 1, d: "Розставте кораблі на полі 10×10 і по черзі шукайте флот суперника. Влучання дає додатковий постріл, а промах передає хід супернику." }
+];
+const GMETA = Object.fromEntries(GAMES.map(g => [g.id, g]));
+const cfg = { n: +ls.get("h_n") || 5, lives: +ls.get("h_l") || 8, rounds: +ls.get("d_rounds") || 5, crocN: +ls.get("c_n") || 6, findN: +ls.get("f_n") || 10, xoN: +ls.get("x_n") || 3, bombLvl: +ls.get("b_l") || 2, dur: +ls.get("d_dur") || 60000, cat: ls.get("d_cat") || "всі слова", botLvl: +ls.get("b_lv") || 2 };
+const DCATS = ["🐾 тварини", "🍕 їжа", "🏠 речі", "🌋 природа", "🚀 транспорт", "🧙 професії й герої", "🎈 спорт і розваги", "🏰 будівлі та місця", "🎲 різне", "💕 про нас", "🎯 всі слова"].map(x => [x.slice(x.indexOf(" ") + 1), x]);
+let picked = null, glKey = "";
+const BOTG = { xo: 1, ships: 1, find: 1, word: 1 };
+function partnerOn() { const o = otherOf(mySlot), pr = db.presence && db.presence[o]; return !!(pr && Date.now() - pr < 45000); }
+function sortedAll(C) { const ord = C.order || []; return GAMES.map((g, i) => ({ g, i })).sort((a, b) => { const ia = ord.indexOf(a.g.id), ib = ord.indexOf(b.g.id); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.i - b.i; }); }
+function renderGameList(force, cfgIn) {
+  const C = cfgIn || site, ready = Object.keys(db).length > 0, off = ready && !partnerOn(), botOk = C.botOn !== false;
+  const key = JSON.stringify([off, botOk, C.hidden, C.order, C.layout]);
+  if (!force && key === glKey) return; glKey = key;
+  const box = $("glist"); box.className = C.layout === "grid" ? "grid" : ""; box.innerHTML = "";
+  const hid = C.hidden || [], list = sortedAll(C).filter(x => !hid.includes(x.g.id));
+  [["малювання", 0], ["слова й кмітливість", 1]].forEach(([title, grp]) => {
+    const items = list.filter(x => x.g.g === grp); if (!items.length) return;
+    const h = document.createElement("div"); h.className = "sec"; h.textContent = title; box.appendChild(h);
+    items.forEach(({ g, i }) => {
+      const canBot = botOk && BOTG[g.id], dis = off && !canBot;
+      const b = document.createElement("button"); b.className = "gc" + (dis ? " off" : ""); b.style.setProperty("--c", g.c);
+      const sub = dis ? "потрібен другий гравець" : (off && canBot ? "🤖 можна з ботом" : g.s);
+      b.innerHTML = `<span class="gt">${g.e}</span><span class="gx"><b>${g.n}</b><small>${sub}</small></span><span class="ch">›</span>`;
+      b.onclick = () => { if (dis) { toast("для цієї гри потрібен другий гравець: бот у ній ще не вміє", "bad"); return; } openSheet(i); };
+      box.appendChild(b);
+    });
+  });
+}
+
+function hello() { const h = new Date().getHours(); return h < 5 ? "доброї ночі" : h < 12 ? "доброго ранку" : h < 18 ? "добрий день" : "добрий вечір"; }
+function renderHeader() {
+  $("mHello").textContent = site.greet ? site.greet.replace("{name}", user.name).replace("{hello}", hello()) : `${hello()}, ${user.name}`;
+  $("mAv").textContent = user.emoji;
+  const o = otherOf(mySlot), p = db.players && db.players[o], pr = db.presence && db.presence[o];
+  const on = p && pr && Date.now() - pr < 45000;
+  $("mSt").textContent = (rc === DUO ? "" : `🔑 ${rc} · `) + (p ? (on ? `❤️ ${p.name} онлайн` : `💔 ${p.name} не в мережі`) : "чекаємо другого гравця…");
+  if (site.showPresence === false) $("mSt").textContent = "";
+  try { renderGameList(); } catch (e) {}
+}
+function renderMenu() { renderHeader(); if (tab === "stats") renderStats(); }
+
+/* ───── вкладки ───── */
+let tab = "games";
+function setTab(t) {
+  if (tab === "studio" && t !== "studio" && typeof sdraft !== "undefined" && sdraft) applyDesign(site);
+  tab = t; editName = false;
+  ["games", "stats", "set", "studio"].forEach(x => { $("p-" + x).classList.toggle("on", x === t); document.querySelector(`[data-tab="${x}"]`).classList.toggle("on", x === t); });
+  if (t === "stats") renderStats(); else if (t === "set") renderSettings(); else if (t === "studio") renderStudio();
+  renderHeader(); $("s-menu").scrollTop = 0;
+}
+$("dock").onclick = e => { const b = e.target.closest("[data-tab]"); if (b && b.dataset.tab !== tab) { vib(8); setTab(b.dataset.tab); } };
+
+/* ───── шторка гри ───── */
+function chips(label, key, vals, store) {
+  const d = document.createElement("div");
+  d.innerHTML = `<div class="ol">${label}</div><div class="og"></div>`;
+  vals.forEach(item => { const v = Array.isArray(item) ? item[0] : item, lb = Array.isArray(item) ? item[1] : item; const c = document.createElement("button"); c.className = "chip" + (cfg[key] === v ? " on" : ""); c.textContent = lb; c.onclick = () => { cfg[key] = v; ls.set(store, v); [...d.lastChild.children].forEach(x => x.classList.toggle("on", x === c)); }; d.lastChild.appendChild(c); });
+  return d;
+}
+function openSheet(i) {
+  picked = GAMES[i];
+  $("shT").textContent = picked.e; $("shT").style.setProperty("--c", picked.c); $("shN").textContent = picked.n; $("dDesc").textContent = picked.d.replace("{a}", `${pl("a").emoji} ${pl("a").name}`);
+  $("dSet").textContent = "";
+  if (picked.id === "word") $("dSet").append(chips("питань", "n", [3, 5, 10], "h_n"), chips("спроб на помилки", "lives", [6, 8, 10], "h_l"));
+  if (picked.id === "croc") $("dSet").append(chips("раундів", "crocN", [4, 6, 10], "c_n"));
+  if (picked.id === "find") $("dSet").append(chips("до скількох очок", "findN", [5, 10, 15], "f_n"));
+  if (picked.id === "xo") $("dSet").append(chips("до скількох перемог", "xoN", [2, 3, 5, 10], "x_n"));
+  if (picked.id === "bomb") $("dSet").append(chips("складність", "bombLvl", [[1, "легка · 2 модулі"], [2, "звичайна · 3"], [3, "складна · 4"]], "b_l"));
+  if (picked.id === "same" || picked.id === "guess") $("dSet").append(chips("раунди", "rounds", [3, 5, 10], "d_rounds"), chips("час на малюнок", "dur", [[30000, "30 с"], [60000, "60 с"], [90000, "90 с"]], "d_dur"), chips("слова", "cat", DCATS, "d_cat"));
+  const botCan = site.botOn !== false && BOTG[picked.id], off = Object.keys(db).length > 0 && !partnerOn();
+  if (botCan) $("dSet").append(chips("рівень бота", "botLvl", [[1, "легкий"], [2, "звичайний"], [3, "складний"]], "b_lv"));
+  $("botBtn").style.display = botCan && !off ? "" : "none";
+  $("startBtn").textContent = botCan && off ? "грати з ботом 🤖" : "почати гру";
+  document.body.classList.add("sh-open"); vib(10);
+}
+function closeSheet() { picked = null; document.body.classList.remove("sh-open"); }
+$("scrim").onclick = $("shClose").onclick = () => closeSheet();
+function startGame(bot) {
+  if (!picked) return;
+  const l = { id: rnd(), game: picked.id, by: mySlot, bot: bot ? otherOf(mySlot) : null, cfg: { n: cfg.n, lives: cfg.lives, rounds: cfg.rounds, dur: cfg.dur, cat: cfg.cat, crocN: cfg.crocN, findN: cfg.findN, xoN: cfg.xoN, bombLvl: cfg.bombLvl, botLvl: cfg.botLvl } };
+  if (l.game === "word") put("game", newHang({ ...l.cfg, bot: l.bot }));
+  launchSeen = l.id; if (!bot) put("launch", l); run(l);
+}
+$("startBtn").onclick = () => { if (!picked) return; const botCan = site.botOn !== false && BOTG[picked.id], off = Object.keys(db).length > 0 && !partnerOn(); startGame(!!(botCan && off)); };
+$("botBtn").onclick = () => startGame(true);
+function run(l) {
+  closeSheet();
+  if (l.game === "word") { gKey = ""; go("s-hang"); renderHang(); }
+  else if (l.game === "ships") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "battleship.html"; }
+  else if (l.game === "erudit") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "erudit.html"; }
+  else if (l.game === "xo") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "xo.html"; }
+  else if (l.game === "bomb") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "bomb.html"; }
+  else if (l.game === "find") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "find.html"; }
+  else if (l.game === "croc") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "crocodile.html"; }
+  else { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "draw.html"; }
+}
+
+/* ───── статистика ───── */
+const COOP = { relay: 1, bomb: 1 };
+const MON = ["січ", "лют", "бер", "кві", "тра", "чер", "лип", "сер", "вер", "жов", "лис", "гру"];
+function when(t) {
+  if (!t) return "";
+  const d = new Date(t), n = new Date(), hm = d.toTimeString().slice(0, 5), day = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((day(n) - day(d)) / 864e5);
+  return diff === 0 ? `сьогодні, ${hm}` : diff === 1 ? `вчора, ${hm}` : `${d.getDate()} ${MON[d.getMonth()]}, ${hm}`;
+}
+function pct(a, b) { return b ? Math.round(a / b * 100) + "%" : "—"; }
+function renderStats() {
+  const el = $("p-stats"), log = Object.values((db.stats && db.stats.log) || {}).filter(x => x && GMETA[x.g]).sort((a, b) => (b.t || 0) - (a.t || 0));
+  if (!log.length) { el.innerHTML = `<h1 class="pt">статистика</h1><div class="empty"><b>📊</b>тут зʼявиться історія ваших ігор.<br>зіграйте першу — і вона запишеться сама</div>`; return; }
+  const W = { v: 0, a: 0 }, per = {}; let ties = 0;
+  log.forEach(x => {
+    const p = per[x.g] = per[x.g] || { n: 0, v: 0, a: 0, t: 0 };
+    p.n++; if (x.w === "v" || x.w === "a") { W[x.w]++; p[x.w]++; } else if (!COOP[x.g]) { ties++; p.t++; }
+  });
+  const total = log.length, comp = W.v + W.a, lead = W.v === W.a ? "" : W.v > W.a ? "v" : "a";
+  const dp = s => `<div class="dp${lead === s ? " lead" : ""}"><em>${esc(pl(s).emoji)}</em><b>${W[s]}</b><span>${esc(pl(s).name)}</span></div>`;
+  // факти
+  const facts = [];
+  const fav = Object.entries(per).sort((a, b) => b[1].n - a[1].n)[0];
+  if (fav) facts.push(["улюблена гра", `${GMETA[fav[0]].e} ${GMETA[fav[0]].n} · ${fav[1].n}`]);
+  let st = 0, sh = { v: [0, 0], a: [0, 0] }, ships = false, gOk = 0, gN = 0, crocs = 0;
+  log.forEach(x => {
+    if (x.g === "ships" && x.sh) { ships = true; ["v", "a"].forEach(s => { if (x.sh[s]) { sh[s][0] += x.sh[s][0] || 0; sh[s][1] += x.sh[s][1] || 0; } }); }
+    if (x.g === "croc" && x.n) { crocs++; gOk += ((x.s && x.s.v) || 0) + ((x.s && x.s.a) || 0); gN += x.n; }
+  });
+  if (ships) facts.push(["точність у морському бою", `${esc(pl("a").emoji)} ${pct(sh.a[1], sh.a[0])} · ${esc(pl("v").emoji)} ${pct(sh.v[1], sh.v[0])}`]);
+  if (crocs) facts.push(["крокодил: вгадано", `${gOk} з ${gN} (${pct(gOk, gN)})`]);
+  const bl = log.filter(x => x.g === "bomb");
+  if (bl.length) facts.push(["бомб розміновано", `${bl.reduce((a, x) => a + (x.n || 0), 0)} · рекорд ${Math.max(...bl.map(x => x.n || 0))} поспіль`]);
+  const erl = log.filter(x => x.g === "erudit");
+  if (erl.length) { let top = null; erl.forEach(x => ["v", "a"].forEach(p => { const b = x.bw && x.bw[p]; if (b && (!top || b.s > top.s)) top = { w: b.w, s: b.s, p }; })); if (top) facts.push(["ерудит: найкраще слово", `${esc(pl(top.p).emoji)} ${esc(top.w)} · ${top.s}`]); }
+  const xl = log.filter(x => x.g === "xo");
+  if (xl.length) { let gv = 0, ga = 0, dr = 0; xl.forEach(x => { gv += (x.s && x.s.v) || 0; ga += (x.s && x.s.a) || 0; dr += x.n || 0; }); facts.push(["хрестики-нулики: партій", `${esc(pl("a").emoji)} ${ga} · ${esc(pl("v").emoji)} ${gv} · нічиїх ${dr}`]); }
+  const first = log[0] && (log[0].w === "v" || log[0].w === "a") ? log[0].w : "";
+  if (first) { for (const x of log) { if (x.w === first) st++; else break; } if (st > 1) facts.push(["поточна серія перемог", `${esc(pl(first).emoji)} ${st} підряд`]); }
+  const days = new Set(log.map(x => new Date(x.t || 0).toDateString())).size;
+  facts.push(["днів, коли грали", String(days)]);
+  if (ties) facts.push(["нічиїх", String(ties)]);
+  const rows = GAMES.filter(g => per[g.id]).sort((a, b) => per[b.id].n - per[a.id].n).map(g => {
+    const p = per[g.id], right = COOP[g.id] ? "разом 💛" : `${esc(pl("a").emoji)} ${p.a} · ${esc(pl("v").emoji)} ${p.v}`;
+    return `<div class="gr"><span class="ge">${g.e}</span><span class="gx"><b>${g.n}</b><small>${p.n} ${p.n === 1 ? "гра" : p.n < 5 ? "гри" : "ігор"}</small></span><span class="gw">${right}</span></div>`;
+  }).join("");
+  const last = log.slice(0, 6).map(x => {
+    const g = GMETA[x.g], res = COOP[x.g] ? "разом 💛" : (x.w === "v" || x.w === "a") ? `${esc(pl(x.w).emoji)} <b>${esc(pl(x.w).name)}</b>` : "нічия";
+    return `<div class="lr"><span class="ge">${g.e}</span><span class="gx"><b>${g.n}</b><small>${when(x.t)}</small></span><span class="gw">${res}</span></div>`;
+  }).join("");
+  el.innerHTML = `<h1 class="pt">статистика</h1>
+<div class="hero-n"><b>${total}</b><span>${total === 1 ? "гра зіграна" : "ігор зіграно разом"}</span></div>
+<div class="duel">${dp("a")}${dp("v")}</div>
+${comp ? `<div class="bar"><i class="sa" style="width:${W.a / comp * 100}%"></i><i class="sv" style="width:${W.v / comp * 100}%"></i></div>` : ""}
+<div class="sec">за іграми</div><div class="card2">${rows}</div>
+<div class="sec">цікаве</div><div class="card2">${facts.map(f => `<div class="fr"><span>${f[0]}</span><b>${f[1]}</b></div>`).join("")}</div>
+<div class="sec">останні ігри</div><div class="card2">${last}</div>`;
+}
+
+
+/* ───── студія: усе налаштування вигляду й функцій (лише адміністратор) ───── */
+function isAdmin() { return !!user && user.pref === "v"; }
+let sdraft = null, studioOpen = { home: true };
+const EMOJI_SETS = [["🎨 малювання", DEF_SITE.emojis], ["🎃 геловін", PRESETS.halloween.emojis], ["❄️ зима", PRESETS.winter.emojis],
+  ["🍕 їжа", ["🍕", "🍔", "🍩", "🍓", "🍉", "🍪", "🧁", "🍿", "🥑", "🍦"]], ["🚀 космос", ["🚀", "🪐", "🌙", "⭐", "👽", "🛸", "☄️", "🌍"]], ["🐾 тварини", ["🐶", "🐱", "🦊", "🐼", "🐸", "🦄", "🐙", "🦋", "🐧", "🐢"]]];
+const SWATCH = { rose: "#e0507a", violet: "#8e4ec6", blue: "#3e63dd", teal: "#12a594", green: "#2f9e44", amber: "#f5a524", orange: "#f76b15", red: "#e5484d" };
+const ACCP = { rose: ["#e0507a", "#4a7de0"], violet: ["#8e4ec6", "#4d8dff"], blue: ["#3e63dd", "#38b6ff"], teal: ["#12a594", "#3e63dd"], green: ["#2f9e44", "#12a594"], amber: ["#f5a524", "#f76b15"], orange: ["#f76b15", "#e5484d"], red: ["#e5484d", "#d6409f"] };
+function splitEmoji(str) {
+  try { if (window.Intl && Intl.Segmenter) return [...new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(str)].map(x => x.segment).filter(x => x.trim()); } catch (e) {}
+  return Array.from(str).filter(x => x.trim());
+}
+function applyDesign(cfg) { try { applyDesign0(cfg); } catch (e) {} }
+function applyDesign0(cfg) {
+  const C = cfg || site, r = document.documentElement;
+  if (C.acc && ACCP[C.acc]) { r.style.setProperty("--ac", ACCP[C.acc][0]); r.style.setProperty("--b1", ACCP[C.acc][0]); r.style.setProperty("--b2", ACCP[C.acc][1]); }
+  else ["--ac", "--b1", "--b2"].forEach(p => r.style.removeProperty(p));
+  const set = (a, v, def) => { if (!v || v === def) r.removeAttribute(a); else r.setAttribute(a, v); };
+  set("data-btn", C.btn, "dark"); set("data-uf", C.uiFont, "system"); set("data-dn", C.density, "normal"); set("data-tl", C.tiles, "tint"); set("data-mbg", C.menuBg, "plain"); set("data-anim", C.anim === "off" ? "off" : "", "");
+  r.style.setProperty("--r1", { sharp: "10px", normal: "22px", round: "32px" }[C.radius] || "22px");
+  const st = document.querySelector('[data-tab="stats"]'); if (st) st.hidden = C.showStats === false;
+  const sd = document.querySelector('[data-tab="studio"]'); if (sd) sd.hidden = !isAdmin();
+  try { renderGameList(true, C); } catch (e) {}
+}
+function renderStudio() {
+  const el = $("p-studio"); if (!isAdmin()) { el.innerHTML = ""; return; }
+  if (!sdraft) sdraft = JSON.parse(JSON.stringify(site));
+  const D = sdraft, on = k => D[k] !== false;
+  const grp = (k, label, opts) => `<div class="adl"><div class="ol">${label}</div><div class="og" data-k="${k}">${opts.map(([v, l]) => `<button class="chip${String(D[k]) === String(v) ? " on" : ""}" data-v="${v}">${l}</button>`).join("")}</div></div>`;
+  const txt = (k, label, ph) => `<div class="adl"><div class="ol">${label}</div><input class="ai" data-k="${k}" value="${esc(D[k] || "")}" placeholder="${ph}" maxlength="60" autocomplete="off"></div>`;
+  const tg = (k, label, hint, v) => `<div class="ro"><span>${label}${hint ? `<small>${hint}</small>` : ""}</span><button class="sw${v ? " on" : ""}" data-tg="${k}" aria-label="${label}"></button></div>`;
+  const acc = (id, title, body) => `<div class="card2 acc${studioOpen[id] ? " open" : ""}"><button class="acc-h" data-acc="${id}"><span>${title}</span><i>›</i></button><div class="acc-b">${body}</div></div>`;
+  const home = `<div class="adm-note">Це бачать усі на екрані входу.</div>
+<div class="adl"><div class="ol">готові набори</div><div class="og">${[["def", "звичайний"], ["halloween", "🎃 геловін"], ["winter", "❄️ зима"]].map(([v, l]) => `<button class="chip" data-pre="${v}">${l}</button>`).join("")}</div></div>
+${txt("brand", "назва", "draw & more")}${txt("logo", "емодзі над назвою", "🎨")}
+<div class="adl"><div class="ol">підписи під назвою (кожен з нового рядка, змінюються по колу)</div><textarea class="ai" data-k="tagline" rows="4">${esc((D.tagline || []).join("\n"))}</textarea></div>
+${txt("cta", "текст кнопки", "авторизуватись")}${txt("foot", "нижній рядок", "")}
+<div class="adl"><div class="ol">емодзі на фоні (через пробіл)</div><input class="ai" data-k="emojis" value="${esc((D.emojis || []).join(" "))}" autocomplete="off"><div class="og" style="margin-top:10px">${EMOJI_SETS.map(([l], i) => `<button class="chip" data-set="${i}">${l}</button>`).join("")}</div></div>
+${grp("count", "скільки емодзі", [[8, "8"], [16, "16"], [24, "24"], [32, "32"], [40, "40"]])}
+${grp("size", "розмір емодзі", [["s", "малі"], ["m", "середні"], ["l", "великі"]])}
+${grp("motion", "як рухаються", [["float", "левітація"], ["rain", "дощ"], ["bounce", "відскок"], ["swirl", "вихор"]])}
+${grp("touch", "коли тримаєш палець", [["repel", "тікають"], ["attract", "липнуть"], ["none", "ніяк"]])}
+${grp("tapfx", "тап по екрану", [["pop", "підскок"], ["gone", "лопаються"], ["burst", "феєрверк"], ["none", "нічого"]])}
+${grp("bg", "фон", [["candy", "цукерки"], ["night", "ніч"], ["mint", "мʼята"], ["ocean", "океан"], ["sunset", "захід"]])}
+${grp("font", "шрифт назви", [["serif", "з засічками"], ["sans", "без засічок"], ["round", "округлий"], ["mono", "моно"], ["hand", "рукописний"]])}
+${grp("brandFx", "колір назви", [["gradient", "перелив"], ["plain", "звичайний"]])}
+<div class="adb"><button class="wht" data-ad="preview">👀 переглянути головний екран</button></div>`;
+  const design = `<div class="adl"><div class="ol">акцентний колір</div><div class="swt"><button class="none${D.acc === "none" ? " on" : ""}" data-sw="none" aria-label="стандарт"></button>${Object.entries(SWATCH).map(([k, c]) => `<button class="${D.acc === k ? "on" : ""}" style="--sw:${c}" data-sw="${k}" aria-label="${k}"></button>`).join("")}</div></div>
+${grp("btn", "кнопки", [["dark", "темні"], ["accent", "кольорові"]])}
+${grp("radius", "заокруглення", [["sharp", "гострі"], ["normal", "звичайні"], ["round", "круглі"]])}
+${grp("uiFont", "шрифт сайту", [["system", "системний"], ["serif", "з засічками"], ["round", "округлий"], ["mono", "моно"]])}
+${grp("density", "щільність карток", [["compact", "компактно"], ["normal", "звичайно"], ["airy", "просторо"]])}
+${grp("layout", "список ігор", [["list", "списком"], ["grid", "сіткою"]])}
+${grp("tiles", "іконки ігор", [["tint", "напівпрозорі"], ["solid", "суцільні"], ["outline", "контур"]])}
+${grp("menuBg", "фон меню", [["plain", "чистий"], ["aura", "сяйво"], ["dots", "крапки"]])}
+${grp("skin", "свято на всьому сайті", [["none", "немає"], ["halloween", "🎃 геловін"], ["winter", "❄️ зима"]])}
+${tg("anim", "анімації", "вимкни, якщо телефон гальмує", D.anim !== "off")}
+${txt("greet", "привітання у меню", "добрий день, {name}")}
+<div class="adm-note">У привітанні можна писати {name} (імʼя) та {hello} (добрий день).</div>`;
+  const hid = D.hidden || [];
+  const games = sortedAll(D).map(({ g }) => `<div class="gmr${hid.includes(g.id) ? " hid" : ""}"><span class="ge">${g.e}</span><b>${g.n}</b><div class="mv"><button data-up="${g.id}" aria-label="вище">↑</button><button data-dn="${g.id}" aria-label="нижче">↓</button></div><button class="sw${hid.includes(g.id) ? "" : " on"}" data-gv="${g.id}" aria-label="показувати"></button></div>`).join("");
+  const func = `${tg("botOn", "боти", "коли другого гравця нема в мережі, можна грати з ботом", on("botOn"))}
+${grp("botLvl", "рівень бота за замовчуванням", [[1, "легкий"], [2, "звичайний"], [3, "складний"]])}
+<div class="adm-note">Бот є в іграх: хрестики-нулики, морський бій, знайди число, вгадай слово. У малюванні, крокодилі, бомбі та ерудиті потрібен живий гравець.</div>
+${tg("showStats", "вкладка «статистика»", "", on("showStats"))}
+${tg("showPresence", "статус «онлайн» у меню", "", on("showPresence"))}`;
+  const data = `<div class="adb"><button class="wht" data-ad="export">⬇️ експорт статистики (JSON)</button></div>
+<div class="adb" style="border-top:0;padding-top:0"><button class="wht" data-ad="resetq">🔄 скинути «використані питання»</button></div>
+<div class="adb" style="border-top:0;padding-top:0"><button class="wht" data-ad="cleargames">🧹 очистити застряглі ігри</button></div>
+<div class="adm-note">«Очистити застряглі ігри» видаляє стан незавершених партій (хрестики, морський бій, ерудит тощо), але не зачіпає статистику.</div>`;
+  el.innerHTML = `<h1 class="pt">студія</h1>
+<div class="sbar"><button class="wht" data-ad="reset">↩️ скинути</button><button class="blk" data-ad="save">💾 зберегти для всіх</button></div><div class="snote" id="sNote"></div>
+${acc("home", "🏠 Головний екран", home)}${acc("design", "🎨 Вигляд сайту", design)}${acc("games", "🎮 Ігри: порядок і показ", `<div class="adm-note">Вимкнені ігри зникають зі списку в обох.</div>${games}`)}${acc("func", "🤖 Боти й функції", func)}${acc("data", "🛠 Дані й обслуговування", data)}
+<div class="ver">зміни видно лише тобі, доки не натиснеш «зберегти для всіх»</div>`;
+}
+(() => {
+  const root = $("p-studio"), msg = t => { const m = $("sNote"); if (m) m.textContent = t; };
+  const live = () => { applyDesign(sdraft); msg("не збережено — натисни «зберегти для всіх»"); };
+  const fullOrder = () => sortedAll(sdraft).map(x => x.g.id);
+  root.addEventListener("click", async e => {
+    const b = e.target.closest("button"); if (!b || !sdraft) return;
+    const d = b.dataset;
+    if (d.acc) { studioOpen[d.acc] = !studioOpen[d.acc]; b.parentElement.classList.toggle("open"); return; }
+    if (d.pre) { const keep = {}; ["acc", "btn", "radius", "uiFont", "density", "layout", "tiles", "menuBg", "anim", "greet", "hidden", "order", "botOn", "botLvl", "showStats", "showPresence"].forEach(k => keep[k] = sdraft[k]); sdraft = { ...DEF_SITE, ...JSON.parse(JSON.stringify(PRESETS[d.pre])), ...keep }; if (PRESETS[d.pre].skin) sdraft.skin = PRESETS[d.pre].skin; renderStudio(); live(); return; }
+    if (d.set !== undefined) { sdraft.emojis = [...EMOJI_SETS[+d.set][1]]; root.querySelector('input[data-k="emojis"]').value = sdraft.emojis.join(" "); return; }
+    if (d.sw) { sdraft.acc = d.sw; renderStudio(); live(); return; }
+    if (d.tg) { const k = d.tg; if (k === "anim") sdraft.anim = sdraft.anim === "off" ? "on" : "off"; else sdraft[k] = sdraft[k] === false; b.classList.toggle("on"); live(); vib(6); return; }
+    if (d.gv) { const h = new Set(sdraft.hidden || []); h.has(d.gv) ? h.delete(d.gv) : h.add(d.gv); sdraft.hidden = [...h]; renderStudio(); live(); return; }
+    if (d.up || d.dn) { const id = d.up || d.dn, o = fullOrder(), i = o.indexOf(id), j = d.up ? i - 1 : i + 1; if (j >= 0 && j < o.length) { [o[i], o[j]] = [o[j], o[i]]; sdraft.order = o; renderStudio(); live(); } return; }
+    if (d.ad === "preview") {
+      welcomeApply({ ...DEF_SITE, ...sdraft });
+      const k = sdraft.skin || "none"; if (k === "none") document.documentElement.removeAttribute("data-skin"); else document.documentElement.setAttribute("data-skin", k);
+      document.body.classList.add("preview"); go("s-welcome"); return;
+    }
+    if (d.ad === "save") {
+      site = { ...DEF_SITE, ...sdraft }; ls.set("dm_site", JSON.stringify(site));
+      try { const r = await fetch(`${FB}/rooms/${ROOM}/site.json`, { method: "PUT", body: JSON.stringify(site) }); if (!r.ok) throw 0; msg("збережено ✓ тепер це бачать усі"); toast("збережено для всіх ✓"); }
+      catch (err) { msg("нема звʼязку — збережено лише на цьому пристрої"); toast("нема звʼязку — не збережено для всіх", "bad"); }
+      welcomeApply(site); applySkin(); vib(15); return;
+    }
+    if (d.ad === "reset") {
+      if (!(await askConfirm("повернути стандартний вигляд і функції для всіх?"))) return;
+      site = { ...DEF_SITE }; sdraft = JSON.parse(JSON.stringify(site)); ls.del("dm_site");
+      try { const r = await fetch(`${FB}/rooms/${ROOM}/site.json`, { method: "DELETE" }); if (!r.ok) throw 0; toast("скинуто ✓"); } catch (err) { toast("не вдалось скинути для всіх", "bad"); }
+      welcomeApply(site); applySkin(); renderStudio(); return;
+    }
+    if (d.ad === "export") {
+      const data = { exported: new Date().toISOString(), site, stats: (db.stats && db.stats.log) || {} };
+      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })), a = document.createElement("a");
+      a.href = url; a.download = "draw-and-more-stats.json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000); toast("файл збережено ✓"); return;
+    }
+    if (d.ad === "resetq") { if (await askConfirm("скинути список використаних питань?")) { put("usedQs", null); toast("питання знову доступні ✓"); } return; }
+    if (d.ad === "cleargames") {
+      if (!(await askConfirm("видалити стан незавершених ігор? статистика залишиться"))) return;
+      ["xo", "find", "bomb", "erudit", "croc", "battle", "game", "launch"].forEach(p => put(p, null)); toast("очищено ✓"); return;
+    }
+    const g = b.closest(".og"); if (g && g.dataset.k && d.v !== undefined) {
+      const k = g.dataset.k; sdraft[k] = (k === "count" || k === "botLvl") ? +d.v : d.v;
+      [...g.children].forEach(x => x.classList.toggle("on", x === b)); vib(6); live();
+    }
+  });
+  root.addEventListener("input", e => {
+    const t = e.target; if (!t.classList || !t.classList.contains("ai") || !sdraft) return;
+    const k = t.dataset.k;
+    if (k === "tagline") sdraft.tagline = t.value.split("\n").map(x => x.trim()).filter(Boolean);
+    else if (k === "emojis") sdraft.emojis = splitEmoji(t.value);
+    else sdraft[k] = t.value;
+    if (k === "greet") live();
+  });
+  $("pvClose").onclick = () => { document.body.classList.remove("preview"); welcomeApply(site); applySkin(); go("s-menu"); setTab("studio"); };
+})();
+
+/* ───── налаштування ───── */
+function renderSettings() {
+  const duo = rc === DUO, th = ls.get("dm_theme") || "auto", vb = ls.get("dm_vib") !== "0", sn = ls.get("dm_snd") !== "0";
+  $("p-set").innerHTML = `<h1 class="pt">меню</h1>
+<div class="card2"><div class="prof"><div class="av big">${user.emoji}</div><div><b>${esc(user.name)}</b><small>${duo ? "💞 ваша спільна кімната" : "гість · 🔑 " + esc(rc)}</small></div></div>
+${editName ? `<div class="ro"><input id="nmEdit" maxlength="12" value="${esc(user.name)}" autocomplete="off"><button class="lnk" data-s="saveName">зберегти</button></div>` : `<div class="ro"><span>імʼя</span><button class="lnk" data-s="name">змінити</button></div>`}
+<div class="ro col"><span>емодзі</span></div><div class="ems">${EMOJIS.map(e => `<button data-em="${e}"${e === user.emoji ? ' class="on"' : ""}>${e}</button>`).join("")}</div></div>
+<div class="sec">вигляд</div>
+<div class="card2"><div class="ro col"><span>тема</span><div class="seg">${[["auto", "авто"], ["light", "світла"], ["dark", "темна"]].map(([k, l]) => `<button data-th="${k}"${th === k ? ' class="on"' : ""}>${l}</button>`).join("")}</div></div>
+<div class="ro col"><span>оформлення</span><div class="seg">${[["auto", "як на сайті"], ["none", "звичайне"], ["halloween", "🎃"], ["winter", "❄️"]].map(([k, l]) => `<button data-sk="${k}"${(ls.get("dm_skin") || "auto") === k ? ' class="on"' : ""}>${l}</button>`).join("")}</div></div></div>
+<div class="sec">відгук</div>
+<div class="card2"><div class="ro"><span>вібрація</span><button class="sw${vb ? " on" : ""}" data-s="vib" aria-label="вібрація"></button></div><div class="ro"><span>звуки в малюванні</span><button class="sw${sn ? " on" : ""}" data-s="snd" aria-label="звуки"></button></div></div>
+<div class="sec">дані</div>
+<div class="card2"><div class="ro"><span>скинути статистику</span><button class="lnk dng" data-s="reset">скинути</button></div>${duo ? "" : `<div class="ro"><span>кімната</span><button class="lnk" data-s="leave">вийти</button></div>`}</div>
+<div class="card2"><div class="ro"><span>акаунт</span><button class="lnk dng" data-s="out">вийти</button></div></div>
+${isAdmin() ? `
+<div class="sec">повідомлення Аліні · тільки для тебе</div>
+<div class="card2">
+  <div class="adl">
+    <b>💌 Написати Аліні</b>
+    <textarea id="noteToAlina" class="ai"
+      maxlength="240"
+      rows="3"
+      placeholder="Напиши щось приємне…"></textarea>
+  </div>
+  <div class="adb">
+    <button class="blk sm" data-s="sendNote">надіслати</button>
+  </div>
+</div>
+` : ""}
+<div class="ver">draw &amp; more · зроблено для двох 💛</div>`;
+}
+$("p-set").onclick = async e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const th = b.dataset.th, s = b.dataset.s, em = b.dataset.em;
+  if (b.dataset.sk) { ls.set("dm_skin", b.dataset.sk); applySkin(); renderSettings(); vib(8); return; }
+  if (th) { ls.set("dm_theme", th); applyTheme(); renderSettings(); }
+  else if (em) { user.emoji = em; ls.set("dm_user", JSON.stringify(user)); put("players/" + mySlot, me()); renderSettings(); renderHeader(); vib(8); }
+  else if (s === "vib") { ls.set("dm_vib", ls.get("dm_vib") === "0" ? "1" : "0"); renderSettings(); vib(20); }
+  else if (s === "snd") { ls.set("dm_snd", ls.get("dm_snd") === "0" ? "1" : "0"); renderSettings(); }
+  else if (s === "name") { editName = true; renderSettings(); const i = $("nmEdit"); if (i) { i.focus(); i.select(); } }
+  else if (s === "saveName") { const n = ($("nmEdit").value || "").trim().slice(0, 12); editName = false; if (n) { user.name = n; ls.set("dm_user", JSON.stringify(user)); put("players/" + mySlot, me()); renderHeader(); } renderSettings(); }
+  else if (s === "reset") {
+  if (await askConfirm("точно скинути всю статистику ігор?")) {
+    put("stats", null); renderSettings(); toast("статистику скинуто");
+  }
+}
+else if (s === "leave") {
+  if (await askConfirm("вийти з кімнати?")) {
+    leaveRoom(); toast("ти вийшов(ла) з кімнати");
+  }
+}
+else if (s === "out") {
+  if (await askConfirm("вийти з акаунта?")) {
+    logout(); toast("ти вийшов(ла) з акаунта");
+  }
+}
+else if (s === "sendNote" && isAdmin() && mySlot === "v") {
+  const message = ($("noteToAlina")?.value || "").trim().slice(0, 240);
+
+  if (!message) {
+    toast("спочатку напиши повідомлення", "bad");
+    return;
+  }
+
+  put("message", {
+    id: rnd() + Date.now().toString(36),
+    by: "v",
+    name: user.name,
+    emoji: user.emoji,
+    text: message,
+    t: Date.now()
+  });
+
+  $("noteToAlina").value = "";
+  toast("повідомлення надіслано 💌");
+}
+};
+
+/* ───── гра: вгадай слово ───── */
+const QS = [
+["Яка країна має найбільшу кількість часових поясів?", "ФРАНЦІЯ"],
+["Який хімічний елемент має символ W?", "ВОЛЬФРАМ"],
+["Хто написав роман «Злочин і кара»?", "ДОСТОЄВСЬКИЙ"],
+["Яка протока розділяє Європу та Африку?", "ГІБРАЛТАР"],
+["Яка планета має найбільшу кількість кілець?", "САТУРН"],
+["У якому році розпочалася Перша світова війна?", "1914"],
+["Яка найдовша річка Європи?", "ВОЛГА"],
+["Хто відкрив пеніцилін?", "ФЛЕМІНГ"],
+["Яка столиця Канади?", "ОТТАВА"],
+["Який орган людського тіла виробляє інсулін?", "ПІДШЛУНКОВА"],
+["Яка пустеля є найбільшою у світі?", "АНТАРКТИЧНА"],
+["Хто створив картину «Мона Ліза»?", "ДАВІНЧІ"],
+["Який газ переважає в атмосфері Землі?", "АЗОТ"],
+["Яка найменша незалежна держава світу?", "ВАТИКАН"],
+["Як називається наука про землетруси?", "СЕЙСМОЛОГІЯ"],
+["Який метал є рідким за кімнатної температури?", "РТУТЬ"],
+["Хто був першим президентом України?", "КРАВЧУК"],
+["Яка гора є найвищою в Африці?", "КІЛІМАНДЖАРО"],
+["Яка частина клітини містить спадкову інформацію?", "ЯДРО"],
+["У якому місті розташований Колізей?", "РИМ"],
+["Який океан є найглибшим?", "ТИХИЙ"],
+["Хто написав «Лісову пісню»?", "ЛЕСЯУКРАЇНКА"],
+["Яка країна подарувала США Статую Свободи?", "ФРАНЦІЯ"],
+["Який математик сформулював теорему про прямокутний трикутник?", "ПІФАГОР"],
+["Яка кровоносна судина несе кров від серця?", "АРТЕРІЯ"],
+["Який континент перетинають усі меридіани?", "АНТАРКТИДА"],
+["Яка столиця Австралії?", "КАНБЕРРА"],
+["Як називається процес перетворення води на пару?", "ВИПАРОВУВАННЯ"],
+["Яка тварина є найбільшою на планеті?", "СИНІЙКИТ"],
+["Хто написав трагедію «Гамлет»?", "ШЕКСПІР"],
+["Який український князь охрестив Русь?", "ВОЛОДИМИР"],
+["Який елемент позначається символом Au?", "ЗОЛОТО"],
+["Яке озеро є найглибшим у світі?", "БАЙКАЛ"],
+["Яка країна відома як батьківщина піци?", "ІТАЛІЯ"],
+["Як називається центр атома?", "ЯДРО"],
+["Хто винайшов телефон?", "БЕЛЛ"],
+["Яка столиця Норвегії?", "ОСЛО"],
+["Який птах є символом миру?", "ГОЛУБ"],
+["Скільки кісток має доросла людина?", "206"],
+["Яка планета обертається навколо Сонця найдовше?", "НЕПТУН"],
+["Хто написав «Кайдашеву сім'ю»?", "НЕЧУЙЛЕВИЦЬКИЙ"],
+["Який материк є найсухішим?", "АНТАРКТИДА"],
+["Яка наука вивчає гриби?", "МІКОЛОГІЯ"],
+["Який газ необхідний для дихання людини?", "КИСЕНЬ"],
+["Яка столиця Бразилії?", "БРАЗИЛІА"],
+["Хто створив періодичну систему хімічних елементів?", "МЕНДЕЛЄЄВ"],
+["Яка країна має форму чобота?", "ІТАЛІЯ"],
+["Яка найменша кістка людського тіла?", "СТРЕМІНЦЕ"],
+["Як називається найближча до Землі зоря?", "СОНЦЕ"],
+["Який український гетьман очолив Національно-визвольну війну 1648 року?", "ХМЕЛЬНИЦЬКИЙ"],
+["Яка столиця Ісландії?", "РЕЙК'ЯВІК"],
+["Який прилад вимірює атмосферний тиск?", "БАРОМЕТР"],
+["Яка тварина має три серця?", "ВОСЬМИНІГ"],
+["Хто написав роман «Тигролови»?", "БАГРЯНИЙ"],
+["Який метал є основою сталі?", "ЗАЛІЗО"],
+["Яка річка протікає через Лондон?", "ТЕМЗА"],
+["Як називається наука про спадковість?", "ГЕНЕТИКА"],
+["Яка країна першою відправила людину в космос?", "СРСР"],
+["Який вчений сформулював закони руху?", "НЬЮТОН"],
+["Яка найбільша внутрішня пустеля Азії?", "ГОБІ"],
+["Який художник написав «Зоряну ніч»?", "ВАНГОГ"],
+["Яка столиця Швейцарії?", "БЕРН"],
+["Який орган відповідає за вироблення жовчі?", "ПЕЧІНКА"],
+["Яка мова має найбільшу кількість носіїв як рідна?", "КИТАЙСЬКА"],
+["Хто був автором першої конституції України 1710 року?", "ОРЛИК"],
+["Яка країна має найбільшу площу у світі?", "РОСІЯ"],
+["Який природний супутник має найбільшу планету Сонячної системи?", "ГАНІМЕД"],
+["Як називається перехід твердого тіла одразу в газ?", "СУБЛІМАЦІЯ"],
+["Яка найвища вершина України?", "ГОВЕРЛА"],
+["Хто відкрив Америку для європейців у 1492 році?", "КОЛУМБ"],
+["Який вітамін виробляється в шкірі під дією сонця?", "ВІТАМІНД"],
+["Яка столиця Португалії?", "ЛІСАБОН"],
+["Який океан омиває східне узбережжя Африки?", "ІНДІЙСЬКИЙ"],
+["Як називається найдавніша форма письма в Месопотамії?", "КЛИНОПИС"],
+["Яка частинка має негативний електричний заряд?", "ЕЛЕКТРОН"],
+["Який український композитор створив «Щедрик»?", "ЛЕОНТОВИЧ"]
+];
+const ABC = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ";
+let gKey = "", gmode = false, draft = [], ovKey = "";
+function shuffle(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function newHang(c) {  // c.bot — слот бота (якщо гра з ботом)
+  // питання, що вже були у вашій кімнаті, не повторюємо, доки не закінчаться всі
+  const used = db.usedQs || {};
+  let pool = QS.map((_, i) => i).filter(i => !used["q" + i]), fresh = false;
+  if (pool.length < c.n) { pool = QS.map((_, i) => i); fresh = true; }
+  const idx = shuffle(pool).slice(0, c.n), nu = fresh ? {} : { ...used };
+  idx.forEach(i => { nu["q" + i] = 1; });
+  put("usedQs", nu);
+  return { id: rnd(), qs: idx, n: c.n, lives: c.lives, r: 0, tried: "", turn: "a", score: { v: 0, a: 0 }, bot: c.bot || null, botLvl: c.botLvl || 2 };
+}
+const cloneG = () => { const g = JSON.parse(JSON.stringify(db.game)); g.tried = g.tried || ""; g.score = g.score || {}; g.score.v = g.score.v || 0; g.score.a = g.score.a || 0; return g; };
+const wordOf = g => QS[g.qs[g.r]][1];
+function hangMove(ch, who = mySlot) {
+  const g = cloneG(), w = wordOf(g);
+  if (g.res || g.turn !== who || g.tried.includes(ch)) return;
+  g.tried += ch;
+  const hits = [...w].filter(c => c === ch).length;
+  g.last = { by: who, t: "l", v: ch, ok: hits > 0 };
+  if (hits) {
+    g.score[who] += hits;
+    if ([...w].every(c => g.tried.includes(c))) { g.score[who] += 2; g.res = { w: who }; }
+  } else if ([...g.tried].filter(c => !w.includes(c)).length >= g.lives) g.res = { w: "" };
+  if (!g.res) g.turn = otherOf(g.turn);
+  if (who === mySlot) vib(hits ? 15 : [20, 30, 20]); put("game", g);
+}
+function hangWord() {
+  const g = cloneG(), w = wordOf(g);
+  const bl = [...w].filter(c => !g.tried.includes(c));
+  if (g.res || g.turn !== mySlot || draft.length < bl.length) return;
+  let i = 0; const s = [...w].map(c => g.tried.includes(c) ? c : draft[i++]).join("");
+  if (s === w) { g.score[mySlot] += bl.length + 2; g.res = { w: mySlot }; g.last = null; }
+  else { g.score[mySlot] = Math.max(0, g.score[mySlot] - 1); g.last = { by: mySlot, t: "w", v: s }; g.turn = otherOf(g.turn); }
+  gmode = false; draft = []; put("game", g);
+}
+function nextRound() {
+  const g = cloneG(), nr = g.r + 1;
+  if (nr >= g.n) { g.done = true; put("game", g); return; }
+  g.r = nr; g.tried = ""; g.turn = "a"; delete g.res; delete g.last; put("game", g);
+}
+function renderHang() {
+  const g = db.game;
+  if (!g || !g.qs) { $("hgQ").textContent = "чекаємо початок гри…"; $("hgBox").textContent = $("hgKb").textContent = $("hgAct").textContent = $("hgPl").textContent = $("hgSt").textContent = ""; return; }
+  const T = g.tried || "", w = wordOf(g), res = g.res, sc = g.score || {};
+  const key = g.id + ":" + g.r; if (key !== gKey) { gKey = key; gmode = false; draft = []; }
+  if (g.turn !== mySlot || res) { gmode = false; draft = []; }
+  const wrong = [...T].filter(c => !w.includes(c)).length, left = Math.max(0, g.lives - wrong);
+  $("hgInfo").textContent = `${g.r + 1}/${g.n} · ${"❤️".repeat(left)}${"🖤".repeat(g.lives - left)}`;
+  $("hgPl").innerHTML = ["a", "v"].map(s => `<div class="pc${g.turn === s && !res ? " turn" : ""}"><span>${esc(pl(s).emoji)} ${esc(pl(s).name)}</span><b>${sc[s] || 0}</b></div>`).join("");
+  $("hgQ").textContent = QS[g.qs[g.r]][0];
+  const bl = [...w].filter(c => !T.includes(c));
+  let di = 0;
+  $("hgBox").innerHTML = [...w].map(c => T.includes(c) ? `<i class="o">${c}</i>` : res ? `<i class="m">${c}</i>` : gmode ? `<i class="d">${draft[di++] || ""}</i>` : "<i></i>").join("");
+  const L = g.last; let st = "";
+  if (L) st = L.t === "l" ? `${esc(pl(L.by).emoji)} літера «${L.v}» — ${L.ok ? "є ✅" : "нема ❌"}` : `${esc(pl(L.by).emoji)} слово «${esc(L.v)}» — не те ❌ (−1)`;
+  if (!res) st += `<br><b>${g.turn === mySlot ? "твоя черга" : `ходить ${esc(pl(g.turn).emoji)} ${esc(pl(g.turn).name)}`}</b>`;
+  $("hgSt").innerHTML = st;
+  $("hgKb").innerHTML = [...ABC].map(c => {
+    const t = T.includes(c), good = t && w.includes(c);
+    const dis = t || res || g.turn !== mySlot || (gmode && draft.length >= bl.length);
+    return `<button class="k${good ? " ok" : t ? " bad" : ""}" data-k="${c}"${dis ? " disabled" : ""}>${c}</button>`;
+  }).join("");
+  const my = g.turn === mySlot && !res;
+  $("hgAct").innerHTML = !my ? "" : gmode
+    ? `<button class="wht" data-a="back">⌫</button><button class="wht" data-a="cancel">скасувати</button><button class="blk sm" data-a="ok"${draft.length < bl.length ? " disabled" : ""}>підтвердити</button>`
+    : `<button class="wht" data-a="word">вгадати слово</button>`;
+  const ok = key + ":" + (g.done ? "d" : res ? "r" : ""), ov = $("hgOv");
+  if (ok !== ovKey) {
+    ovKey = ok;
+    if (g.done) {
+      const a = sc.a || 0, v = sc.v || 0, win = a === v ? "" : a > v ? "a" : "v";
+      if (!g.bot) put("stats/log/" + g.id, { g: "word", w: win, s: { v, a }, t: Date.now() });
+      ov.innerHTML = `<div class="big">${win ? "🏆" : "🤝"}</div><h2>${win ? `перемагає ${esc(pl(win).emoji)} ${esc(pl(win).name)}` : "нічия"}</h2>` +
+        ["a", "v"].map(s => `<div class="row${s === win ? " win" : ""}"><span>${esc(pl(s).emoji)} ${esc(pl(s).name)}</span><b>${sc[s] || 0}</b></div>`).join("") +
+        `<button class="blk" data-a="again">ще раз</button><button class="wht" data-a="menu">в меню</button>`;
+      ov.classList.add("on"); vib([30, 50, 30, 50, 90]);
+    } else if (res) {
+      ov.innerHTML = `<div class="big">${res.w ? "🎉" : "💔"}</div><h2>${res.w ? `${esc(pl(res.w).emoji)} ${esc(pl(res.w).name)} відгадує слово!` : "спроби закінчились"}</h2><div class="wd">${w}</div>` +
+        `<button class="blk" data-a="next">${g.r + 1 >= g.n ? "підсумок" : "далі"}</button>`;
+      ov.classList.add("on"); vib([30, 50, 30]);
+    } else ov.classList.remove("on");
+  }
+  botCheck(g);
+}
+/* бот для «вгадай слово»: вгадує літери за частотою та списком відповідей, не підглядаючи в слово */
+let botT = 0;
+const FREQ = "ОАНІЕВИТРСКЛДМПУЯЗЬБГЧХЖШЮЦЩЇЄФҐЙ";
+function botPick(g) {
+  const w = wordOf(g), T = g.tried || "", lvl = +(g.botLvl || 2), left = [...ABC].filter(c => !T.includes(c));
+  const rand = (n = 10) => { const top = [...FREQ].filter(c => left.includes(c)).slice(0, n); return top[Math.floor(Math.random() * top.length)] || left[0]; };
+  if (lvl === 1) return rand(14);
+  const pat = [...w].map(c => T.includes(c) ? c : null), wrong = [...T].filter(c => !w.includes(c));
+  const cand = QS.map(q => q[1]).filter(a => a.length === pat.length && pat.every((p, i) => p === null ? !T.includes(a[i]) : a[i] === p) && !wrong.some(c => a.includes(c)));
+  const cnt = {}; cand.forEach(a => new Set([...a].filter((c, i) => pat[i] === null)).forEach(c => { cnt[c] = (cnt[c] || 0) + 1; }));
+  const best = Object.entries(cnt).filter(([c]) => left.includes(c)).sort((a, b) => b[1] - a[1]);
+  if (!best.length) return rand();
+  if (lvl === 2 && Math.random() < .25) return rand();
+  return best[0][0];
+}
+function botCheck(g) {
+  if (!g || !g.bot || g.done || g.res || g.turn !== g.bot || g.bot === mySlot || botT) return;
+  const key = g.id + ":" + g.r + ":" + (g.tried || "");
+  botT = setTimeout(() => { botT = 0; const cg = db.game; if (!cg || cg.res || cg.done || cg.turn !== cg.bot) return; if (cg.id + ":" + cg.r + ":" + (cg.tried || "") !== key) return; hangMove(botPick(cg), cg.bot); }, 1100 + Math.random() * 900);
+}
+$("hgKb").onclick = e => { const b = e.target.closest("button"); if (!b || b.disabled) return; if (gmode) { draft.push(b.dataset.k); renderHang(); } else hangMove(b.dataset.k); };
+$("hgAct").onclick = e => {
+  const b = e.target.closest("button"); if (!b || b.disabled) return; const a = b.dataset.a;
+  if (a === "word") { gmode = true; draft = []; renderHang(); }
+  else if (a === "cancel") { gmode = false; draft = []; renderHang(); }
+  else if (a === "back") { draft.pop(); renderHang(); }
+  else if (a === "ok") hangWord();
+};
+$("hgOv").onclick = e => {
+  const a = e.target.closest("button")?.dataset.a;
+  if (a === "next") nextRound();
+  else if (a === "again") { const g = db.game; put("game", newHang({ n: g.n, lives: g.lives, bot: g.bot, botLvl: g.botLvl })); }
+  else if (a === "menu") { $("hgOv").classList.remove("on"); toMenu(); }
+};
+$("hgBack").onclick = toMenu;
+
+/* ───── старт ───── */
+applyDesign();
+if (user) go("s-splash"); else startWelcome();
+(async () => {
+  if (!user) return;
+  if (user.pref) { if (await joinDuo()) go("s-welcome"); return; }
+  showHome();
+  const c = ls.get("dm_room"); if (!c) return;
+  try {
+    const room = await getRoom(c), slot = room && room.players && slotFor(room);
+    if (slot && room.players[slot] && room.players[slot].uid === user.uid) enter(c, slot);
+    else ls.del("dm_room");
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
