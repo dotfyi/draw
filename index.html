@@ -455,23 +455,34 @@ body.menu-on #dock {
   display: none !important;
 }
 
-/* Темна тема */
+/* Темна тема: ручний вибір */
+:root[data-theme="dark"] #dock {
+  background: rgba(35, 35, 38, 0.82);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 8px 25px rgba(0,0,0,.25),
+              inset 0 1px 1px rgba(255,255,255,.12);
+}
+:root[data-theme="dark"] .dk {
+  color: #dedede;
+}
+:root[data-theme="dark"] .dk.on {
+  background: rgba(255,255,255,.14);
+  color: #fff;
+}
+
+/* Системна темна тема — лише в режимі auto */
 @media (prefers-color-scheme: dark) {
-  #dock {
-    background: rgba(35, 35, 38, 0.78);
+  :root:not([data-theme="light"]) #dock {
+    background: rgba(35, 35, 38, 0.82);
     border-color: rgba(255, 255, 255, 0.16);
-
-    box-shadow:
-      0 8px 25px rgba(0, 0, 0, 0.25),
-      inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 25px rgba(0,0,0,.25),
+                inset 0 1px 1px rgba(255,255,255,.12);
   }
-
-  .dk {
+  :root:not([data-theme="light"]) .dk {
     color: #dedede;
   }
-
-  .dk.on {
-    background: rgba(255, 255, 255, 0.14);
+  :root:not([data-theme="light"]) .dk.on {
+    background: rgba(255,255,255,.14);
     color: #fff;
   }
 }
