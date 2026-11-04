@@ -343,20 +343,19 @@ body.preview #pvClose{display:block}
 
 
 
-
-/* Компактне нижнє меню */
+/* Нижнє компактне меню */
 #dock {
   display: none;
   position: fixed;
   left: 50%;
   bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
   transform: translateX(-50%);
-  width: auto;
-  max-width: none;
+  width: max-content;
+  max-width: calc(100vw - 24px);
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 7px 10px;
+  padding: 6px 10px;
   border-radius: 999px;
   background: var(--pill);
   border: 1px solid var(--line);
@@ -364,24 +363,33 @@ body.preview #pvClose{display:block}
   z-index: 6;
 }
 
+/* Показуємо меню */
 body.menu-on #dock {
   display: flex;
 }
 
+/* Кнопки меню */
 .dk {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: none;
+  flex: 0 0 44px;
   width: 44px;
   height: 44px;
   padding: 0;
-  border-radius: 50%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--muted);
-  transition: background .2s, color .2s;
+  font-size: 14px;
+  font-weight: 600;
+  transition: color .2s, transform .2s;
 }
 
+/* Іконки */
 .dk svg {
+  display: block;
   width: 21px;
   height: 21px;
   fill: none;
@@ -391,23 +399,34 @@ body.menu-on #dock {
   stroke-linejoin: round;
 }
 
+/* Ховаємо назви пунктів */
 .dk span {
   display: none !important;
 }
 
-/* Активна іконка — чорне коло */
+/* Активний пункт */
 .dk.on {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #000;
-  color: #fff;
+  color: #000;
+  background: transparent;
 }
 
+/* Чорне підкреслення активного пункту */
+.dk.on::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 1px;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 3px;
+  border-radius: 3px;
+  background: #000;
+}
+
+/* Ефект натискання */
 .dk:active {
   transform: scale(.94);
 }
-
 
 
 /* картка гри (шторка) */
