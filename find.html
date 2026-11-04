@@ -90,16 +90,19 @@ const other = s => s === "v" ? "a" : "v";
 const room = ls.get("dm_room"), me = ls.get("dm_slot");
 let L = null; try { L = JSON.parse(ls.get("dm_launch")); } catch (e) {}
 if (!room || (me !== "v" && me !== "a") || !L || !L.id) location.replace("index.html");
+const BOT = (L && L.bot && L.bot !== me) ? L.bot : null, BLVL = +(L && L.cfg && L.cfg.botLvl) || 2;
 const fb = `${FB}/rooms/${ROOM}/dm/${room}/find`;
 function logStat(id, rec) {
-  if (!room || !id) return;
+  if (!room || !id || BOT) return;
   rec.t = rec.t || Date.now();
   fetch(`${FB}/rooms/${ROOM}/dm/${room}/stats/log/${id}.json`, { method: "PUT", body: JSON.stringify(rec), keepalive: true }).catch(() => {});
 }
 
 const PEOPLE = { a: { name: "аліна", emoji: "🦊" }, v: { name: "вадим", emoji: "👻" } };
+if (BOT) PEOPLE[BOT] = { name: "бот", emoji: "🤖" };
 fetch(`${FB}/rooms/${ROOM}/dm/${room}/players.json`).then(r => r.json()).then(p => {
   if (p) for (const s of ["v", "a"]) if (p[s] && p[s].name) PEOPLE[s] = { name: p[s].name, emoji: p[s].emoji || PEOPLE[s].emoji };
+  if (BOT) PEOPLE[BOT] = { name: "бот", emoji: "🤖" };
   tick(true);
 }).catch(() => {});
 
@@ -223,6 +226,20 @@ function buildRound(g, r) {
   box.innerHTML = round.toks.map((t, i) => `<button class="tk" data-i="${i}" style="left:${t.x / VW * 100}%;top:${t.y / VH * 100}%;font-size:${t.fs * ur}px;color:${t.col};font-family:${t.ff};font-weight:${t.fw};--r:${t.rot}deg;transform:translate(-50%,-50%) rotate(${t.rot}deg)">${t.n}</button>`).join("");
   const tn = $("tn"); tn.textContent = round.target; tn.classList.remove("pop"); void tn.offsetWidth; tn.classList.add("pop");
   $("lock").classList.remove("on");
+  if (BOT) botRound(g, r);
+}
+/* бот знаходить число через якийсь час; чим складніший рівень, тим швидше (і швидше за довге число) */
+let botT = 0;
+function botRound(g, r) {
+  clearTimeout(botT);
+  const len = round.target.length, base = BLVL === 1 ? [4200, 9000] : BLVL === 2 ? [2600, 6200] : [1500, 3600];
+  const ms = base[0] + Math.random() * (base[1] - base[0]) + (len - 1) * 350;
+  botT = setTimeout(() => {
+    const cur2 = game(); if (!cur2 || cur2.id !== g.id || shownR !== r || inter || phaseG !== "play") return;
+    const cl = (db.c && db.c[g.id] && db.c[g.id]["r" + r]) || {}; if (typeof cl[BOT] === "number") return;
+    fetch(`${fb}/c/${g.id}/r${r}/${BOT}.json`, { method: "PUT", body: JSON.stringify({ ".sv": "timestamp" }) }).catch(() => {});
+    const key = g.id + "r" + r; if (firstSeen[key] === undefined) firstSeen[key] = Date.now();
+  }, ms);
 }
 
 function showBanner(t) { const b = $("banner"); b.textContent = t; b.classList.add("on"); clearTimeout(showBanner.t); showBanner.t = setTimeout(() => b.classList.remove("on"), 1500); }
@@ -242,6 +259,7 @@ function tick(force) {
     sizeBox();
     fetch(`${fb}/ready/${g.id}/${me}.json`, { method: "PUT", body: "true", keepalive: true }).catch(() => {});
     apply("put", { path: `/ready/${g.id}/${me}`, data: true });
+    if (BOT) { fetch(`${fb}/ready/${g.id}/${BOT}.json`, { method: "PUT", body: "true" }).catch(() => {}); apply("put", { path: `/ready/${g.id}/${BOT}`, data: true }); }
   }
   renderScore(g, d);
   const rd = (db.ready && db.ready[g.id]) || {}, both = rd.v && rd.a;
