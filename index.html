@@ -343,23 +343,24 @@ body.preview #pvClose{display:block}
 
 
 
-/* нижнє меню — фіксоване, тільки іконки */
+
+/* Компактне нижнє меню */
 #dock {
   display: none;
   position: fixed;
   left: 50%;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
   transform: translateX(-50%);
-  width: calc(100% - 28px);
-  max-width: 440px;
-  justify-content: space-around;
+  width: auto;
+  max-width: none;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  border-radius: 24px;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 999px;
   background: var(--pill);
   border: 1px solid var(--line);
-  box-shadow: 0 12px 32px var(--sh);
+  box-shadow: 0 8px 28px var(--sh);
   z-index: 6;
 }
 
@@ -369,24 +370,20 @@ body.menu-on #dock {
 
 .dk {
   display: flex;
-  flex: 1;
-  min-width: 0;
   align-items: center;
   justify-content: center;
-  padding: 12px;
-  border-radius: 16px;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
   color: var(--muted);
-  transition: background .22s, color .22s, transform .15s;
-}
-
-.dk:active {
-  transform: scale(.94);
+  transition: background .2s, color .2s;
 }
 
 .dk svg {
-  display: block;
-  width: 23px;
-  height: 23px;
+  width: 21px;
+  height: 21px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.9;
@@ -398,10 +395,19 @@ body.menu-on #dock {
   display: none !important;
 }
 
+/* Активна іконка — чорне коло */
 .dk.on {
-  background: var(--inv-bg);
-  color: var(--inv-fg);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
 }
+
+.dk:active {
+  transform: scale(.94);
+}
+
 
 
 /* картка гри (шторка) */
