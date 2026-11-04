@@ -219,7 +219,7 @@ function botPick(b){
 }
 function botSchedule(){
   if(botT)return;
-  botT=setTimeout(()=>{botT=0;const b=db.battle;if(!b||!b.bot||b.finished||b.turn!==b.bot)return;const i=botPick(b);if(i!==undefined)fireAs(b.bot,i)},700+Math.random()*800);
+  botT=setTimeout(async()=>{botT=0;const b=db.battle;if(!b||!b.bot||b.finished||b.turn!==b.bot)return;const i=botPick(b);if(i===undefined)return;try{await fireAs(b.bot,i)}catch(e){setTimeout(botSchedule,1200)}},700+Math.random()*800);
 }
 
 async function fireAs(who,i){
@@ -309,6 +309,13 @@ async function init(){
   if(db.battle?.players?.[slot]?.ready)phase="wait";
   let old=db.battle?.reactions?.[other(slot)]||{};
   seenReaction=Math.max(0,...Object.keys(old).map(Number));
+  connectES();
+  $("room").textContent="🔑 "+room;refresh();
+  // сторож бота: навіть якщо подія загубилась, бот не зависає
+  setInterval(()=>{const b=db.battle;if(b&&b.bot&&b.bot!==slot&&!b.finished&&b.turn===b.bot&&phase==="match")botSchedule()},1500);
+}
+function connectES(){
+  if(es)es.close();
   es=new EventSource(base+".json");
   ["put","patch"].forEach(t=>es.addEventListener(t,e=>{try{
     let before=seenReaction;apply(JSON.parse(e.data));
@@ -316,8 +323,8 @@ async function init(){
     if(latest>before){seenReaction=latest;showReaction(r[latest])}
     refresh()
   }catch(_){}}));
-  $("room").textContent="🔑 "+room;refresh()
 }
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&slot)connectES()});
 
 function refresh(){
   if(!db.battle)return;
