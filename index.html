@@ -343,7 +343,7 @@ body.preview #pvClose{display:block}
 
 
 
-/* ===== LIQUID GLASS BOTTOM MENU ===== */
+/* ===== COMPACT LIQUID GLASS DOCK ===== */
 
 #dock {
   display: none;
@@ -352,24 +352,24 @@ body.preview #pvClose{display:block}
   bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
   transform: translateX(-50%);
 
-  width: min(620px, calc(100vw - 40px));
+  width: min(280px, calc(100vw - 48px));
   box-sizing: border-box;
 
-  align-items: stretch;
+  align-items: center;
   justify-content: space-between;
   gap: 4px;
 
-  padding: 7px;
+  padding: 5px;
 
   background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(30px) saturate(180%);
   -webkit-backdrop-filter: blur(30px) saturate(180%);
 
-  border: 1px solid rgba(0, 0, 0, 0.13);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 999px;
 
   box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.07),
+    0 8px 25px rgba(0, 0, 0, 0.08),
     inset 0 1px 1px rgba(255, 255, 255, 0.9);
 
   z-index: 6;
@@ -382,40 +382,39 @@ body.menu-on #dock {
 /* Кнопки */
 .dk {
   position: relative;
+
   display: flex;
   flex: 1 1 0;
   min-width: 0;
-  height: 80px;
+  height: 52px;
 
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
 
-  padding: 6px 2px;
-
+  padding: 0;
   border: 1px solid transparent;
   border-radius: 999px;
 
   background: transparent;
   color: #383838;
+
   cursor: pointer;
 
   transition:
     background .25s ease,
-    color .25s ease,
     transform .2s ease;
 }
 
-/* Ховаємо старі SVG */
-.dk svg {
-  display: none;
+/* Приховуємо SVG та текст */
+.dk svg,
+.dk span {
+  display: none !important;
 }
 
 /* Емодзі */
 .dk::before {
   display: block;
-  font-size: 36px;
+  font-size: 25px;
   line-height: 1;
 }
 
@@ -435,53 +434,20 @@ body.menu-on #dock {
   content: "🚧";
 }
 
-/* Підписи */
-.dk span {
-  display: block !important;
-  font-size: 15px;
-  line-height: 1.15;
-  font-weight: 750;
-  letter-spacing: 0.1px;
-  white-space: nowrap;
-}
-
 /* Активний пункт */
 .dk.on {
   background: rgba(0, 0, 0, 0.075);
-  border-color: transparent;
   color: #000;
 }
 
 /* Натискання */
 .dk:active {
-  transform: scale(0.96);
+  transform: scale(0.90);
 }
 
 /* Прихована студія */
 .dk[hidden] {
   display: none !important;
-}
-
-/* Маленькі екрани */
-@media (max-width: 480px) {
-  #dock {
-    width: calc(100vw - 32px);
-    padding: 6px;
-    gap: 2px;
-  }
-
-  .dk {
-    height: 68px;
-    gap: 4px;
-  }
-
-  .dk::before {
-    font-size: 29px;
-  }
-
-  .dk span {
-    font-size: 11px;
-  }
 }
 
 /* Темна тема */
@@ -491,7 +457,7 @@ body.menu-on #dock {
     border-color: rgba(255, 255, 255, 0.16);
 
     box-shadow:
-      0 8px 30px rgba(0, 0, 0, 0.25),
+      0 8px 25px rgba(0, 0, 0, 0.25),
       inset 0 1px 1px rgba(255, 255, 255, 0.12);
   }
 
@@ -500,7 +466,7 @@ body.menu-on #dock {
   }
 
   .dk.on {
-    background: rgba(255, 255, 255, 0.13);
+    background: rgba(255, 255, 255, 0.14);
     color: #fff;
   }
 }
