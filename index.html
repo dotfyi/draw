@@ -352,14 +352,14 @@ body.preview #pvClose{display:block}
   bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
   transform: translateX(-50%);
 
-  width: min(720px, calc(100vw - 32px));
+  width: min(620px, calc(100vw - 40px));
   box-sizing: border-box;
 
   align-items: stretch;
   justify-content: space-between;
   gap: 4px;
 
-  padding: 9px;
+  padding: 7px;
 
   background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(30px) saturate(180%);
@@ -382,25 +382,23 @@ body.menu-on #dock {
 /* Кнопки */
 .dk {
   position: relative;
-
   display: flex;
   flex: 1 1 0;
   min-width: 0;
-  height: 94px;
+  height: 80px;
 
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 5px;
 
-  padding: 8px 2px;
+  padding: 6px 2px;
 
   border: 1px solid transparent;
   border-radius: 999px;
 
   background: transparent;
   color: #383838;
-
   cursor: pointer;
 
   transition:
@@ -417,11 +415,10 @@ body.menu-on #dock {
 /* Емодзі */
 .dk::before {
   display: block;
-  font-size: 43px;
+  font-size: 36px;
   line-height: 1;
 }
 
-/* Емодзі для пунктів */
 .dk[data-tab="games"]::before {
   content: "🎮";
 }
@@ -441,12 +438,10 @@ body.menu-on #dock {
 /* Підписи */
 .dk span {
   display: block !important;
-
-  font-size: 17px;
+  font-size: 15px;
   line-height: 1.15;
   font-weight: 750;
   letter-spacing: 0.1px;
-
   white-space: nowrap;
 }
 
@@ -455,9 +450,6 @@ body.menu-on #dock {
   background: rgba(0, 0, 0, 0.075);
   border-color: transparent;
   color: #000;
-
-  box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.015);
 }
 
 /* Натискання */
@@ -470,29 +462,29 @@ body.menu-on #dock {
   display: none !important;
 }
 
-/* Адаптація для маленьких екранів */
+/* Маленькі екрани */
 @media (max-width: 480px) {
   #dock {
-    width: calc(100vw - 24px);
-    padding: 7px;
+    width: calc(100vw - 32px);
+    padding: 6px;
     gap: 2px;
   }
 
   .dk {
-    height: 76px;
-    gap: 5px;
+    height: 68px;
+    gap: 4px;
   }
 
   .dk::before {
-    font-size: 32px;
+    font-size: 29px;
   }
 
   .dk span {
-    font-size: 12px;
+    font-size: 11px;
   }
 }
 
-/* Темна тема системи */
+/* Темна тема */
 @media (prefers-color-scheme: dark) {
   #dock {
     background: rgba(35, 35, 38, 0.78);
