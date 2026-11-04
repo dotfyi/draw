@@ -113,16 +113,19 @@ const other = s => s === "v" ? "a" : "v";
 const room = ls.get("dm_room"), me = ls.get("dm_slot");
 let L = null; try { L = JSON.parse(ls.get("dm_launch")); } catch (e) {}
 if (!room || (me !== "v" && me !== "a") || !L || !L.id) location.replace("index.html");
+const BOT = (L && L.bot && L.bot !== me) ? L.bot : null, BLVL = +(L && L.cfg && L.cfg.botLvl) || 2;
 const fb = `${FB}/rooms/${ROOM}/dm/${room}/xo`, logUrl = `${FB}/rooms/${ROOM}/dm/${room}/stats/log`;
 function logStat(id, rec) {
-  if (!room || !id) return;
+  if (!room || !id || BOT) return;
   rec.t = rec.t || Date.now();
   fetch(`${logUrl}/${id}.json`, { method: "PUT", body: JSON.stringify(rec), keepalive: true }).catch(() => {});
 }
 const PEOPLE = { a: { name: "аліна", emoji: "🦊" }, v: { name: "вадим", emoji: "👻" } };
+if (BOT) PEOPLE[BOT] = { name: "бот", emoji: "🤖" };
 fetch(`${FB}/rooms/${ROOM}/dm/${room}/players.json`).then(r => r.json()).then(p => {
   if (p) for (const s of ["v", "a"]) if (p[s] && p[s].name) PEOPLE[s] = { name: p[s].name, emoji: p[s].emoji || PEOPLE[s].emoji };
-  tick(true);
+  if (BOT) PEOPLE[BOT] = { name: "бот", emoji: "🤖" };
+  lastKey = ""; tick(true);
 }).catch(() => {});
 
 /* ───── дані ───── */
@@ -170,6 +173,30 @@ function derive(g) {
   // наступний вільний ключ
   let next = 0; while (mv["m" + next]) next++;
   return { board, turn, games, wins, draws, gi, next, done, sym };
+}
+
+/* ───── бот: мінімакс; на легкому та звичайному рівні інколи помиляється ───── */
+function winnerOf(b) { for (const l of LINES) if (b[l[0]] && b[l[0]] === b[l[1]] && b[l[1]] === b[l[2]]) return b[l[0]]; return b.every(Boolean) ? "d" : null; }
+function minimax(b, turn, me2, opp) {
+  const w = winnerOf(b); if (w === me2) return 10; if (w === opp) return -10; if (w === "d") return 0;
+  let best = turn === me2 ? -99 : 99;
+  for (let i = 0; i < 9; i++) if (!b[i]) { b[i] = turn; const v = minimax(b, turn === me2 ? opp : me2, me2, opp) + (turn === me2 ? -.01 : .01); b[i] = ""; best = turn === me2 ? Math.max(best, v) : Math.min(best, v); }
+  return best;
+}
+function botMove(d) {
+  const mine = d.sym[BOT], theirs = mine === "X" ? "O" : "X", free = []; for (let i = 0; i < 9; i++) if (!d.board[i]) free.push(i);
+  if (!free.length) return -1;
+  const err = BLVL === 1 ? .55 : BLVL === 2 ? .2 : 0;
+  if (Math.random() < err) return free[Math.floor(Math.random() * free.length)];
+  let best = -99, pick = [];
+  for (const i of free) { const b = [...d.board]; b[i] = mine; const v = minimax(b, theirs, mine, theirs); if (v > best + 1e-9) { best = v; pick = [i]; } else if (Math.abs(v - best) < 1e-9) pick.push(i); }
+  return pick[Math.floor(Math.random() * pick.length)];
+}
+let botT = 0;
+function botCheck(g, d) {
+  if (!BOT || botT || hold || d.done || d.turn !== BOT) return;
+  const key = d.next;
+  botT = setTimeout(() => { botT = 0; const g2 = game(); if (!g2) return; const d2 = derive(g2); if (d2.done || d2.turn !== BOT || d2.next !== key) return; const c = botMove(d2); if (c >= 0) put(`mv/${g2.id}/m${d2.next}`, { c, p: BOT }); }, 650 + Math.random() * 600);
 }
 
 /* ───── загальна статистика зі всіх серій ───── */
@@ -256,6 +283,7 @@ function tick() {
     lastKey = key; renderTop(g, d); paintBoard(d, g, hold ? hold.g : null); renderStats();
   }
   if (d.done && !hold && shownG >= d.games.length) showFinal(g, d);
+  botCheck(g, d);
 }
 setInterval(() => tick(), 150);
 
