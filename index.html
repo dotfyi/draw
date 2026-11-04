@@ -648,6 +648,12 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 :root[data-theme="dark"] #s-welcome .hero{background:rgba(25,25,28,.50);border-color:rgba(255,255,255,.12)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) #s-welcome .hero{background:rgba(25,25,28,.50);border-color:rgba(255,255,255,.12)}}
 
+/* кнопки входу — внизу екрана, а головний блок по центру над ними */
+#s-welcome{justify-content:flex-start!important;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 26px)!important}
+#s-welcome .hero{margin-top:auto!important;margin-bottom:0!important}
+#s-welcome #toAuth{margin-top:auto!important}
+#s-welcome #toGuest{margin-top:10px!important}
+#s-welcome #wFoot{margin-top:14px!important}
 </style>
 </head>
 <body>
