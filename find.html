@@ -228,18 +228,20 @@ function buildRound(g, r) {
   $("lock").classList.remove("on");
   if (BOT) botRound(g, r);
 }
-/* бот знаходить число через якийсь час; чим складніший рівень, тим швидше (і швидше за довге число) */
-let botT = 0;
+/* бот знаходить число через якийсь час; термін зберігається, а сторож у tick() страхує від втрати таймера */
+let botDue = 0, botSentAt = 0;
 function botRound(g, r) {
-  clearTimeout(botT);
   const len = round.target.length, base = BLVL === 1 ? [4200, 9000] : BLVL === 2 ? [2600, 6200] : [1500, 3600];
-  const ms = base[0] + Math.random() * (base[1] - base[0]) + (len - 1) * 350;
-  botT = setTimeout(() => {
-    const cur2 = game(); if (!cur2 || cur2.id !== g.id || shownR !== r || inter || phaseG !== "play") return;
-    const cl = (db.c && db.c[g.id] && db.c[g.id]["r" + r]) || {}; if (typeof cl[BOT] === "number") return;
-    fetch(`${fb}/c/${g.id}/r${r}/${BOT}.json`, { method: "PUT", body: JSON.stringify({ ".sv": "timestamp" }) }).catch(() => {});
-    const key = g.id + "r" + r; if (firstSeen[key] === undefined) firstSeen[key] = Date.now();
-  }, ms);
+  botDue = Date.now() + base[0] + Math.random() * (base[1] - base[0]) + (len - 1) * 350; botSentAt = 0;
+}
+function botWatch(g) {
+  if (!BOT || !round || phaseG !== "play" || inter || !botDue || Date.now() < botDue) return;
+  if (botSentAt && Date.now() - botSentAt < 2500) return;
+  const r = shownR, cl = (db.c && db.c[g.id] && db.c[g.id]["r" + r]) || {};
+  if (typeof cl[BOT] === "number") { botDue = 0; return; }
+  botSentAt = Date.now();
+  fetch(`${fb}/c/${g.id}/r${r}/${BOT}.json`, { method: "PUT", body: JSON.stringify({ ".sv": "timestamp" }) }).catch(() => { botSentAt = 0; });
+  const key = g.id + "r" + r; if (firstSeen[key] === undefined) firstSeen[key] = Date.now();
 }
 
 function showBanner(t) { const b = $("banner"); b.textContent = t; b.classList.add("on"); clearTimeout(showBanner.t); showBanner.t = setTimeout(() => b.classList.remove("on"), 1500); }
@@ -262,6 +264,7 @@ function tick(force) {
     if (BOT) { fetch(`${fb}/ready/${g.id}/${BOT}.json`, { method: "PUT", body: "true" }).catch(() => {}); apply("put", { path: `/ready/${g.id}/${BOT}`, data: true }); }
   }
   renderScore(g, d);
+  botWatch(g);
   const rd = (db.ready && db.ready[g.id]) || {}, both = rd.v && rd.a;
   if (phaseG === "wait") {
     if (!both) { $("tn").textContent = "–"; showCover(`<span>${PEOPLE[other(me)].emoji} ${esc(PEOPLE[other(me)].name)} ще заходить…</span>`); return; }
