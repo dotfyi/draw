@@ -55,6 +55,11 @@ h2{font-family:var(--serif);font-size:28px;font-weight:600;text-align:center}
 @keyframes drw{to{stroke-dashoffset:0}}
 #tag{min-height:22px;height:auto;max-width:100%;font-size:15px;line-height:1.45;font-weight:550;letter-spacing:.1px;color:var(--fg);text-wrap:balance;transition:opacity .4s}
 .cta{min-width:min(250px,100%);margin:2px 0 0;padding:15px 30px;animation:pulse 2.6s ease-out infinite}
+.cta-secondary {
+  min-width: min(250px, 100%);
+  margin-top: -6px;
+  padding: 14px 28px;
+}
 @keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--b1,#e0507a) 45%,transparent)}70%,100%{box-shadow:0 0 0 18px color-mix(in srgb,var(--b1,#e0507a) 0%,transparent)}}
 .brand.f-sans{font-family:ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;font-weight:800}
 .brand.f-round{font-family:ui-rounded,"SF Pro Rounded","Trebuchet MS",sans-serif;font-weight:800}
@@ -657,6 +662,7 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 <div id="tag"></div>
 </div>
 <button class="blk cta" id="toAuth">авторизуватись</button>
+<button class="wht cta-secondary" id="toGuest">грати як гість</button>
 <div class="foot" id="wFoot"></div>
 </div>
 <button id="pvClose">✕ закрити перегляд</button>
@@ -998,6 +1004,11 @@ $("toAuth").onclick = () => document.body.classList.contains("preview") ? 0 : op
   if (CODES[code]) return login({ ...CODES[code], uid: "u_" + CODES[code].pref });
   if (code === "0000") { $("nm").value = ""; go("s-name"); return; }
   return "невірний код";
+  $("toGuest").onclick = () => {
+  if (document.body.classList.contains("preview")) return;
+  $("nm").value = "";
+  go("s-name");
+};
 });
 $("nmGo").onclick = () => {
   const name = $("nm").value.trim(); if (!name) return;
