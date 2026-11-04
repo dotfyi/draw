@@ -1161,7 +1161,7 @@ function renderGameList(force, cfgIn) {
       const b = document.createElement("button"); b.className = "gc" + (dis ? " off" : ""); b.style.setProperty("--c", g.c);
       const sub = dis ? "потрібен другий гравець" : (off && canBot ? "🤖 можна з ботом" : g.s);
       b.innerHTML = `<span class="gt">${g.e}</span><span class="gx"><b>${g.n}</b><small>${sub}</small></span><span class="ch">›</span>`;
-      b.onclick = () => { if (dis) { toast("для цієї гри потрібен другий гравець: бот у ній ще не вміє", "bad"); return; } openSheet(i); };
+      b.onclick = () => { if (dis) { toast("для цієї гри потрібен другий гравець: бот у ній ще не вміє грати", "bad"); return; } openSheet(i); };
       box.appendChild(b);
     });
   });
