@@ -1413,7 +1413,7 @@ ${editName ? `<div class="ro"><input id="nmEdit" maxlength="12" value="${esc(use
 <div class="ro col"><span>емодзі</span></div><div class="ems">${EMOJIS.map(e => `<button data-em="${e}"${e === user.emoji ? ' class="on"' : ""}>${e}</button>`).join("")}</div></div>
 <div class="sec">вигляд</div>
 <div class="card2"><div class="ro col"><span>тема</span><div class="seg">${[["auto", "авто"], ["light", "світла"], ["dark", "темна"]].map(([k, l]) => `<button data-th="${k}"${th === k ? ' class="on"' : ""}>${l}</button>`).join("")}</div></div>
-<div class="ro col"><span>оформлення</span><div class="seg">${[["auto", "як на сайті"], ["none", "звичайне"], ["halloween", "🎃"], ["winter", "❄️"]].map(([k, l]) => `<button data-sk="${k}"${(ls.get("dm_skin") || "auto") === k ? ' class="on"' : ""}>${l}</button>`).join("")}</div></div></div>
+<div class="ro col"><span>оформлення</span><div class="seg">${[["none", "звичайне"], ["halloween", "🎃"], ["winter", "❄️"]].map(([k, l]) => `<button data-sk="${k}"${(ls.get("dm_skin") || "auto") === k ? ' class="on"' : ""}>${l}</button>`).join("")}</div></div></div>
 <div class="sec">відгук</div>
 <div class="card2"><div class="ro"><span>вібрація</span><button class="sw${vb ? " on" : ""}" data-s="vib" aria-label="вібрація"></button></div><div class="ro"><span>звуки в малюванні</span><button class="sw${sn ? " on" : ""}" data-s="snd" aria-label="звуки"></button></div></div>
 <div class="sec">дані</div>
