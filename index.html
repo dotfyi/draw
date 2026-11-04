@@ -343,7 +343,7 @@ body.preview #pvClose{display:block}
 
 
 
-/* ===== LIQUID GLASS BOTTOM DOCK ===== */
+/* ===== LIQUID GLASS BOTTOM MENU ===== */
 
 #dock {
   display: none;
@@ -352,25 +352,25 @@ body.preview #pvClose{display:block}
   bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
   transform: translateX(-50%);
 
-  width: max-content;
-  max-width: calc(100vw - 24px);
+  width: min(720px, calc(100vw - 32px));
+  box-sizing: border-box;
 
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 4px;
 
-  padding: 7px;
+  padding: 9px;
 
-  background: rgba(255, 255, 255, 0.58);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
 
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  border-radius: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  border-radius: 999px;
 
   box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.10),
-    inset 0 1px 1px rgba(255, 255, 255, 0.8);
+    0 8px 30px rgba(0, 0, 0, 0.07),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9);
 
   z-index: 6;
 }
@@ -379,59 +379,49 @@ body.menu-on #dock {
   display: flex;
 }
 
-/* Пункти меню */
+/* Кнопки */
 .dk {
   position: relative;
 
   display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 94px;
+
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 7px;
 
-  flex: 0 0 62px;
-  width: 62px;
-  height: 58px;
-
-  gap: 3px;
-  padding: 5px 2px;
+  padding: 8px 2px;
 
   border: 1px solid transparent;
-  border-radius: 17px;
+  border-radius: 999px;
 
   background: transparent;
-  color: var(--muted);
+  color: #383838;
 
   cursor: pointer;
 
   transition:
     background .25s ease,
-    border .25s ease,
-    transform .2s ease,
-    color .2s ease;
+    color .25s ease,
+    transform .2s ease;
 }
 
-/* Емодзі замість SVG */
+/* Ховаємо старі SVG */
 .dk svg {
   display: none;
 }
 
-/* Текст */
-.dk span {
-  display: block !important;
-  font-size: 10px;
-  line-height: 1;
-  font-weight: 600;
-  letter-spacing: .2px;
-  text-transform: lowercase;
-}
-
-/* Емодзі перед текстом */
+/* Емодзі */
 .dk::before {
-  font-size: 21px;
-  line-height: 1.2;
+  display: block;
+  font-size: 43px;
+  line-height: 1;
 }
 
-/* Іконки кожного пункту */
+/* Емодзі для пунктів */
 .dk[data-tab="games"]::before {
   content: "🎮";
 }
@@ -448,36 +438,77 @@ body.menu-on #dock {
   content: "🚧";
 }
 
+/* Підписи */
+.dk span {
+  display: block !important;
+
+  font-size: 17px;
+  line-height: 1.15;
+  font-weight: 750;
+  letter-spacing: 0.1px;
+
+  white-space: nowrap;
+}
+
 /* Активний пункт */
 .dk.on {
-  color: var(--fg);
-  background: rgba(255, 255, 255, 0.72);
-  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.075);
+  border-color: transparent;
+  color: #000;
 
   box-shadow:
-    0 3px 10px rgba(0, 0, 0, 0.07),
-    inset 0 1px 2px rgba(255, 255, 255, 0.9);
+    inset 0 1px 2px rgba(0, 0, 0, 0.015);
 }
 
 /* Натискання */
 .dk:active {
-  transform: scale(.92);
+  transform: scale(0.96);
 }
 
-/* Темна тема */
+/* Прихована студія */
+.dk[hidden] {
+  display: none !important;
+}
+
+/* Адаптація для маленьких екранів */
+@media (max-width: 480px) {
+  #dock {
+    width: calc(100vw - 24px);
+    padding: 7px;
+    gap: 2px;
+  }
+
+  .dk {
+    height: 76px;
+    gap: 5px;
+  }
+
+  .dk::before {
+    font-size: 32px;
+  }
+
+  .dk span {
+    font-size: 12px;
+  }
+}
+
+/* Темна тема системи */
 @media (prefers-color-scheme: dark) {
   #dock {
-    background: rgba(35, 35, 38, 0.62);
-    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(35, 35, 38, 0.78);
+    border-color: rgba(255, 255, 255, 0.16);
 
     box-shadow:
-      0 8px 30px rgba(0, 0, 0, 0.3),
+      0 8px 30px rgba(0, 0, 0, 0.25),
       inset 0 1px 1px rgba(255, 255, 255, 0.12);
   }
 
+  .dk {
+    color: #dedede;
+  }
+
   .dk.on {
-    background: rgba(255, 255, 255, 0.14);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.13);
     color: #fff;
   }
 }
