@@ -96,6 +96,8 @@ const vib=p=>{try{if(localStorage.getItem("dm_vib")==="0")return}catch(e){}navig
 const $=id=>document.getElementById(id),room=localStorage.getItem("dm_room"),user=JSON.parse(localStorage.getItem("dm_user")||"null");
 if(!room||!user)location.href="index.html";
 const base=`${FB}/rooms/${ROOM}/dm/${room}`,other=s=>s==="v"?"a":"v";
+let L=null;try{L=JSON.parse(localStorage.getItem("dm_launch")||"null")}catch(e){}
+let botT=0,botBusy=false;
 let slot=null,db={},es=null,phase="place",fleet=[],selected=4,vertical=false,seenReaction=0,curGid,loggedGid=null;
 const lengths=[4,3,3,2,2,2,1,1,1,1];
 // верхній ряд — 4 старі, нижній — 4 нові
@@ -156,7 +158,7 @@ function render(){
   renderBoard();$("ships").innerHTML="";$("actions").innerHTML="";
   if(phase==="place"){
     [4,3,2,1].forEach(len=>{let total=lengths.filter(x=>x===len).length,done=fleet.filter(x=>x.len===len).length,btn=document.createElement("button");btn.className="pill"+(selected===len?" on":"");btn.textContent=`${len} палуб · ${done}/${total}`;btn.disabled=done>=total;btn.onclick=()=>{selected=len;render()};$("ships").append(btn)});
-    let rot=document.createElement("button");rot.className="pill on";rot.textContent=vertical?"↕ вертикально":"↔ горизонтально";rot.onclick=()=>{vertical=!vertical;render()};$("actions").append(rot);
+    let rot=document.createElement("button");rot.className="pill on";rot.textContent=vertical?"↕ вертикально":"↔ горизонтально";rot.onclick=()=>{vertical=!vertical;render()};$("actions").append(rot);let rd=document.createElement("button");rd.className="pill";rd.textContent="🎲 випадково";rd.onclick=()=>{fleet=randomFleet();vib(12);render()};$("actions").append(rd);if(fleet.length){let cl=document.createElement("button");cl.className="pill";cl.textContent="🗑";cl.onclick=()=>{fleet=[];selected=4;render()};$("actions").append(cl)}
     let ready=document.createElement("button");ready.className="primary";ready.textContent="готово";ready.disabled=fleet.length!==10;ready.onclick=submitFleet;$("actions").append(ready);
     $("title").textContent="розстав кораблі";$("subtitle").textContent="Вибери довжину внизу, орієнтацію та торкнись поля";$("fleet").textContent=`Розміщено: ${fleet.length}/10`;$("turn").textContent="";$("hint").textContent="Кораблі не можуть торкатися один одного, навіть по діагоналі.";$("bottom").style.display="none";
   }else{
@@ -176,21 +178,65 @@ function opp(){return db.battle?.players?.[other(slot)]||{}}
 
 async function submitFleet(){let payload={ships:fleet,ready:true};await write(`battle/players/${slot}`,payload);phase="wait";refresh()}
 
-async function fire(i){
-  let b=db.battle;if(b.turn!==slot||b.finished)return;
-  let prior=b.shots?.[slot]||{};if(prior[i])return;
-  let ships=opp().ships||[],result={...prior},ship=ships.find(s=>s.cells.includes(i)),now=Date.now();
+async function fire(i){return fireAs(slot,i)}
+/* випадкова розстановка: 10 кораблів, що не торкаються навіть по діагоналі */
+function randomFleet(){
+  for(let a=0;a<300;a++){
+    const ships=[],blocked=new Set();let ok=true;
+    for(const len of lengths){
+      let placed=false;
+      for(let t=0;t<200&&!placed;t++){
+        const cs=cellsFor(Math.floor(Math.random()*100),len,Math.random()<.5);
+        if(!cs||cs.some(i=>blocked.has(i)))continue;
+        ships.push({len,cells:cs});cs.forEach(i=>neighbours(i).forEach(n=>blocked.add(n)));placed=true;
+      }
+      if(!placed){ok=false;break}
+    }
+    if(ok)return ships;
+  }
+  return [];
+}
+/* бот: полює за шахівницею та добиває поранені кораблі */
+function botPick(b){
+  const sh=b.shots?.[b.bot]||{},free=[];for(let i=0;i<100;i++)if(!sh[i])free.push(i);
+  if(!free.length)return undefined;
+  const rnd=a=>a[Math.floor(Math.random()*a.length)],lvl=+(L&&L.cfg&&L.cfg.botLvl)||2;
+  if(lvl===1)return rnd(free);
+  const hits=Object.keys(sh).filter(k=>sh[k].type==="hit").map(Number);
+  if(hits.length){
+    const cand=new Set(),inb=(r,c)=>r>=0&&r<10&&c>=0&&c<10;
+    if(hits.length>=2){
+      const rows=new Set(hits.map(h=>Math.floor(h/10))),cols=new Set(hits.map(h=>h%10));
+      if(rows.size===1){const r=[...rows][0],cs=hits.map(h=>h%10);[Math.min(...cs)-1,Math.max(...cs)+1].forEach(c=>{if(inb(r,c)&&!sh[r*10+c])cand.add(r*10+c)})}
+      else if(cols.size===1){const c=[...cols][0],rs=hits.map(h=>Math.floor(h/10));[Math.min(...rs)-1,Math.max(...rs)+1].forEach(r=>{if(inb(r,c)&&!sh[r*10+c])cand.add(r*10+c)})}
+    }
+    if(!cand.size)hits.forEach(h=>{const r=Math.floor(h/10),c=h%10;[[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc])=>{if(inb(rr,cc)&&!sh[rr*10+cc])cand.add(rr*10+cc)})});
+    if(cand.size)return rnd([...cand]);
+  }
+  if(lvl===2&&Math.random()<.2)return rnd(free);
+  const par=free.filter(i=>(Math.floor(i/10)+i%10)%2===0);
+  return rnd(par.length?par:free);
+}
+function botSchedule(){
+  if(botT)return;
+  botT=setTimeout(()=>{botT=0;const b=db.battle;if(!b||!b.bot||b.finished||b.turn!==b.bot)return;const i=botPick(b);if(i!==undefined)fireAs(b.bot,i)},700+Math.random()*800);
+}
+
+async function fireAs(who,i){
+  let b=db.battle;if(b.turn!==who||b.finished)return;
+  let prior=b.shots?.[who]||{};if(prior[i])return;
+  let ships=(db.battle.players?.[other(who)]?.ships||[]),result={...prior},ship=ships.find(s=>s.cells.includes(i)),now=Date.now();
   result[i]={hit:!!ship,type:ship?"hit":"miss",t:now};
   let sunkShip=ship&&ship.cells.every(x=>result[x]?.hit);
   if(sunkShip){
     for(const x of ship.cells)result[x]={hit:true,type:"sunk",t:(result[x]&&result[x].t)||now};
     for(const x of ship.cells)for(const n of neighbours(x)){if(!result[n]&&!ship.cells.includes(n))result[n]={hit:false,type:"miss",auto:true}}
   }
-  await write(`battle/shots/${slot}`,result);
+  await write(`battle/shots/${who}`,result);
   let allSunk=ships.length>0&&ships.every(sh=>sh.cells.every(x=>result[x]?.hit));
-  if(allSunk){await write("battle/finished",true);await write("battle/winner",slot)}
-  else if(!ship){await write("battle/turn",other(slot))}
-  else{await write("battle/turn",slot)}
+  if(allSunk){await write("battle/finished",true);await write("battle/winner",who)}
+  else if(!ship){await write("battle/turn",other(who))}
+  else{await write("battle/turn",who)}
 }
 
 function tapFeedback(btn,emoji){
@@ -216,6 +262,7 @@ function sideStats(s){
 }
 function fmtTime(ms){let s=Math.round(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
 function logGame(b){
+  if(b.bot)return;
   const id="ships_"+(b.gid||"0");if(loggedGid===id)return;loggedGid=id;
   const a=sideStats("v"),c=sideStats("a"),times=a.times.concat(c.times);
   fetch(`${base}/stats/log/${id}.json`,{method:"PUT",keepalive:true,body:JSON.stringify({g:"ships",w:b.winner||"",sh:{v:[a.shots,a.hits],a:[c.shots,c.hits]},t:times.length?Math.max(...times):Date.now()})}).catch(()=>{});
@@ -244,7 +291,7 @@ function renderStats(){
 
 async function rematch(){
   const b=db.battle;if(!b||!b.finished)return;const loser=b.winner?other(b.winner):"v";
-  await write("battle",{gid:Date.now(),players:{},shots:{},turn:loser,started:false});
+  await write("battle",{gid:Date.now(),lid:b.lid||null,bot:b.bot||null,players:{},shots:{},turn:loser,started:false});
 }
 async function init(){
   let root=await read("");
@@ -252,7 +299,11 @@ async function init(){
   for(const s of ["v","a"])if(root.players[s]?.uid===user.uid)slot=s;
   if(!slot){alert("Цей профіль не є гравцем кімнати.");location.href="index.html";return}
   db=root;
-  if(!db.battle){const nb={gid:Date.now(),players:{},shots:{},turn:"v",started:false};await write("battle",nb);db.battle=nb}
+  const isShips=L&&L.game==="ships";
+  if(isShips&&(!db.battle||db.battle.lid!==L.id)){
+    if(L.by===slot){const nb={gid:Date.now(),lid:L.id,bot:L.bot||null,players:{},shots:{},turn:slot,started:false};await write("battle",nb);db.battle=nb}
+    else db.battle={gid:"wait",lid:"wait",players:{},shots:{},turn:"v"};
+  }else if(!db.battle){const nb={gid:Date.now(),players:{},shots:{},turn:"v",started:false};await write("battle",nb);db.battle=nb}
   curGid=db.battle.gid;
   fleet=db.battle?.players?.[slot]?.ships||[];
   if(db.battle?.players?.[slot]?.ready)phase="wait";
@@ -271,18 +322,21 @@ async function init(){
 function refresh(){
   if(!db.battle)return;
   let b=db.battle;
+  if(b.lid==="wait"){$("title").textContent="чекаємо запуск гри…";$("subtitle").textContent="";return}
   if(b.gid!==curGid){curGid=b.gid;fleet=[];selected=4;vertical=false;$("overlay").classList.remove("show")}
+  if(b.bot&&b.bot!==slot&&!botBusy&&!b.players?.[b.bot]?.ready){botBusy=true;write("battle/players/"+b.bot,{ships:randomFleet(),ready:true}).finally(()=>{botBusy=false})}
   let me=b.players?.[slot],op=b.players?.[other(slot)];
   if(me?.ready&&op?.ready)phase="match";else if(me?.ready)phase="wait";else phase="place";
   if(phase==="place"){fleet=me?.ships||fleet;render()}
   else if(phase==="wait"){$("title").textContent="чекаємо суперника";$("subtitle").textContent="Твій флот готовий. Гра почнеться, щойно суперник завершить розстановку.";$("board").innerHTML="";$("ships").innerHTML="";$("actions").innerHTML="";$("bottom").style.display="none";$("fleet").textContent="готово ✓";$("turn").textContent=""}
   else render();
   if(b.finished){
-    $("ovTitle").textContent=b.winner===slot?"перемога!":"суперник переміг";
+    $("ovTitle").textContent=b.winner===slot?"перемога!":(b.bot?"бот переміг 🤖":"суперник переміг");
     $("ovText").textContent=renderStats()||"Дякуємо за гру";
     $("overlay").classList.add("show");
     logGame(b)
   }else $("overlay").classList.remove("show");
+  if(b.bot&&b.bot!==slot&&phase==="match"&&b.turn===b.bot&&!b.finished)botSchedule();
 }
 
 $("back").onclick=()=>{if(es)es.close();location.href="index.html"};
