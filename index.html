@@ -702,6 +702,51 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 #s-welcome #toAuth{margin-top:0!important}
 #s-welcome .word span{background-image:linear-gradient(100deg,color-mix(in srgb,var(--b1,#e0507a) 58%,var(--fg)),color-mix(in srgb,color-mix(in srgb,var(--b1,#e0507a),var(--b2,#4a7de0)) 62%,var(--fg)),color-mix(in srgb,var(--b2,#4a7de0) 58%,var(--fg)),color-mix(in srgb,var(--b1,#e0507a) 58%,var(--fg)))!important;filter:drop-shadow(0 2px 0 color-mix(in srgb,var(--bg) 70%,transparent)) drop-shadow(0 12px 22px color-mix(in srgb,var(--b1,#e0507a) 14%,transparent))!important}
 #s-welcome .rule{background:linear-gradient(90deg,color-mix(in srgb,var(--b1,#e0507a) 58%,var(--fg)),color-mix(in srgb,var(--b2,#4a7de0) 58%,var(--fg)))}
+/* Альтернативний вхід */
+#s-welcome .auth-alt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, 230px);
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+#s-welcome .auth-alt::before,
+#s-welcome .auth-alt::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: color-mix(in srgb, var(--fg) 18%, transparent);
+}
+
+#s-welcome #toGuest {
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 7px 10px !important;
+  display: block !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--muted) !important;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--muted) 55%, transparent);
+  text-underline-offset: 3px;
+}
+
+/* Емодзі не успадковує градієнт заголовка */
+.hello::after {
+  -webkit-text-fill-color: initial;
+  color: initial;
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+}
 </style>
 </head>
 <body>
@@ -717,7 +762,8 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 <div class="tdots" id="tdots"></div>
 </div>
 <button class="blk cta" id="toAuth">авторизуватись</button>
-<button class="wht cta-secondary" id="toGuest">увійти як гість</button>
+<div class="auth-alt" aria-hidden="true"><span>або</span></div>
+<button class="lnk" id="toGuest">увійти як гість</button>
 <div class="foot" id="wFoot"></div>
 </div>
 <button id="pvClose">✕ закрити перегляд</button>
