@@ -694,6 +694,14 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 #s-welcome #toGuest{margin-top:5px!important;height:54px;padding-top:0;padding-bottom:0;display:flex;align-items:center;justify-content:center;font-weight:600;background:color-mix(in srgb,var(--pill) 80%,transparent);border:1.5px solid color-mix(in srgb,var(--fg) 14%,transparent)}
 #s-welcome #wFoot{margin-top:14px!important;max-width:300px;text-shadow:0 1px 10px color-mix(in srgb,var(--bg) 90%,transparent)}
 @media(prefers-reduced-motion:reduce){#s-welcome .word span,#s-welcome .stk,#s-welcome #toAuth::after,#s-welcome .rule i{animation:none!important}#s-welcome .word span{opacity:1}}
+/* ── правки: чорна кнопка, вищий і спокійніший логотип, червоне поле коду ── */
+#cells.bad i{border-color:var(--bad)!important;color:var(--bad);background:color-mix(in srgb,var(--bad) 9%,var(--pill));box-shadow:0 0 0 3px color-mix(in srgb,var(--bad) 18%,transparent)}
+#s-welcome #toAuth{background:#111!important;color:#fff!important;border:1px solid rgba(255,255,255,.16);box-shadow:0 14px 30px rgba(0,0,0,.28)!important}
+#s-welcome #toAuth::after{background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%)}
+#s-welcome .hero{margin-bottom:clamp(70px,19vh,170px)!important}
+#s-welcome #toAuth{margin-top:0!important}
+#s-welcome .word span{background-image:linear-gradient(100deg,color-mix(in srgb,var(--b1,#e0507a) 58%,var(--fg)),color-mix(in srgb,color-mix(in srgb,var(--b1,#e0507a),var(--b2,#4a7de0)) 62%,var(--fg)),color-mix(in srgb,var(--b2,#4a7de0) 58%,var(--fg)),color-mix(in srgb,var(--b1,#e0507a) 58%,var(--fg)))!important;filter:drop-shadow(0 2px 0 color-mix(in srgb,var(--bg) 70%,transparent)) drop-shadow(0 12px 22px color-mix(in srgb,var(--b1,#e0507a) 14%,transparent))!important}
+#s-welcome .rule{background:linear-gradient(90deg,color-mix(in srgb,var(--b1,#e0507a) 58%,var(--fg)),color-mix(in srgb,var(--b2,#4a7de0) 58%,var(--fg)))}
 </style>
 </head>
 <body>
@@ -897,7 +905,7 @@ const meHtml = u => `<b>${u.emoji}</b><span>${esc(u.name)}</span>`;
 /* ───── налаштування головного екрана (зберігаються для всіх) ───── */
 const DEF_SITE = {
   rev: 3, brand: "GRAI", logo: "🎨", cta: "почати грати", foot: "Ігри для двох · без реєстрації · миттєвий старт",
-  tagline: ["Хто кого сьогодні? 😏", "Один екран — дві долі.", "Малюй, вгадуй, ображайся жартома.", "Ще одна партія? Ну ще одна.", "Реванш — це не слабкість.", "Тут перемагають, усміхаючись."],
+  tagline: ["Хто кого сьогодні? 😏", "Один екран — дві долі.", "Малюй, вгадуй, жартуй.", "Ще одна партія? Ну ще одна.", "Реванш — це не слабкість.", "Тут перемагають, усміхаючись."],
   emojis: ["🎨", "✏️", "🖍️", "🔤", "❓", "🧩", "🖌️", "💡", "🎲", "✨", "🖼️", "🕵️", "🔄", "📝", "🐊", "🚢"],
   count: 16, size: "m", motion: "float", touch: "repel", tapfx: "pop", bg: "candy", font: "round", brandFx: "gradient", skin: "none", acc: "none", btn: "dark", radius: "normal", uiFont: "system", density: "normal", layout: "list", tiles: "tint", menuBg: "plain", anim: "on", greet: "", hidden: [], order: [], botOn: true, botLvl: 2, showStats: true, showPresence: true
 };
@@ -1052,25 +1060,32 @@ fetch(`${FB}/rooms/${ROOM}/site.json`).then(r => r.json()).then(d => {
 applySkin();
 
 /* ───── екран коду ───── */
-let codeVal = "", codeCb = null, backTo = "s-welcome";
+let codeVal = "", codeCb = null, backTo = "s-welcome", codeAuto = false, submitting = false;
 (() => { "123456789 0⌫".split("").forEach(k => { const b = document.createElement("button"); if (k === " ") { b.style.visibility = "hidden"; } else { b.textContent = k; b.dataset.k = k; } $("pad").appendChild(b); }); })();
 function paintCode() { [...$("cells").children].forEach((c, i) => { c.textContent = codeVal[i] || ""; c.classList.toggle("f", i === codeVal.length); }); $("cgo").disabled = codeVal.length < 4; }
-function openCode(title, btn, hint, back, cb) { codeVal = ""; codeCb = cb; backTo = back; $("ctitle").textContent = title; $("cgo").textContent = btn; $("chint").textContent = hint; $("cerr").textContent = ""; paintCode(); go("s-code"); }
-function keyIn(k) { if (k === "⌫") codeVal = codeVal.slice(0, -1); else if (codeVal.length < 4) codeVal += k; $("cerr").textContent = ""; paintCode(); }
+function openCode(title, btn, hint, back, cb, auto) { codeVal = ""; codeCb = cb; backTo = back; codeAuto = !!auto; submitting = false; $("cgo").style.display = auto ? "none" : ""; $("cells").classList.remove("bad"); $("ctitle").textContent = title; $("cgo").textContent = btn; $("chint").textContent = hint; $("cerr").textContent = ""; paintCode(); go("s-code"); }
+function keyIn(k) { if ($("cells").classList.contains("bad") || submitting) return; if (k === "⌫") codeVal = codeVal.slice(0, -1); else if (codeVal.length < 4) codeVal += k; $("cerr").textContent = ""; paintCode(); if (codeAuto && k !== "⌫" && codeVal.length === 4) setTimeout(submitCode, 160); }
 $("pad").onclick = e => { const b = e.target.closest("button[data-k]"); if (b) { vib(8); keyIn(b.dataset.k); } };
 addEventListener("keydown", e => { if (cur() !== "s-code") return; if (/^\d$/.test(e.key)) keyIn(e.key); else if (e.key === "Backspace") keyIn("⌫"); else if (e.key === "Enter" && codeVal.length === 4) $("cgo").click(); });
 $("cback").onclick = () => go(backTo);
-$("cgo").onclick = async () => {
-  $("cgo").disabled = true;
+async function submitCode() {
+  if (submitting || codeVal.length < 4) return;
+  submitting = true; $("cgo").disabled = true;
   const err = await codeCb(codeVal);
-  if (err) { $("cerr").textContent = err; $("cells").classList.remove("shake"); void $("cells").offsetWidth; $("cells").classList.add("shake"); vib([20, 40, 20]); codeVal = ""; paintCode(); }
-};
+  submitting = false;
+  if (err) {
+    const c = $("cells"); $("cerr").textContent = err;
+    c.classList.remove("shake"); void c.offsetWidth; c.classList.add("shake", "bad"); vib([90, 50, 90, 50, 140]);
+    setTimeout(() => { c.classList.remove("bad"); codeVal = ""; paintCode(); }, 700);
+  }
+}
+$("cgo").onclick = submitCode;
 
 /* ───── вхід ───── */
 $("toAuth").onclick = () => document.body.classList.contains("preview") ? 0 : openCode("введи код", "увійти", "", "s-welcome", code => {
   if (CODES[code]) return login({ ...CODES[code], uid: "u_" + CODES[code].pref });
   return "невірний код";
-});
+}, true);
 $("toGuest").onclick = () => {
   if (document.body.classList.contains("preview")) return;
   $("nm").value = ""; go("s-name");
