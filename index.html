@@ -1649,6 +1649,8 @@ function selectGiftCategory(category) {
   activeGiftCategory = category;
   renderGiftCatalog();
 }
+window.selectGiftCategory = selectGiftCategory;
+window.sendGift = sendGift;
 
 function renderGiftCatalog() {
   const el = $("giftCatalog");
