@@ -1375,6 +1375,7 @@ function renderHeader() {
     : `${hello()}, ${user.name}`;
 
   const helloEl = $("mHello");
+helloEl.innerHTML = `${hello()},<br>${esc(user.name)}`;
   helloEl.replaceChildren();
 
   let parts;
