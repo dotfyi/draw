@@ -779,6 +779,54 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 :root[data-theme="dark"] .dk.on {
   background: rgba(255, 255, 255, 0.16) !important;
 }
+/* Емодзі в привітанні — без градієнта */
+.hello .emoji-plain {
+  display: inline-block;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+  color: inherit !important;
+  animation: none !important;
+}
+
+/* Активний пункт меню */
+.dk.on {
+  border: 1px solid rgba(45, 45, 45, 0.32) !important;
+  background: rgba(255, 255, 255, 0.58) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.10),
+    inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+/* Плавне збільшення емодзі активної вкладки */
+.dk::before {
+  transition: font-size .2s ease, transform .2s ease;
+}
+
+.dk.on::before {
+  font-size: 30px;
+  transform: scale(1.08);
+}
+
+/* Активна вкладка в темній темі */
+:root[data-theme="dark"] .dk.on {
+  border-color: rgba(255,255,255,.42) !important;
+  background: rgba(255,255,255,.18) !important;
+  box-shadow: 0 2px 9px rgba(0,0,0,.24);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .dk.on {
+    border-color: rgba(255,255,255,.42) !important;
+    background: rgba(255,255,255,.18) !important;
+  }
+}
+
+/* Трохи зміщуємо емодзі над GRAI ліворуч */
+#s-welcome .stk {
+  right: 11% !important;
+}
 </style>
 </head>
 <body>
@@ -1322,7 +1370,33 @@ function renderGameList(force, cfgIn) {
 
 function hello() { const h = new Date().getHours(); return h < 5 ? "доброї ночі" : h < 12 ? "доброго ранку" : h < 18 ? "добрий день" : "добрий вечір"; }
 function renderHeader() {
-  $("mHello").textContent = site.greet ? site.greet.replace("{name}", user.name).replace("{hello}", hello()) : `${hello()}, ${user.name}`;
+  const greeting = site.greet
+    ? site.greet.replace("{name}", user.name).replace("{hello}", hello())
+    : `${hello()}, ${user.name}`;
+
+  const helloEl = $("mHello");
+  helloEl.replaceChildren();
+
+  let parts;
+  try {
+    parts = [...new Intl.Segmenter(undefined, {
+      granularity: "grapheme"
+    }).segment(greeting)].map(x => x.segment);
+  } catch (e) {
+    parts = Array.from(greeting);
+  }
+
+  parts.forEach(ch => {
+    if (/\p{Extended_Pictographic}/u.test(ch)) {
+      const span = document.createElement("span");
+      span.className = "emoji-plain";
+      span.textContent = ch;
+      helloEl.appendChild(span);
+    } else {
+      helloEl.appendChild(document.createTextNode(ch));
+    }
+  });
+
   $("mAv").textContent = user.emoji;
   const o = otherOf(mySlot), p = db.players && db.players[o], pr = db.presence && db.presence[o];
   const on = p && pr && Date.now() - pr < 45000;
