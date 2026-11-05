@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#ffffff">
 <script>(function(){try{var t=localStorage.getItem("dm_theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()</script>
-<link rel="apple-touch-icon" href="E722EAF1-B3AC-4FF4-8276-3C1C301DBEE1.png">
+<link rel="apple-touch-icon" href="D146F804-D91D-4ED1-8312-C3C094169B11.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
 <title>GRAI</title>
 <style>
@@ -508,9 +508,6 @@ body.menu-on #dock {
 
 .dk[data-tab="studio"]::before {
   content: "🚧";
-}
-.dk[data-tab="profile"]::before {
-  content: "👤";
 }
 
 /* Активний пункт */
@@ -1724,7 +1721,12 @@ function renderGiftCatalog() {
 }
 
 function sendGift(emoji) {
-  if (!rc || !mySlot) return;
+  alert("rc: " + rc + " | mySlot: " + mySlot);
+
+  if (!rc || !mySlot) {
+    alert("Не знайдено кімнату або гравця");
+    return;
+  }
 
   const allowed = Object.values(GIFT_CATEGORIES).flat();
   if (!allowed.includes(emoji)) return;
@@ -1741,7 +1743,10 @@ function sendGift(emoji) {
   });
 
   renderGiftHistory();
+  alert("Подарунок відправлено!");
 }
+
+window.sendGift = sendGift;
 
 function renderGiftHistory() {
   const el = $("giftHistory");
