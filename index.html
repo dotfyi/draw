@@ -1394,7 +1394,8 @@ const GAMES = [
   { id: "xo", e: "❌", n: "хрестики-нулики", s: "серія до N перемог", c: "255,90,115", g: 1, d: "Класика на двох: поле 3×3, ходите по черзі, а хто ходить першим, чергується. Грайте серію до потрібної кількості перемог. Знизу видно статистику серії та за весь час." },
   { id: "bomb", e: "💣", n: "розмінуй бомбу", s: "говоріть вголос — розмінуйте разом", c: "235,70,70", g: 1, d: "Один (сапер) бачить бомбу: дроти, кнопку, символи й кольори. Другий (штаб) має інструкцію, але нічого не бачить. Описуйте усе вголос і розмінуйте разом до того, як спливе час. Після кожної бомби ролі міняються, а гра триває до першого вибуху." },
   { id: "erudit", e: "🔠", n: "ерудит", s: "складай слова на полі 15×15", c: "120,100,230", g: 1, d: "Класичний «Ерудит»: поле 15×15, по 7 фішок, бонусні клітинки на літеру й слово, порожні фішки та бонус за всі сім літер. Слова перевіряє ваша довіра: сумніваєшся — оскаржуй, а автор вирішує. Підказку з онлайн-словника видно біля кожного слова." },
-  { id: "ships", e: "🚢", n: "морський бій", s: "класичний флот 10×10", c: "60,130,220", g: 1, d: "Розставте кораблі на полі 10×10 і по черзі шукайте флот суперника. Влучання дає додатковий постріл, а промах передає хід супернику." }
+  { id: "ships", e: "🚢", n: "морський бій", s: "класичний флот 10×10", c: "60,130,220", g: 1, d: "Розставте кораблі на полі 10×10 і по черзі шукайте флот суперника. Влучання дає додатковий постріл, а промах передає хід супернику." },
+  { id: "bingo", e: "🎱", n: "бінго", s: "знаходь числа й збирай лінії", c: "80,150,210", g: 1, d: "Класичне бінго: знаходьте числа на картках і збирайте виграшні лінії." }
 ];
 const GMETA = Object.fromEntries(GAMES.map(g => [g.id, g]));
 const cfg = { n: +ls.get("h_n") || 5, lives: +ls.get("h_l") || 8, rounds: +ls.get("d_rounds") || 5, crocN: +ls.get("c_n") || 6, findN: +ls.get("f_n") || 10, xoN: +ls.get("x_n") || 3, bombLvl: +ls.get("b_l") || 2, dur: +ls.get("d_dur") || 60000, cat: ls.get("d_cat") || "всі слова", botLvl: +ls.get("b_lv") || 2 };
@@ -1529,6 +1530,7 @@ function run(l) {
   closeSheet();
   if (l.game === "word") { gKey = ""; go("s-hang"); renderHang(); }
   else if (l.game === "ships") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "battleship.html"; }
+  else if (l.game === "bingo") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "bingo.html"; }
   else if (l.game === "erudit") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "erudit.html"; }
   else if (l.game === "xo") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "xo.html"; }
   else if (l.game === "bomb") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "bomb.html"; }
