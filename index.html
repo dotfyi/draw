@@ -1632,7 +1632,7 @@ function renderStudio() {
   const acc = (id, title, body) => `<div class="card2 acc${studioOpen[id] ? " open" : ""}"><button class="acc-h" data-acc="${id}"><span>${title}</span><i>›</i></button><div class="acc-b">${body}</div></div>`;
   const home = `<div class="adm-note">Це бачать усі на екрані входу.</div>
 <div class="adl"><div class="ol">готові набори</div><div class="og">${[["def", "звичайний"], ["halloween", "🎃 геловін"], ["winter", "❄️ зима"]].map(([v, l]) => `<button class="chip" data-pre="${v}">${l}</button>`).join("")}</div></div>
-${txt("brand", "назва", "draw & more")}${txt("logo", "емодзі над назвою", "🎨")}
+${txt("brand", "назва", "grai")}${txt("logo", "емодзі над назвою", "🎨")}
 <div class="adl"><div class="ol">підписи під назвою (кожен з нового рядка, змінюються по колу)</div><textarea class="ai" data-k="tagline" rows="4">${esc((D.tagline || []).join("\n"))}</textarea></div>
 ${txt("cta", "текст кнопки", "авторизуватись")}${txt("foot", "нижній рядок", "")}
 <div class="adl"><div class="ol">емодзі на фоні (через пробіл)</div><input class="ai" data-k="emojis" value="${esc((D.emojis || []).join(" "))}" autocomplete="off"><div class="og" style="margin-top:10px">${EMOJI_SETS.map(([l], i) => `<button class="chip" data-set="${i}">${l}</button>`).join("")}</div></div>
@@ -1760,7 +1760,7 @@ ${isAdmin() ? `
   </div>
 </div>
 ` : ""}
-<div class="ver">draw &amp; more · зроблено для двох 💛</div>`;
+<div class="ver">grai · зроблено для двох 💛</div>`;
 }
 $("p-set").onclick = async e => {
   const b = e.target.closest("button"); if (!b) return;
