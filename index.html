@@ -121,37 +121,68 @@ body.preview #pvClose{display:block}
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 7px;
+  gap: 8px;
   flex: none;
+  min-width: 88px;
+}
+
+.profile-xp #mAv {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 38px;
+  background: var(--pill);
+  border: 3px solid #d9aa42;
+  box-shadow: 0 4px 13px rgba(190, 145, 45, .22);
+}
+
+.profile-level {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .4px;
+  color: var(--muted);
+  margin-top: 1px;
 }
 
 .xp-pill {
   margin: 0;
-  padding: 7px 11px;
-  font-size: 12px;
-}
-.xp-pill {
-  margin-left: auto;
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 9px 12px;
-  border: 1px solid var(--line);
+  padding: 6px 13px;
+  min-width: 88px;
+  border: 1px solid #e0b84f;
   border-radius: 999px;
-  background: var(--pill);
-  color: var(--fg);
-  font-size: 13px;
-  font-weight: 700;
+  background: linear-gradient(135deg, #fff0b8, #e9bd55);
+  color: #60430c;
+  font-size: 14px;
+  font-weight: 900;
   white-space: nowrap;
-  box-shadow: 0 3px 10px var(--sh);
-  transition: transform .2s;
+  box-shadow: 0 3px 9px rgba(190, 145, 45, .2);
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
 }
 
 .xp-pill:active {
   transform: scale(.94);
+  box-shadow: 0 1px 4px rgba(190, 145, 45, .2);
+}
+
+.xp-progress {
+  width: 88px;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--line);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.08);
+}
+
+.xp-progress-fill {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #dba936, #ffda72);
+  transition: width .7s cubic-bezier(.2,.8,.2,1);
 }
 .hello{font:600 27px var(--serif);line-height:1.1}
 .st{font-size:13px;color:var(--muted);margin-top:5px}
@@ -931,12 +962,18 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
   </div>
 
   <div class="profile-xp">
-    <div class="av" id="mAv"></div>
+  <div class="av" id="mAv"></div>
 
-    <button class="xp-pill" id="mXp" onclick="setTab('stats')">
-      🏆 0 XP
-    </button>
+  <div class="profile-level" id="mLevel">РІВЕНЬ 1</div>
+
+  <button class="xp-pill" id="mXp" onclick="setTab('stats')">
+    🏆 0 XP
+  </button>
+
+  <div class="xp-progress">
+    <span class="xp-progress-fill" id="mXpFill"></span>
   </div>
+</div>
 </div>
 
 <div id="glist" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -1443,6 +1480,13 @@ function getMyXP() {
     return total + points;
   }, 0);
 }
+function getXPLevel(xp) {
+  const step = 10;
+  const level = Math.floor(xp / step) + 1;
+  const progress = (xp % step) / step * 100;
+
+  return { level, progress };
+}
 function renderHeader() {
   const greeting = site.greet
   ? site.greet.replace("{name}", `\n${user.name}`).replace("{hello}", hello())
@@ -1472,8 +1516,13 @@ helloEl.innerHTML = `${hello()},<br>${esc(user.name)}`;
     }
   });
 
-  $("mXp").textContent = `🏆 ${getMyXP()} XP`;
-  $("mAv").textContent = user.emoji;
+const xp = getMyXP();
+const levelInfo = getXPLevel(xp);
+
+$("mXp").textContent = `🏆 ${xp} XP`;
+$("mAv").textContent = user.emoji;
+$("mLevel").textContent = `РІВЕНЬ ${levelInfo.level}`;
+$("mXpFill").style.width = `${levelInfo.progress}%`;
   const o = otherOf(mySlot), p = db.players && db.players[o], pr = db.presence && db.presence[o];
   const on = p && pr && Date.now() - pr < 45000;
   $("mSt").textContent = (rc === DUO ? "" : `🔑 ${rc} · `) + (p ? (on ? `❤️ ${p.name} онлайн` : `💔 ${p.name} не в мережі`) : "чекаємо другого гравця…");
