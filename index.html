@@ -1639,6 +1639,24 @@ function selectGiftCategory(category) {
   renderGiftCatalog();
 }
 
+
+const GIFT_CATEGORIES = {
+  "Романтичні": ["❤️","💝","💖","💕","💘","💗","💓","💞","🌹","💐","🌷","💌","🫶"],
+  "Милі": ["🧸","🐻","🐰","🐱","🐼","🐥","🦊","🐨","🎀","🦋"],
+  "Солодощі": ["🍫","🍬","🍭","🍩","🍪","🍰","🧁","🍓","🍒","🍯","🧋"],
+  "Сюрпризи": ["🎁","🎊","🎉","💎","👑","🏆","🪄","🎈","🪅","🕯️"],
+  "Особливі": ["⭐","🌟","🌙","☀️","🌈","✨","🌸","🌻","🪻"]
+};
+
+let activeGiftCategory = "Романтичні";
+
+function selectGiftCategory(category) {
+  if (!GIFT_CATEGORIES[category]) return;
+  activeGiftCategory = category;
+  renderGiftCatalog();
+  renderGiftHistory();
+}
+
 function renderGiftCatalog() {
   const el = $("giftCatalog");
   if (!el) return;
