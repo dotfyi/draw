@@ -1482,14 +1482,18 @@ function getXPLevel(xp) {
 
   return { level, progress };
 }
+
 function renderProfile() {
   const el = $("profileContent");
-  const friend = pl(otherOf(mySlot));
-const isFriend = rc === DUO && !!(db.players && db.players[otherOf(mySlot)]);
   if (!el) return;
+
+  const friend = pl(otherOf(mySlot));
+  const isFriend = rc === DUO &&
+    !!(db.players && db.players[otherOf(mySlot)]);
 
   const xp = getMyXP();
   const info = getXPLevel(xp);
+
   const log = Object.values((db.stats && db.stats.log) || {})
     .filter(x => x && GMETA[x.g]);
 
@@ -1497,16 +1501,25 @@ const isFriend = rc === DUO && !!(db.players && db.players[otherOf(mySlot)]);
 
   el.innerHTML = `
     <div style="
-      padding:22px 16px;
-      border-radius:24px;
-      background:linear-gradient(135deg,#fce7f3,#ede9fe);
-      color:#35243a;
+      padding:26px 20px;
+      border-radius:26px;
+      background:#f3eee6;
+      color:#403a32;
       text-align:center;
-      margin:12px 0 18px;
+      margin:12px 0 16px;
+      border:1px solid #e8dfd2;
     ">
-      <div style="font-size:64px;margin-bottom:8px">
-        ${esc(user.emoji)}
-      </div>
+      <div style="
+        width:82px;
+        height:82px;
+        margin:0 auto 12px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:50%;
+        background:#fffaf3;
+        font-size:45px;
+      ">${esc(user.emoji)}</div>
 
       <div style="font-size:25px;font-weight:800">
         ${esc(user.name)}
@@ -1514,35 +1527,35 @@ const isFriend = rc === DUO && !!(db.players && db.players[otherOf(mySlot)]);
 
       <div style="
         display:inline-block;
-        margin-top:10px;
+        margin-top:9px;
         padding:7px 15px;
         border-radius:30px;
-        background:#ffffffb8;
+        background:#fffaf3;
+        color:#74634f;
+        font-size:13px;
         font-weight:800;
-      ">
-        ⭐ РІВЕНЬ ${info.level}
-      </div>
+      ">РІВЕНЬ ${info.level}</div>
 
-      <div style="font-size:19px;font-weight:800;margin-top:16px">
-        🏆 ${xp} XP
+      <div style="font-size:22px;font-weight:800;margin-top:18px">
+        ${xp} <span style="font-size:13px;color:#8c7c69">XP</span>
       </div>
 
       <div style="
-        height:10px;
-        background:#ffffffa8;
+        height:8px;
+        background:#ded4c6;
         border-radius:20px;
         overflow:hidden;
-        margin-top:10px;
+        margin-top:12px;
       ">
         <div style="
           height:100%;
           width:${info.progress}%;
-          background:#bd69a0;
+          background:#a58b6b;
           border-radius:20px;
         "></div>
       </div>
 
-      <div style="font-size:12px;margin-top:7px">
+      <div style="font-size:12px;color:#8c7c69;margin-top:8px">
         До наступного рівня
       </div>
     </div>
@@ -1553,86 +1566,149 @@ const isFriend = rc === DUO && !!(db.players && db.players[otherOf(mySlot)]);
       gap:12px;
     ">
       <div style="
-        padding:20px 10px;
+        padding:19px 10px;
         border-radius:20px;
         background:var(--card);
         text-align:center;
+        border:1px solid #eae4da;
       ">
-        <div style="font-size:28px">🎮</div>
+        <div style="font-size:25px">🎮</div>
         <div style="font-size:25px;font-weight:800">${log.length}</div>
         <div class="st">зіграно ігор</div>
       </div>
 
       <div style="
-        padding:20px 10px;
+        padding:19px 10px;
         border-radius:20px;
         background:var(--card);
         text-align:center;
+        border:1px solid #eae4da;
       ">
-        <div style="font-size:28px">🏆</div>
+        <div style="font-size:25px">🏆</div>
         <div style="font-size:25px;font-weight:800">${wins}</div>
         <div class="st">перемог</div>
       </div>
     </div>
+
     <div style="
-  margin-top:18px;
-  padding:18px;
-  border-radius:20px;
-  background:var(--card);
-  text-align:center;
-">
-  <div style="font-size:32px">💞</div>
-  <div style="font-size:18px;font-weight:800">
-    ${isFriend ? "Ви друзі!" : "Чекаємо на друга"}
-  </div>
-  <div class="st">
-    ${isFriend ? `Ти та ${esc(friend.name)} — разом у GRAI ❤️` : "Коли друг приєднається, він з'явиться тут"}
-  </div>
-</div>
-        <div style="margin-top:24px">
-      <div style="font-size:21px;font-weight:800;margin-bottom:12px">
-        🎁 Подарунки для Аліни
+      margin-top:14px;
+      padding:19px;
+      border-radius:20px;
+      background:var(--card);
+      border:1px solid #eae4da;
+      text-align:center;
+    ">
+      <div style="font-size:27px">🤍</div>
+      <div style="font-size:17px;font-weight:800;margin-top:5px">
+        ${isFriend ? "Ви друзі!" : "Чекаємо на друга"}
       </div>
+      <div class="st" style="margin-top:5px">
+        ${isFriend
+          ? `Ти та ${esc(friend.name)} — разом у GRAI`
+          : "Коли друг приєднається, він з'явиться тут"}
+      </div>
+    </div>
+
+    <div style="margin-top:25px">
+      <div style="font-size:20px;font-weight:800;color:var(--text)">
+        Подарунки для Аліни
+      </div>
+      <div class="st" style="margin-top:4px;margin-bottom:12px">
+        Обери щось приємне 💌
+      </div>
+
       <div id="giftCatalog"></div>
 
-      <div style="font-size:21px;font-weight:800;margin:24px 0 12px">
-        💌 Історія подарунків
-      </div>
+      <div style="
+        font-size:20px;
+        font-weight:800;
+        margin:25px 0 12px;
+        color:var(--text);
+      ">Історія подарунків</div>
+
       <div id="giftHistory"></div>
     </div>
   `;
-    renderGiftCatalog();
-  renderGiftHistory();
+
+  
+let activeGiftCategory = "Романтичні";
+
+function selectGiftCategory(category) {
+  if (!GIFT_CATEGORIES[category]) return;
+  activeGiftCategory = category;
+  renderGiftCatalog();
 }
-const GIFT_CATEGORIES = {
-  "Романтичні": ["❤️","💝","💖","💕","💘","💗","💓","💞","🌹","💐","🌷","💌","🫶"],
-  "Милі": ["🧸","🐻","🐰","🐱","🐼","🐥","🦊","🐨","🎀","🦋"],
-  "Солодощі": ["🍫","🍬","🍭","🍩","🍪","🍰","🧁","🍓","🍒","🍯","🧋"],
-  "Сюрпризи": ["🎁","🎊","🎉","💎","👑","🏆","🪄","🎈","🪅","🕯️"],
-  "Особливі": ["⭐","🌟","🌙","☀️","🌈","✨","🌸","🌻","🪻"]
-};
 
 function renderGiftCatalog() {
   const el = $("giftCatalog");
   if (!el) return;
 
-  el.innerHTML = Object.entries(GIFT_CATEGORIES).map(([category, gifts]) => `
-    <div style="margin:18px 0">
-      <div style="font-weight:800;margin-bottom:10px">
-        ${category}
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
-        ${gifts.map(emoji => `
-          <button
-            type="button"
-            onclick="sendGift('${emoji}')"
-            style="font-size:27px;padding:10px 2px;border:0;border-radius:14px;background:var(--card);cursor:pointer"
-          >${emoji}</button>
-        `).join("")}
-      </div>
+  const categories = Object.keys(GIFT_CATEGORIES);
+  const gifts = GIFT_CATEGORIES[activeGiftCategory] ||
+    GIFT_CATEGORIES[categories[0]];
+
+  el.innerHTML = `
+    <div style="
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      padding:3px 2px 12px;
+      scrollbar-width:none;
+    ">
+      ${categories.map(category => `
+        <button
+          type="button"
+          onclick="selectGiftCategory('${category}')"
+          style="
+            flex:0 0 auto;
+            border:1px solid ${activeGiftCategory === category ? "#a58b6b" : "#e8dfd2"};
+            border-radius:30px;
+            padding:9px 14px;
+            background:${activeGiftCategory === category ? "#a58b6b" : "var(--card)"};
+            color:${activeGiftCategory === category ? "#fff" : "var(--text)"};
+            font-size:12px;
+            font-weight:700;
+            cursor:pointer;
+          "
+        >${category}</button>
+      `).join("")}
     </div>
-  `).join("");
+
+    <div style="
+      display:flex;
+      gap:10px;
+      overflow-x:auto;
+      padding:4px 2px 12px;
+      scroll-snap-type:x mandatory;
+      scrollbar-width:thin;
+    ">
+      ${gifts.map(emoji => `
+        <button
+          type="button"
+          onclick="sendGift('${emoji}')"
+          style="
+            flex:0 0 66px;
+            height:70px;
+            border:1px solid #eae4da;
+            border-radius:17px;
+            background:var(--card);
+            font-size:31px;
+            cursor:pointer;
+            scroll-snap-align:start;
+          "
+        >${emoji}</button>
+      `).join("")}
+    </div>
+
+    <div class="st" style="text-align:center;font-size:11px">
+      Обери категорію та гортай подарунки вбік →
+    </div>
+  `;
 }
+
+  renderGiftHistory();
+}
+
 function sendGift(emoji) {
   if (!rc || !mySlot) return;
 
