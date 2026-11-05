@@ -117,6 +117,28 @@ body.preview #pvClose{display:block}
 .pane{display:none;flex-direction:column;gap:12px}
 .pane.on{display:flex;animation:fi .35s both}
 .ph{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0 4px}
+.xp-pill {
+  margin-left: auto;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--pill);
+  color: var(--fg);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px var(--sh);
+  transition: transform .2s;
+}
+
+.xp-pill:active {
+  transform: scale(.94);
+}
 .hello{font:600 27px var(--serif);line-height:1.1}
 .st{font-size:13px;color:var(--muted);margin-top:5px}
 .av{width:46px;height:46px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:26px;border:1px solid var(--line);flex:none}
@@ -887,7 +909,20 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 
 <div class="s" id="s-menu">
 <section class="pane on" id="p-games">
-<div class="ph"><div><div class="hello" id="mHello"></div><div class="st" id="mSt"></div></div><div class="av" id="mAv"></div></div>
+
+<div class="ph">
+  <div>
+    <div class="hello" id="mHello"></div>
+    <div class="st" id="mSt"></div>
+  </div>
+
+  <button class="xp-pill" id="mXp" onclick="setTab('stats')">
+    🏆 0 XP
+  </button>
+
+  <div class="av" id="mAv"></div>
+</div>
+
 <div id="glist" style="display:flex;flex-direction:column;gap:10px"></div>
 </section>
 <section class="pane" id="p-stats"></section>
@@ -1373,6 +1408,24 @@ function renderGameList(force, cfgIn) {
 }
 
 function hello() { const h = new Date().getHours(); return h < 5 ? "доброї ночі" : h < 12 ? "доброго ранку" : h < 18 ? "добрий день" : "добрий вечір"; }
+function getMyXP() {
+  const log = Object.values((db.stats && db.stats.log) || {});
+
+  return log.reduce((total, game) => {
+    if (!game || !GMETA[game.g]) return total;
+
+    // +10 XP за зіграну партію
+    let points = 10;
+
+    // +5 XP за перемогу
+    if (game.w === mySlot) points += 5;
+
+    // +2 XP за нічию або спільну перемогу
+    else if (!game.w) points += 2;
+
+    return total + points;
+  }, 0);
+}
 function renderHeader() {
   const greeting = site.greet
   ? site.greet.replace("{name}", `\n${user.name}`).replace("{hello}", hello())
@@ -1402,6 +1455,7 @@ helloEl.innerHTML = `${hello()},<br>${esc(user.name)}`;
     }
   });
 
+  $("mXp").textContent = `🏆 ${getMyXP()} XP`;
   $("mAv").textContent = user.emoji;
   const o = otherOf(mySlot), p = db.players && db.players[o], pr = db.presence && db.presence[o];
   const on = p && pr && Date.now() - pr < 45000;
