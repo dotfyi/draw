@@ -509,6 +509,9 @@ body.menu-on #dock {
 .dk[data-tab="studio"]::before {
   content: "🚧";
 }
+.dk[data-tab="profile"]::before {
+  content: "👤";
+}
 
 /* Активний пункт */
 .dk.on {
@@ -960,20 +963,6 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
     <div class="hello" id="mHello"></div>
     <div class="st" id="mSt"></div>
   </div>
-
-  <div class="profile-xp">
-  <div class="av" id="mAv"></div>
-
-  <div class="profile-level" id="mLevel">РІВЕНЬ 1</div>
-
-  <button class="xp-pill" id="mXp" onclick="setTab('stats')">
-    🏆 0 XP
-  </button>
-
-  <div class="xp-progress">
-    <span class="xp-progress-fill" id="mXpFill"></span>
-  </div>
-</div>
 </div>
 
 <div id="glist" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -981,6 +970,9 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 <section class="pane" id="p-stats"></section>
 <section class="pane" id="p-set"></section>
 <section class="pane" id="p-studio"></section>
+<section class="pane" id="p-profile">
+  <div id="profileContent"></div>
+</section>
 
 </div>
 
@@ -988,6 +980,9 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 <button class="dk on" data-tab="games"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span>ігри</span></button>
 <button class="dk" data-tab="stats"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></svg><span>статистика</span></button>
 <button class="dk" data-tab="set"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span>меню</span></button>
+<button class="dk" data-tab="profile">
+  <span>профіль</span>
+</button>
 <button class="dk" data-tab="studio" hidden><svg viewBox="0 0 24 24"><path d="M4 20l9-9"/><path d="M14 4l1.2 2.6L18 8l-2.8 1.4L14 12l-1.2-2.6L10 8l2.8-1.4z"/><path d="M19 14l.7 1.5L21 16l-1.3.7L19 18l-.7-1.3L17 16l1.3-.5z"/></svg><span>студія</span></button>
 </nav>
 
@@ -1487,6 +1482,231 @@ function getXPLevel(xp) {
 
   return { level, progress };
 }
+function renderProfile() {
+  const el = $("profileContent");
+  const friend = pl(otherOf(mySlot));
+const isFriend = rc === DUO && !!(db.players && db.players[otherOf(mySlot)]);
+  if (!el) return;
+
+  const xp = getMyXP();
+  const info = getXPLevel(xp);
+  const log = Object.values((db.stats && db.stats.log) || {})
+    .filter(x => x && GMETA[x.g]);
+
+  const wins = log.filter(x => x.w === mySlot).length;
+
+  el.innerHTML = `
+    <div style="
+      padding:22px 16px;
+      border-radius:24px;
+      background:linear-gradient(135deg,#fce7f3,#ede9fe);
+      color:#35243a;
+      text-align:center;
+      margin:12px 0 18px;
+    ">
+      <div style="font-size:64px;margin-bottom:8px">
+        ${esc(user.emoji)}
+      </div>
+
+      <div style="font-size:25px;font-weight:800">
+        ${esc(user.name)}
+      </div>
+
+      <div style="
+        display:inline-block;
+        margin-top:10px;
+        padding:7px 15px;
+        border-radius:30px;
+        background:#ffffffb8;
+        font-weight:800;
+      ">
+        ⭐ РІВЕНЬ ${info.level}
+      </div>
+
+      <div style="font-size:19px;font-weight:800;margin-top:16px">
+        🏆 ${xp} XP
+      </div>
+
+      <div style="
+        height:10px;
+        background:#ffffffa8;
+        border-radius:20px;
+        overflow:hidden;
+        margin-top:10px;
+      ">
+        <div style="
+          height:100%;
+          width:${info.progress}%;
+          background:#bd69a0;
+          border-radius:20px;
+        "></div>
+      </div>
+
+      <div style="font-size:12px;margin-top:7px">
+        До наступного рівня
+      </div>
+    </div>
+
+    <div style="
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    ">
+      <div style="
+        padding:20px 10px;
+        border-radius:20px;
+        background:var(--card);
+        text-align:center;
+      ">
+        <div style="font-size:28px">🎮</div>
+        <div style="font-size:25px;font-weight:800">${log.length}</div>
+        <div class="st">зіграно ігор</div>
+      </div>
+
+      <div style="
+        padding:20px 10px;
+        border-radius:20px;
+        background:var(--card);
+        text-align:center;
+      ">
+        <div style="font-size:28px">🏆</div>
+        <div style="font-size:25px;font-weight:800">${wins}</div>
+        <div class="st">перемог</div>
+      </div>
+    </div>
+    <div style="
+  margin-top:18px;
+  padding:18px;
+  border-radius:20px;
+  background:var(--card);
+  text-align:center;
+">
+  <div style="font-size:32px">💞</div>
+  <div style="font-size:18px;font-weight:800">
+    ${isFriend ? "Ви друзі!" : "Чекаємо на друга"}
+  </div>
+  <div class="st">
+    ${isFriend ? `Ти та ${esc(friend.name)} — разом у GRAI ❤️` : "Коли друг приєднається, він з'явиться тут"}
+  </div>
+</div>
+        <div style="margin-top:24px">
+      <div style="font-size:21px;font-weight:800;margin-bottom:12px">
+        🎁 Подарунки для Аліни
+      </div>
+      <div id="giftCatalog"></div>
+
+      <div style="font-size:21px;font-weight:800;margin:24px 0 12px">
+        💌 Історія подарунків
+      </div>
+      <div id="giftHistory"></div>
+    </div>
+  `;
+    renderGiftCatalog();
+  renderGiftHistory();
+}
+const GIFT_CATEGORIES = {
+  "Романтичні": ["❤️","💝","💖","💕","💘","💗","💓","💞","🌹","💐","🌷","💌","🫶"],
+  "Милі": ["🧸","🐻","🐰","🐱","🐼","🐥","🦊","🐨","🎀","🦋"],
+  "Солодощі": ["🍫","🍬","🍭","🍩","🍪","🍰","🧁","🍓","🍒","🍯","🧋"],
+  "Сюрпризи": ["🎁","🎊","🎉","💎","👑","🏆","🪄","🎈","🪅","🕯️"],
+  "Особливі": ["⭐","🌟","🌙","☀️","🌈","✨","🌸","🌻","🪻"]
+};
+
+function renderGiftCatalog() {
+  const el = $("giftCatalog");
+  if (!el) return;
+
+  el.innerHTML = Object.entries(GIFT_CATEGORIES).map(([category, gifts]) => `
+    <div style="margin:18px 0">
+      <div style="font-weight:800;margin-bottom:10px">
+        ${category}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+        ${gifts.map(emoji => `
+          <button
+            type="button"
+            onclick="sendGift('${emoji}')"
+            style="font-size:27px;padding:10px 2px;border:0;border-radius:14px;background:var(--card);cursor:pointer"
+          >${emoji}</button>
+        `).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+function sendGift(emoji) {
+  if (!rc || !mySlot) return;
+
+  const allowed = Object.values(GIFT_CATEGORIES).flat();
+  if (!allowed.includes(emoji)) return;
+
+  const other = otherOf(mySlot);
+  const key = Date.now().toString(36) + "_" +
+    Math.random().toString(36).slice(2, 9);
+
+  put("gifts/" + key, {
+    emoji: emoji,
+    from: mySlot,
+    to: other,
+    t: Date.now()
+  });
+
+  renderGiftHistory();
+}
+
+function renderGiftHistory() {
+  const el = $("giftHistory");
+  if (!el) return;
+
+  const gifts = Object.values(db.gifts || {})
+    .filter(g => g && g.emoji && g.t)
+    .sort((a, b) => b.t - a.t)
+    .slice(0, 30);
+
+  if (!gifts.length) {
+    el.innerHTML = `
+      <div class="st" style="padding:14px;text-align:center">
+        Тут поки немає подарунків. Зроби перший сюрприз! 💝
+      </div>
+    `;
+    return;
+  }
+
+  el.innerHTML = gifts.map(g => {
+    const sender = db.players && db.players[g.from];
+    const receiver = db.players && db.players[g.to];
+
+    const fromName = esc(sender ? sender.name : "Гравець");
+    const toName = esc(receiver ? receiver.name : "Гравець");
+
+    const date = new Date(g.t).toLocaleString("uk-UA", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    return `
+      <div style="
+        display:flex;
+        align-items:center;
+        gap:12px;
+        padding:12px;
+        margin-bottom:8px;
+        border-radius:16px;
+        background:var(--card);
+      ">
+        <div style="font-size:34px">${g.emoji}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700">
+            ${fromName} → ${toName}
+          </div>
+          <div class="st">${date}</div>
+        </div>
+        <div>💌</div>
+      </div>
+    `;
+  }).join("");
+}
 function renderHeader() {
   const greeting = site.greet
   ? site.greet.replace("{name}", `\n${user.name}`).replace("{hello}", hello())
@@ -1516,28 +1736,28 @@ helloEl.innerHTML = `${hello()},<br>${esc(user.name)}`;
     }
   });
 
-const xp = getMyXP();
-const levelInfo = getXPLevel(xp);
-
-$("mXp").textContent = `🏆 ${xp} XP`;
-$("mAv").textContent = user.emoji;
-$("mLevel").textContent = `РІВЕНЬ ${levelInfo.level}`;
-$("mXpFill").style.width = `${levelInfo.progress}%`;
   const o = otherOf(mySlot), p = db.players && db.players[o], pr = db.presence && db.presence[o];
   const on = p && pr && Date.now() - pr < 45000;
   $("mSt").textContent = (rc === DUO ? "" : `🔑 ${rc} · `) + (p ? (on ? `❤️ ${p.name} онлайн` : `💔 ${p.name} не в мережі`) : "чекаємо другого гравця…");
   if (site.showPresence === false) $("mSt").textContent = "";
   try { renderGameList(); } catch (e) {}
 }
-function renderMenu() { renderHeader(); if (tab === "stats") renderStats(); }
+function renderMenu() {
+  renderHeader();
+  if (tab === "stats") renderStats();
+  else if (tab === "profile") renderProfile();
+}
 
 /* ───── вкладки ───── */
 let tab = "games";
 function setTab(t) {
   if (tab === "studio" && t !== "studio" && typeof sdraft !== "undefined" && sdraft) applyDesign(site);
   tab = t; editName = false;
-  ["games", "stats", "set", "studio"].forEach(x => { $("p-" + x).classList.toggle("on", x === t); document.querySelector(`[data-tab="${x}"]`).classList.toggle("on", x === t); });
-  if (t === "stats") renderStats(); else if (t === "set") renderSettings(); else if (t === "studio") renderStudio();
+  ["games", "stats", "set", "studio", "profile"].forEach(x => { $("p-" + x).classList.toggle("on", x === t); document.querySelector(`[data-tab="${x}"]`).classList.toggle("on", x === t); });
+  if (t === "stats") renderStats();
+else if (t === "set") renderSettings();
+else if (t === "studio") renderStudio();
+else if (t === "profile") renderProfile();
   renderHeader(); $("s-menu").scrollTop = 0;
 }
 $("dock").onclick = e => { const b = e.target.closest("[data-tab]"); if (b && b.dataset.tab !== tab) { vib(8); setTab(b.dataset.tab); } };
