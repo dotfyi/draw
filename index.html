@@ -121,68 +121,37 @@ body.preview #pvClose{display:block}
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 7px;
   flex: none;
-  min-width: 88px;
-}
-
-.profile-xp #mAv {
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 38px;
-  background: var(--pill);
-  border: 3px solid #d9aa42;
-  box-shadow: 0 4px 13px rgba(190, 145, 45, .22);
-}
-
-.profile-level {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: .4px;
-  color: var(--muted);
-  margin-top: 1px;
 }
 
 .xp-pill {
   margin: 0;
-  padding: 6px 13px;
-  min-width: 88px;
-  border: 1px solid #e0b84f;
+  padding: 7px 11px;
+  font-size: 12px;
+}
+.xp-pill {
+  margin-left: auto;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
   border-radius: 999px;
-  background: linear-gradient(135deg, #fff0b8, #e9bd55);
-  color: #60430c;
-  font-size: 14px;
-  font-weight: 900;
+  background: var(--pill);
+  color: var(--fg);
+  font-size: 13px;
+  font-weight: 700;
   white-space: nowrap;
-  box-shadow: 0 3px 9px rgba(190, 145, 45, .2);
-  cursor: pointer;
-  transition: transform .2s, box-shadow .2s;
+  box-shadow: 0 3px 10px var(--sh);
+  transition: transform .2s;
 }
 
 .xp-pill:active {
   transform: scale(.94);
-  box-shadow: 0 1px 4px rgba(190, 145, 45, .2);
-}
-
-.xp-progress {
-  width: 88px;
-  height: 7px;
-  overflow: hidden;
-  border-radius: 99px;
-  background: var(--line);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.08);
-}
-
-.xp-progress-fill {
-  display: block;
-  width: 0%;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #dba936, #ffda72);
-  transition: width .7s cubic-bezier(.2,.8,.2,1);
 }
 .hello{font:600 27px var(--serif);line-height:1.1}
 .st{font-size:13px;color:var(--muted);margin-top:5px}
@@ -960,6 +929,14 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
     <div class="hello" id="mHello"></div>
     <div class="st" id="mSt"></div>
   </div>
+
+  <div class="profile-xp">
+    <div class="av" id="mAv"></div>
+
+    <button class="xp-pill" id="mXp" onclick="setTab('stats')">
+      🏆 0 XP
+    </button>
+  </div>
 </div>
 
 <div id="glist" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -967,9 +944,6 @@ html[data-anim="off"] *{animation:none!important;transition:none!important}
 <section class="pane" id="p-stats"></section>
 <section class="pane" id="p-set"></section>
 <section class="pane" id="p-studio"></section>
-<section class="pane" id="p-profile">
-  <div id="profileContent"></div>
-</section>
 
 </div>
 
@@ -1419,15 +1393,16 @@ const GAMES = [
   { id: "find", e: "🔢", n: "знайди число", s: "хто швидше знайде число", c: "235,105,70", g: 1, d: "На полі хаотично розкидані числа. Зверху зʼявляється число — хто першим його знайде й торкнеться, той отримує бал. Помилився — пауза 1,5 с. Грають до заданої кількості очок." },
   { id: "xo", e: "❌", n: "хрестики-нулики", s: "серія до N перемог", c: "255,90,115", g: 1, d: "Класика на двох: поле 3×3, ходите по черзі, а хто ходить першим, чергується. Грайте серію до потрібної кількості перемог. Знизу видно статистику серії та за весь час." },
   { id: "bomb", e: "💣", n: "розмінуй бомбу", s: "говоріть вголос — розмінуйте разом", c: "235,70,70", g: 1, d: "Один (сапер) бачить бомбу: дроти, кнопку, символи й кольори. Другий (штаб) має інструкцію, але нічого не бачить. Описуйте усе вголос і розмінуйте разом до того, як спливе час. Після кожної бомби ролі міняються, а гра триває до першого вибуху." },
+  { id: "bingo", e: "🎱", n: "бінго", s: "хто першим крикне «бінго»", c: "210,90,200", g: 1, d: "У кожного своя картка 5×5. Кульки падають по черзі, а ти позначаєш числа, що випали. Хто першим збере лінію (рядок, стовпчик чи діагональ) і крикне «Бінго!», той виграє раунд. Видно, скільки чисел бракує суперникові." },
+  { id: "loto", e: "🎟️", n: "лото", s: "бочонки, квитки, хто першим закриє ряд", c: "205,120,70", g: 1, d: "Класичне лото: у кожного квитки з рядами по 5 чисел. Бочонки падають по черзі, а ти закриваєш числа, що випали. Хто першим закриє потрібну кількість рядів і натисне «Лото!», той виграє раунд. Видно, скільки чисел бракує суперникові." },
   { id: "erudit", e: "🔠", n: "ерудит", s: "складай слова на полі 15×15", c: "120,100,230", g: 1, d: "Класичний «Ерудит»: поле 15×15, по 7 фішок, бонусні клітинки на літеру й слово, порожні фішки та бонус за всі сім літер. Слова перевіряє ваша довіра: сумніваєшся — оскаржуй, а автор вирішує. Підказку з онлайн-словника видно біля кожного слова." },
-  { id: "ships", e: "🚢", n: "морський бій", s: "класичний флот 10×10", c: "60,130,220", g: 1, d: "Розставте кораблі на полі 10×10 і по черзі шукайте флот суперника. Влучання дає додатковий постріл, а промах передає хід супернику." },
-  { id: "bingo", e: "🎱", n: "бінго", s: "знаходь числа й збирай лінії", c: "80,150,210", g: 1, d: "Класичне бінго: знаходьте числа на картках і збирайте виграшні лінії." }
+  { id: "ships", e: "🚢", n: "морський бій", s: "класичний флот 10×10", c: "60,130,220", g: 1, d: "Розставте кораблі на полі 10×10 і по черзі шукайте флот суперника. Влучання дає додатковий постріл, а промах передає хід супернику." }
 ];
 const GMETA = Object.fromEntries(GAMES.map(g => [g.id, g]));
-const cfg = { n: +ls.get("h_n") || 5, lives: +ls.get("h_l") || 8, rounds: +ls.get("d_rounds") || 5, crocN: +ls.get("c_n") || 6, findN: +ls.get("f_n") || 10, xoN: +ls.get("x_n") || 3, bombLvl: +ls.get("b_l") || 2, dur: +ls.get("d_dur") || 60000, cat: ls.get("d_cat") || "всі слова", botLvl: +ls.get("b_lv") || 2 };
+const cfg = { n: +ls.get("h_n") || 5, lives: +ls.get("h_l") || 8, rounds: +ls.get("d_rounds") || 5, crocN: +ls.get("c_n") || 6, findN: +ls.get("f_n") || 10, xoN: +ls.get("x_n") || 3, bombLvl: +ls.get("b_l") || 2, dur: +ls.get("d_dur") || 60000, cat: ls.get("d_cat") || "всі слова", botLvl: +ls.get("b_lv") || 2, bingoN: +ls.get("bg_n") || 3, bingoSpd: +ls.get("bg_s") || 2200, bingoAuto: +ls.get("bg_a") || 0, lotoN: +ls.get("lt_n") || 3, lotoSpd: +ls.get("lt_s") || 1500, lotoAuto: +ls.get("lt_a") || 0, lotoTix: +ls.get("lt_t") || 2, lotoLines: +ls.get("lt_l") || 1 };
 const DCATS = ["🐾 тварини", "🍕 їжа", "🏠 речі", "🌋 природа", "🚀 транспорт", "🧙 професії й герої", "🎈 спорт і розваги", "🏰 будівлі та місця", "🎲 різне", "💕 про нас", "🎯 всі слова"].map(x => [x.slice(x.indexOf(" ") + 1), x]);
 let picked = null, glKey = "";
-const BOTG = { xo: 1, ships: 1, find: 1, word: 1 };
+const BOTG = { xo: 1, ships: 1, find: 1, word: 1, bingo: 1, loto: 1 };
 function partnerOn() { const o = otherOf(mySlot), pr = db.presence && db.presence[o]; return !!(pr && Date.now() - pr < 45000); }
 function sortedAll(C) { const ord = C.order || []; return GAMES.map((g, i) => ({ g, i })).sort((a, b) => { const ia = ord.indexOf(a.g.id), ib = ord.indexOf(b.g.id); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.i - b.i; }); }
 function renderGameList(force, cfgIn) {
@@ -1469,336 +1444,6 @@ function getMyXP() {
     return total + points;
   }, 0);
 }
-function getXPLevel(xp) {
-  const step = 10;
-  const level = Math.floor(xp / step) + 1;
-  const progress = (xp % step) / step * 100;
-
-  return { level, progress };
-}
-
-function renderProfile() {
-  const el = $("profileContent");
-  if (!el) return;
-
-  const friend = pl(otherOf(mySlot));
-  const isFriend = rc === DUO &&
-    !!(db.players && db.players[otherOf(mySlot)]);
-
-  const xp = getMyXP();
-  const info = getXPLevel(xp);
-
-  const log = Object.values((db.stats && db.stats.log) || {})
-    .filter(x => x && GMETA[x.g]);
-
-  const wins = log.filter(x => x.w === mySlot).length;
-
-  el.innerHTML = `
-    <div style="
-      padding:26px 20px;
-      border-radius:26px;
-      background:#f3eee6;
-      color:#403a32;
-      text-align:center;
-      margin:12px 0 16px;
-      border:1px solid #e8dfd2;
-    ">
-      <div style="
-        width:82px;
-        height:82px;
-        margin:0 auto 12px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        border-radius:50%;
-        background:#fffaf3;
-        font-size:45px;
-      ">${esc(user.emoji)}</div>
-
-      <div style="font-size:25px;font-weight:800">
-        ${esc(user.name)}
-      </div>
-
-      <div style="
-        display:inline-block;
-        margin-top:9px;
-        padding:7px 15px;
-        border-radius:30px;
-        background:#fffaf3;
-        color:#74634f;
-        font-size:13px;
-        font-weight:800;
-      ">РІВЕНЬ ${info.level}</div>
-
-      <div style="font-size:22px;font-weight:800;margin-top:18px">
-        ${xp} <span style="font-size:13px;color:#8c7c69">XP</span>
-      </div>
-
-      <div style="
-        height:8px;
-        background:#ded4c6;
-        border-radius:20px;
-        overflow:hidden;
-        margin-top:12px;
-      ">
-        <div style="
-          height:100%;
-          width:${info.progress}%;
-          background:#a58b6b;
-          border-radius:20px;
-        "></div>
-      </div>
-
-      <div style="font-size:12px;color:#8c7c69;margin-top:8px">
-        До наступного рівня
-      </div>
-    </div>
-
-    <div style="
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    ">
-      <div style="
-        padding:19px 10px;
-        border-radius:20px;
-        background:var(--card);
-        text-align:center;
-        border:1px solid #eae4da;
-      ">
-        <div style="font-size:25px">🎮</div>
-        <div style="font-size:25px;font-weight:800">${log.length}</div>
-        <div class="st">зіграно ігор</div>
-      </div>
-
-      <div style="
-        padding:19px 10px;
-        border-radius:20px;
-        background:var(--card);
-        text-align:center;
-        border:1px solid #eae4da;
-      ">
-        <div style="font-size:25px">🏆</div>
-        <div style="font-size:25px;font-weight:800">${wins}</div>
-        <div class="st">перемог</div>
-      </div>
-    </div>
-
-    <div style="
-      margin-top:14px;
-      padding:19px;
-      border-radius:20px;
-      background:var(--card);
-      border:1px solid #eae4da;
-      text-align:center;
-    ">
-      <div style="font-size:27px">🤍</div>
-      <div style="font-size:17px;font-weight:800;margin-top:5px">
-        ${isFriend ? "Ви друзі!" : "Чекаємо на друга"}
-      </div>
-      <div class="st" style="margin-top:5px">
-        ${isFriend
-          ? `Ти та ${esc(friend.name)} — разом у GRAI`
-          : "Коли друг приєднається, він з'явиться тут"}
-      </div>
-    </div>
-
-    <div style="margin-top:25px">
-      <div style="font-size:20px;font-weight:800;color:var(--text)">
-        Подарунки для Аліни
-      </div>
-      <div class="st" style="margin-top:4px;margin-bottom:12px">
-        Обери щось приємне 💌
-      </div>
-
-      <div id="giftCatalog"></div>
-
-      <div style="
-        font-size:20px;
-        font-weight:800;
-        margin:25px 0 12px;
-        color:var(--text);
-      ">Історія подарунків</div>
-
-      <div id="giftHistory"></div>
-    </div>
-  `;
-
-  
-
-
-
-const GIFT_CATEGORIES = {
-  "Романтичні": ["❤️","💝","💖","💕","💘","💗","💓","💞","🌹","💐","🌷","💌","🫶"],
-  "Милі": ["🧸","🐻","🐰","🐱","🐼","🐥","🦊","🐨","🎀","🦋"],
-  "Солодощі": ["🍫","🍬","🍭","🍩","🍪","🍰","🧁","🍓","🍒","🍯","🧋"],
-  "Сюрпризи": ["🎁","🎊","🎉","💎","👑","🏆","🪄","🎈","🪅","🕯️"],
-  "Особливі": ["⭐","🌟","🌙","☀️","🌈","✨","🌸","🌻","🪻"]
-};
-
-let activeGiftCategory = "Романтичні";
-
-function selectGiftCategory(category) {
-  if (!GIFT_CATEGORIES[category]) return;
-  activeGiftCategory = category;
-  renderGiftCatalog();
-}
-window.selectGiftCategory = selectGiftCategory;
-window.sendGift = sendGift;
-
-function renderGiftCatalog() {
-  const el = $("giftCatalog");
-  if (!el) return;
-
-  const categories = Object.keys(GIFT_CATEGORIES);
-  const gifts = GIFT_CATEGORIES[activeGiftCategory] ||
-    GIFT_CATEGORIES[categories[0]];
-
-  el.innerHTML = `
-    <div style="
-      display:flex;
-      gap:8px;
-      overflow-x:auto;
-      padding:3px 2px 12px;
-      scrollbar-width:none;
-    ">
-      ${categories.map(category => `
-        <button
-          type="button"
-          onclick="selectGiftCategory('${category}')"
-          style="
-            flex:0 0 auto;
-            border:1px solid ${activeGiftCategory === category ? "#a58b6b" : "#e8dfd2"};
-            border-radius:30px;
-            padding:9px 14px;
-            background:${activeGiftCategory === category ? "#a58b6b" : "var(--card)"};
-            color:${activeGiftCategory === category ? "#fff" : "var(--text)"};
-            font-size:12px;
-            font-weight:700;
-            cursor:pointer;
-          "
-        >${category}</button>
-      `).join("")}
-    </div>
-
-    <div style="
-      display:flex;
-      gap:10px;
-      overflow-x:auto;
-      padding:4px 2px 12px;
-      scroll-snap-type:x mandatory;
-      scrollbar-width:thin;
-    ">
-      ${gifts.map(emoji => `
-        <button
-          type="button"
-          onclick="sendGift('${emoji}')"
-          style="
-            flex:0 0 66px;
-            height:70px;
-            border:1px solid #eae4da;
-            border-radius:17px;
-            background:var(--card);
-            font-size:31px;
-            cursor:pointer;
-            scroll-snap-align:start;
-          "
-        >${emoji}</button>
-      `).join("")}
-    </div>
-
-    <div class="st" style="text-align:center;font-size:11px">
-      Обери категорію та гортай подарунки вбік →
-    </div>
-  `;
-}
-
-  renderGiftCatalog();
-  renderGiftHistory();
-}
-
-function sendGift(emoji) {
-  alert("rc: " + rc + " | mySlot: " + mySlot);
-
-  if (!rc || !mySlot) {
-    alert("Не знайдено кімнату або гравця");
-    return;
-  }
-
-  const allowed = Object.values(GIFT_CATEGORIES).flat();
-  if (!allowed.includes(emoji)) return;
-
-  const other = otherOf(mySlot);
-  const key = Date.now().toString(36) + "_" +
-    Math.random().toString(36).slice(2, 9);
-
-  put("gifts/" + key, {
-    emoji: emoji,
-    from: mySlot,
-    to: other,
-    t: Date.now()
-  });
-
-  renderGiftHistory();
-  alert("Подарунок відправлено!");
-}
-
-window.sendGift = sendGift;
-
-function renderGiftHistory() {
-  const el = $("giftHistory");
-  if (!el) return;
-
-  const gifts = Object.values(db.gifts || {})
-    .filter(g => g && g.emoji && g.t)
-    .sort((a, b) => b.t - a.t)
-    .slice(0, 30);
-
-  if (!gifts.length) {
-    el.innerHTML = `
-      <div class="st" style="padding:14px;text-align:center">
-        Тут поки немає подарунків. Зроби перший сюрприз! 💝
-      </div>
-    `;
-    return;
-  }
-
-  el.innerHTML = gifts.map(g => {
-    const sender = db.players && db.players[g.from];
-    const receiver = db.players && db.players[g.to];
-
-    const fromName = esc(sender ? sender.name : "Гравець");
-    const toName = esc(receiver ? receiver.name : "Гравець");
-
-    const date = new Date(g.t).toLocaleString("uk-UA", {
-      day: "2-digit",
-      month: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-
-    return `
-      <div style="
-        display:flex;
-        align-items:center;
-        gap:12px;
-        padding:12px;
-        margin-bottom:8px;
-        border-radius:16px;
-        background:var(--card);
-      ">
-        <div style="font-size:34px">${g.emoji}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:700">
-            ${fromName} → ${toName}
-          </div>
-          <div class="st">${date}</div>
-        </div>
-        <div>💌</div>
-      </div>
-    `;
-  }).join("");
-}
 function renderHeader() {
   const greeting = site.greet
   ? site.greet.replace("{name}", `\n${user.name}`).replace("{hello}", hello())
@@ -1828,28 +1473,23 @@ helloEl.innerHTML = `${hello()},<br>${esc(user.name)}`;
     }
   });
 
+  $("mXp").textContent = `🏆 ${getMyXP()} XP`;
+  $("mAv").textContent = user.emoji;
   const o = otherOf(mySlot), p = db.players && db.players[o], pr = db.presence && db.presence[o];
   const on = p && pr && Date.now() - pr < 45000;
   $("mSt").textContent = (rc === DUO ? "" : `🔑 ${rc} · `) + (p ? (on ? `❤️ ${p.name} онлайн` : `💔 ${p.name} не в мережі`) : "чекаємо другого гравця…");
   if (site.showPresence === false) $("mSt").textContent = "";
   try { renderGameList(); } catch (e) {}
 }
-function renderMenu() {
-  renderHeader();
-  if (tab === "stats") renderStats();
-  else if (tab === "profile") renderProfile();
-}
+function renderMenu() { renderHeader(); if (tab === "stats") renderStats(); }
 
 /* ───── вкладки ───── */
 let tab = "games";
 function setTab(t) {
   if (tab === "studio" && t !== "studio" && typeof sdraft !== "undefined" && sdraft) applyDesign(site);
   tab = t; editName = false;
-  ["games", "stats", "set", "studio", "profile"].forEach(x => { $("p-" + x).classList.toggle("on", x === t); document.querySelector(`[data-tab="${x}"]`).classList.toggle("on", x === t); });
-  if (t === "stats") renderStats();
-else if (t === "set") renderSettings();
-else if (t === "studio") renderStudio();
-else if (t === "profile") renderProfile();
+  ["games", "stats", "set", "studio"].forEach(x => { $("p-" + x).classList.toggle("on", x === t); document.querySelector(`[data-tab="${x}"]`).classList.toggle("on", x === t); });
+  if (t === "stats") renderStats(); else if (t === "set") renderSettings(); else if (t === "studio") renderStudio();
   renderHeader(); $("s-menu").scrollTop = 0;
 }
 $("dock").onclick = e => { const b = e.target.closest("[data-tab]"); if (b && b.dataset.tab !== tab) { vib(8); setTab(b.dataset.tab); } };
@@ -1868,6 +1508,8 @@ function openSheet(i) {
   if (picked.id === "word") $("dSet").append(chips("питань", "n", [3, 5, 10], "h_n"), chips("спроб на помилки", "lives", [6, 8, 10], "h_l"));
   if (picked.id === "croc") $("dSet").append(chips("раундів", "crocN", [4, 6, 10], "c_n"));
   if (picked.id === "find") $("dSet").append(chips("до скількох очок", "findN", [5, 10, 15], "f_n"));
+  if (picked.id === "bingo") $("dSet").append(chips("до скількох перемог", "bingoN", [1, 3, 5], "bg_n"), chips("швидкість кульок", "bingoSpd", [[3000, "повільно"], [2200, "звичайно"], [1500, "швидко"]], "bg_s"), chips("позначки на картці", "bingoAuto", [[0, "вручну"], [1, "автоматично"]], "bg_a"));
+  if (picked.id === "loto") $("dSet").append(chips("до скількох перемог", "lotoN", [1, 3, 5], "lt_n"), chips("щоб виграти раунд", "lotoLines", [[1, "1 ряд"], [2, "2 ряди"], [3, "3 ряди"]], "lt_l"), chips("квитків у гравця", "lotoTix", [1, 2], "lt_t"), chips("швидкість бочонків", "lotoSpd", [[2200, "повільно"], [1500, "звичайно"], [1000, "швидко"]], "lt_s"), chips("позначки на квитках", "lotoAuto", [[0, "вручну"], [1, "автоматично"]], "lt_a"));
   if (picked.id === "xo") $("dSet").append(chips("до скількох перемог", "xoN", [2, 3, 5, 10], "x_n"));
   if (picked.id === "bomb") $("dSet").append(chips("складність", "bombLvl", [[1, "легка · 2 модулі"], [2, "звичайна · 3"], [3, "складна · 4"]], "b_l"));
   if (picked.id === "same" || picked.id === "guess") $("dSet").append(chips("раунди", "rounds", [3, 5, 10], "d_rounds"), chips("час на малюнок", "dur", [[30000, "30 с"], [60000, "60 с"], [90000, "90 с"]], "d_dur"), chips("слова", "cat", DCATS, "d_cat"));
@@ -1881,7 +1523,7 @@ function closeSheet() { picked = null; document.body.classList.remove("sh-open")
 $("scrim").onclick = $("shClose").onclick = () => closeSheet();
 function startGame(bot) {
   if (!picked) return;
-  const l = { id: rnd(), game: picked.id, by: mySlot, bot: bot ? otherOf(mySlot) : null, cfg: { n: cfg.n, lives: cfg.lives, rounds: cfg.rounds, dur: cfg.dur, cat: cfg.cat, crocN: cfg.crocN, findN: cfg.findN, xoN: cfg.xoN, bombLvl: cfg.bombLvl, botLvl: cfg.botLvl } };
+  const l = { id: rnd(), game: picked.id, by: mySlot, bot: bot ? otherOf(mySlot) : null, cfg: { n: cfg.n, lives: cfg.lives, rounds: cfg.rounds, dur: cfg.dur, cat: cfg.cat, crocN: cfg.crocN, findN: cfg.findN, xoN: cfg.xoN, bombLvl: cfg.bombLvl, botLvl: cfg.botLvl, bingoN: cfg.bingoN, bingoSpd: cfg.bingoSpd, bingoAuto: cfg.bingoAuto, lotoN: cfg.lotoN, lotoSpd: cfg.lotoSpd, lotoAuto: cfg.lotoAuto, lotoTix: cfg.lotoTix, lotoLines: cfg.lotoLines } };
   if (l.game === "word") put("game", newHang({ ...l.cfg, bot: l.bot }));
   launchSeen = l.id; if (!bot) put("launch", l); run(l);
 }
@@ -1891,8 +1533,9 @@ function run(l) {
   closeSheet();
   if (l.game === "word") { gKey = ""; go("s-hang"); renderHang(); }
   else if (l.game === "ships") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "battleship.html"; }
-  else if (l.game === "bingo") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "bingo.html"; }
   else if (l.game === "erudit") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "erudit.html"; }
+  else if (l.game === "loto") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "loto.html"; }
+  else if (l.game === "bingo") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "bingo.html"; }
   else if (l.game === "xo") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "xo.html"; }
   else if (l.game === "bomb") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "bomb.html"; }
   else if (l.game === "find") { ls.set("dm_slot", mySlot); ls.set("dm_launch", JSON.stringify(l)); location.href = "find.html"; }
@@ -1993,7 +1636,7 @@ function renderStudio() {
   const acc = (id, title, body) => `<div class="card2 acc${studioOpen[id] ? " open" : ""}"><button class="acc-h" data-acc="${id}"><span>${title}</span><i>›</i></button><div class="acc-b">${body}</div></div>`;
   const home = `<div class="adm-note">Це бачать усі на екрані входу.</div>
 <div class="adl"><div class="ol">готові набори</div><div class="og">${[["def", "звичайний"], ["halloween", "🎃 геловін"], ["winter", "❄️ зима"]].map(([v, l]) => `<button class="chip" data-pre="${v}">${l}</button>`).join("")}</div></div>
-${txt("brand", "назва", "grai")}${txt("logo", "емодзі над назвою", "🎨")}
+${txt("brand", "назва", "draw & more")}${txt("logo", "емодзі над назвою", "🎨")}
 <div class="adl"><div class="ol">підписи під назвою (кожен з нового рядка, змінюються по колу)</div><textarea class="ai" data-k="tagline" rows="4">${esc((D.tagline || []).join("\n"))}</textarea></div>
 ${txt("cta", "текст кнопки", "авторизуватись")}${txt("foot", "нижній рядок", "")}
 <div class="adl"><div class="ol">емодзі на фоні (через пробіл)</div><input class="ai" data-k="emojis" value="${esc((D.emojis || []).join(" "))}" autocomplete="off"><div class="og" style="margin-top:10px">${EMOJI_SETS.map(([l], i) => `<button class="chip" data-set="${i}">${l}</button>`).join("")}</div></div>
@@ -2022,7 +1665,7 @@ ${txt("greet", "привітання у меню", "добрий день, {name
   const games = sortedAll(D).map(({ g }) => `<div class="gmr${hid.includes(g.id) ? " hid" : ""}"><span class="ge">${g.e}</span><b>${g.n}</b><div class="mv"><button data-up="${g.id}" aria-label="вище">↑</button><button data-dn="${g.id}" aria-label="нижче">↓</button></div><button class="sw${hid.includes(g.id) ? "" : " on"}" data-gv="${g.id}" aria-label="показувати"></button></div>`).join("");
   const func = `${tg("botOn", "боти", "коли другого гравця нема в мережі, можна грати з ботом", on("botOn"))}
 ${grp("botLvl", "рівень бота за замовчуванням", [[1, "легкий"], [2, "звичайний"], [3, "складний"]])}
-<div class="adm-note">Бот є в іграх: хрестики-нулики, морський бій, знайди число, вгадай слово. У малюванні, крокодилі, бомбі та ерудиті потрібен живий гравець.</div>
+<div class="adm-note">Бот є в іграх: хрестики-нулики, морський бій, знайди число, вгадай слово, бінго, лото. У малюванні, крокодилі, бомбі та ерудиті потрібен живий гравець.</div>
 ${tg("showStats", "вкладка «статистика»", "", on("showStats"))}
 ${tg("showPresence", "статус «онлайн» у меню", "", on("showPresence"))}`;
   const data = `<div class="adb"><button class="wht" data-ad="export">⬇️ експорт статистики (JSON)</button></div>
@@ -2121,7 +1764,7 @@ ${isAdmin() ? `
   </div>
 </div>
 ` : ""}
-<div class="ver">grai · зроблено для двох 💛</div>`;
+<div class="ver">draw &amp; more · зроблено для двох 💛</div>`;
 }
 $("p-set").onclick = async e => {
   const b = e.target.closest("button"); if (!b) return;
